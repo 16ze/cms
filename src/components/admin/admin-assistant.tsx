@@ -56,17 +56,27 @@ export default function AdminAssistant({
   useEffect(() => {
     const scrollToBottom = () => {
       if (messagesEndRef.current) {
-        messagesEndRef.current.scrollIntoView({ 
+        messagesEndRef.current.scrollIntoView({
           behavior: "smooth",
-          block: "nearest"
+          block: "nearest",
         });
       }
     };
-    
+
     // Petit délai pour s'assurer que le DOM est mis à jour
     const timeoutId = setTimeout(scrollToBottom, 150);
     return () => clearTimeout(timeoutId);
   }, [messages]);
+
+  // Focus sur l'input quand l'assistant s'ouvre
+  useEffect(() => {
+    if (isOpen && inputRef.current) {
+      const timeoutId = setTimeout(() => {
+        inputRef.current?.focus();
+      }, 300);
+      return () => clearTimeout(timeoutId);
+    }
+  }, [isOpen]);
 
   // Gestion de la session timeout
   useEffect(() => {
@@ -149,6 +159,13 @@ export default function AdminAssistant({
     setInputValue("");
     setIsTyping(true);
 
+    // Maintenir le focus sur l'input après l'envoi
+    setTimeout(() => {
+      if (inputRef.current) {
+        inputRef.current.focus();
+      }
+    }, 100);
+
     try {
       const response = await fetch(apiEndpoint, {
         method: "POST",
@@ -209,6 +226,12 @@ export default function AdminAssistant({
       setMessages((prev) => [...prev, errorMessage]);
     } finally {
       setIsTyping(false);
+      // Remettre le focus sur l'input après la réponse
+      setTimeout(() => {
+        if (inputRef.current) {
+          inputRef.current.focus();
+        }
+      }, 200);
     }
   };
 
@@ -335,6 +358,11 @@ export default function AdminAssistant({
                   rows={1}
                   disabled={isTyping}
                   className="user-input"
+                  autoFocus={false}
+                  style={{ 
+                    opacity: isTyping ? 0.7 : 1,
+                    pointerEvents: isTyping ? 'none' : 'auto'
+                  }}
                 />
                 <button
                   onClick={() => handleSendMessage()}
@@ -858,6 +886,10 @@ export default function AdminAssistant({
         .chat-input {
           padding: 16px;
           border-top: 1px solid #e5e5e7;
+          background: white;
+          position: sticky;
+          bottom: 0;
+          z-index: 10;
         }
 
         .input-container {
@@ -876,14 +908,24 @@ export default function AdminAssistant({
           font-family: inherit;
           outline: none;
           max-height: 80px;
+          transition: all 0.2s ease;
+          background: white;
+          min-height: 36px;
         }
 
         .user-input:focus {
           border-color: #007aff;
+          box-shadow: 0 0 0 2px rgba(0, 122, 255, 0.1);
         }
 
         .user-input:disabled {
-          opacity: 0.5;
+          opacity: 0.7;
+          background: #f8f9fa;
+        }
+
+        .user-input:not(:disabled) {
+          opacity: 1;
+          background: white;
         }
 
         .send-btn {
