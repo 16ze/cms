@@ -1,0 +1,83 @@
+{
+  "company": {
+    "name": "Mon Entreprise",
+    "legalName": "Mon Entreprise SARL",
+    "slug": "mon-entreprise",
+    "foundedYear": 2024,
+    "founder": "Jean Dupont",
+    "industry": "Services & Consulting",
+    "description": "Votre partenaire pour vos projets digitaux",
+
+    "contact": {
+      "email": "contact@exemple.fr",
+      "emailAlternate": "info@exemple.fr",
+      "phone": "+33123456789",
+      "phoneDisplay": "01 23 45 67 89",
+      "address": {
+        "street": "123 rue de la République",
+        "city": "Paris",
+        "postalCode": "75001",
+        "country": "France",
+        "countryCode": "FR",
+        "region": "Île-de-France",
+        "coordinates": {
+          "latitude": 48.8566,
+          "longitude": 2.3522
+        }
+      }
+    },
+
+    "hours": {
+      "days": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+      "opens": "09:00",
+      "closes": "18:00",
+      "timezone": "Europe/Paris"
+    },
+
+    "social": {
+      "facebook": "https://www.facebook.com/monentreprise",
+      "instagram": "https://www.instagram.com/monentreprise",
+      "linkedin": "https://www.linkedin.com/company/monentreprise",
+      "twitter": "https://twitter.com/monentreprise"
+    },
+
+    "branding": {
+      "primaryColor": "#007aff",
+      "secondaryColor": "#8b5cf6",
+      "accentColor": "#f59e0b",
+      "logo": "/logo-court.svg",
+      "logoAlt": "Mon Entreprise Logo",
+      "favicon": "/favicon/favicon.ico",
+      "ogImage": "/images/og-image.jpg"
+    },
+
+    "seo": {
+      "siteUrl": "https://www.exemple.fr",
+      "defaultTitle": "Mon Entreprise | Services & Consulting",
+      "defaultDescription": "Découvrez nos services professionnels pour accompagner votre entreprise dans sa transformation digitale.",
+      "keywords": [
+        "consulting",
+        "services digitaux",
+        "paris",
+        "conseil",
+        "transformation digitale"
+      ],
+      "googleAnalyticsId": "G-XXXXXXXXXX",
+      "googleTagManagerId": "GTM-XXXXXX",
+      "googleSiteVerification": "votre-code-verification",
+      "twitterHandle": "@monentreprise"
+    },
+
+    "services": {
+      "areaServed": {
+        "radius": "50000",
+        "description": "Paris et Île-de-France"
+      },
+      "mainServices": [
+        "Conseil en stratégie digitale",
+        "Développement web sur mesure",
+        "Formation et accompagnement"
+      ]
+    }
+  }
+}

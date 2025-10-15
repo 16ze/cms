@@ -1,0 +1,119 @@
+/**
+ * Améliorations visuelles subtiles pour l'admin
+ * Bordures arrondies et moins marquées
+ */
+
+/* Bordures plus subtiles et arrondies pour tout l'espace admin */
+.light input,
+.light textarea,
+.light select {
+  border-color: #d1d5db !important; /* Gris plus clair */
+  border-radius: 10px !important; /* Plus arrondi */
+  border-width: 1px !important;
+}
+
+.light input:focus,
+.light textarea:focus,
+.light select:focus {
+  border-color: #93c5fd !important; /* Bleu clair au focus */
+  box-shadow: 0 0 0 3px rgba(147, 197, 253, 0.2) !important;
+}
+
+/* Cartes avec bordures subtiles */
+.light .bg-white {
+  border-color: #e5e7eb !important; /* Gris très clair */
+  border-radius: 12px !important; /* Bien arrondi */
+}
+
+/* Boutons avec bordures subtiles */
+.light button,
+.light .btn {
+  border-radius: 10px !important;
+}
+
+/* Boutons bleus avec texte blanc */
+.light button.bg-blue-600,
+.light button.bg-blue-700,
+.light button[class*="bg-blue"],
+.light .bg-blue-600,
+.light .bg-blue-700 {
+  color: white !important;
+}
+
+/* Boutons d'action avec icônes noires */
+.light button[variant="outline"] svg,
+.light .border svg,
+.light button[class*="outline"] svg {
+  color: #374151 !important; /* Gris foncé */
+  stroke: #374151 !important;
+}
+
+/* Boutons d'action hover avec icônes */
+.light button[variant="outline"]:hover svg,
+.light .border:hover svg,
+.light button[class*="outline"]:hover svg {
+  color: #1f2937 !important; /* Gris plus foncé au hover */
+  stroke: #1f2937 !important;
+}
+
+.light button[variant="outline"],
+.light .border {
+  border-color: #d1d5db !important; /* Gris clair */
+}
+
+/* Tables avec bordures subtiles */
+.light table {
+  border-color: #e5e7eb !important;
+}
+
+.light th,
+.light td {
+  border-color: #f3f4f6 !important; /* Gris ultra-clair */
+}
+
+/* Modals avec bordures subtiles */
+.light .rounded-2xl,
+.light .rounded-xl,
+.light .rounded-lg {
+  border-radius: 16px !important; /* Très arrondi */
+  border-color: #e5e7eb !important;
+}
+
+/* Badges avec bordures subtiles (mais pas les spinners) */
+.light .rounded-full:not(.animate-spin):not([class*="spin"]) {
+  border-radius: 12px !important; /* Moins rond, plus moderne */
+}
+
+/* Spinners restent parfaitement ronds */
+.light .animate-spin,
+.light [class*="spin"],
+.light .rounded-full.animate-spin {
+  border-radius: 9999px !important; /* Toujours rond */
+}
+
+/* Dividers plus subtiles */
+.light .border-t,
+.light .border-b,
+.light .border-l,
+.light .border-r {
+  border-color: #f3f4f6 !important; /* Gris ultra-clair */
+}
+
+/* Shadows plus douces */
+.light .shadow-sm {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
+}
+
+.light .shadow,
+.light .shadow-md {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06) !important;
+}
+
+.light .shadow-lg {
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08) !important;
+}
+
+/* Container principal avec padding comfortable */
+.light .p-6 {
+  border-radius: 12px;
+}

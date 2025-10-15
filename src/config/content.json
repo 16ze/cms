@@ -1,0 +1,1002 @@
+{
+  "homepage": {
+    "hero": {
+      "title": "nom de l'entreprise ",
+      "subtitle": "mon nouveau nom ",
+      "ctaButton": "Réserver une consultation",
+      "ctaButtonUrl": "/consultation"
+    },
+    "education": {
+      "bubble1": "mon nouveau nom vous accompagne dans vos projets web et votre transformation digitale.",
+      "bubble2": "avec un accompagnement personnalisé",
+      "bubble3": "Choisissez une solution web ou mobile adaptée à vos besoins",
+      "ctaButton": "Découvrir nos services",
+      "ctaButtonUrl": "/services"
+    },
+    "services": {
+      "title": "Solutions Digitales",
+      "subtitle": "Découvrez toute notre expertise en développement.",
+      "slogan": "Conçues pour votre croissance digitale.",
+      "primaryButton": "En savoir plus",
+      "secondaryButton": "Voir notre portfolio",
+      "primaryButtonUrl": "/services",
+      "secondaryButtonUrl": "/portfolio",
+      "mockups": {
+        "vitrine": {
+          "label": "Site Vitrine"
+        },
+        "ecommerce": {
+          "label": "E-commerce"
+        },
+        "application": {
+          "label": "Application"
+        }
+      }
+    },
+    "grid": {
+      "visibility": {
+        "title": "Visibilité 24/7",
+        "subtitle": "Augmentez votre présence en ligne à tout moment.",
+        "image": "/images/visibilité24sur7.png",
+        "alt": "Visibilité 24/7 - Dashboard analytics avec métriques de performance",
+        "primaryButton": "En savoir plus",
+        "secondaryButton": "Audit gratuit"
+      },
+      "performance": {
+        "title": "Performance Optimale",
+        "subtitle": "Sites ultra-rapides. Toujours plus efficaces.",
+        "image": "/images/performance-optimal.jpg",
+        "alt": "Performance Optimale - Graphiques de vitesse et optimisation web",
+        "primaryButton": "En savoir plus",
+        "secondaryButton": "Test de vitesse"
+      },
+      "conversion": {
+        "title": "Génération de leads",
+        "subtitle": "Transformez vos visiteurs en clients fidèles.",
+        "image": "/images/generation-de-lead.png",
+        "alt": "Génération de leads - Funnel de conversion et stratégie d'acquisition clients",
+        "primaryButton": "En savoir plus",
+        "secondaryButton": "Voir les résultats"
+      },
+      "responsive": {
+        "title": "Design Adaptatif",
+        "subtitle": "Parfait sur tous les appareils et écrans.",
+        "image": "/images/design-adaptatif.png",
+        "alt": "Design Adaptatif - Site web responsive sur mobile, tablette et ordinateur",
+        "primaryButton": "En savoir plus",
+        "secondaryButton": "Voir les démos"
+      },
+      "security": {
+        "title": "Sécurité Avancée",
+        "subtitle": "Protection maximale validée par nos experts.",
+        "image": "/images/securité-avance.png",
+        "alt": "Sécurité Avancée - Protection SSL, cryptage HTTPS et sécurité des données",
+        "primaryButton": "En savoir plus",
+        "secondaryButton": "Audit sécurité"
+      },
+      "roi": {
+        "title": "Retour sur Investissement",
+        "subtitle": "ROI moyen de 300% sur vos projets digitaux.",
+        "image": "/images/retour-sur-investissement.png",
+        "alt": "Retour sur Investissement - Croissance du chiffre d'affaires et ROI digital mesurable",
+        "primaryButton": "En savoir plus",
+        "secondaryButton": "Calculer mon ROI"
+      }
+    },
+    "portfolio": {
+      "slides": [
+        {
+          "title": "E-commerce",
+          "subtitle": "E-commerce beauté avec parcours d'achat optimisé",
+          "category": "E-commerce",
+          "image": "/images/projects/holy-beauty.jpg",
+          "alt": "Projet e-commerce beauté - Boutique en ligne avec interface moderne et parcours d'achat optimisé"
+        },
+        {
+          "title": "Site vitrine",
+          "subtitle": "Site vitrine premium avec réservation intégrée",
+          "category": "Site vitrine",
+          "image": "/images/projects/purple-nails.jpg",
+          "alt": "Site vitrine premium - Interface élégante avec système de réservation intégré"
+        },
+        {
+          "title": "Application web",
+          "subtitle": "Plateforme corporate orientée conversion B2B",
+          "category": "Corporate",
+          "image": "/images/projects/kairo-digital.jpg",
+          "alt": "Application web corporate - Plateforme professionnelle B2B avec design moderne"
+        }
+      ]
+    },
+    "finalCta": {
+      "title": "Prêt à démarrer votre projet ?",
+      "subtitle": "Transformons vos idées en succès digital",
+      "primaryButton": "Démarrer un projet",
+      "secondaryButton": "Voir notre portfolio"
+    },
+
+    "faq": {
+      "title": "Questions Fréquentes",
+      "items": [
+        {
+          "question": "Combien de temps faut-il pour créer un site web ?",
+          "answer": "Le délai varie selon la complexité du projet : 2-3 semaines pour un site vitrine simple, 4-6 semaines pour un site e-commerce, et 6-8 semaines pour une application web complexe. Nous respectons toujours les délais convenus et vous tenons informés de l'avancement."
+        },
+        {
+          "question": "Proposez-vous la maintenance et l'hébergement ?",
+          "answer": "Oui, nous proposons des forfaits de maintenance complète incluant l'hébergement, les mises à jour de sécurité, les sauvegardes automatiques, et le support technique. Nos forfaits sont adaptés à tous les budgets et besoins."
+        },
+        {
+          "question": "Quels sont vos tarifs pour un site web ?",
+          "answer": "Nos tarifs varient selon la complexité et les fonctionnalités demandées. Un site vitrine démarre à 500€, un site e-commerce à partir de 3000€, et une application web sur mesure à partir de 5000€. Nous proposons des devis personnalisés gratuits."
+        },
+        {
+          "question": "Travaillez-vous uniquement à Belfort ou partout en France ?",
+          "answer": "Bien que basés à Belfort, nous travaillons avec des clients partout en France. La majorité de notre travail se fait à distance, et nous nous déplaçons si nécessaire pour les réunions importantes ou la formation."
+        },
+        {
+          "question": "Mes données seront-elles sécurisées ?",
+          "answer": "Absolument. Nous utilisons les dernières technologies de sécurité, des certificats SSL, des sauvegardes régulières, et respectons le RGPD. Vos données sont protégées et nous vous accompagnons dans la conformité légale."
+        },
+        {
+          "question": "Pouvez-vous optimiser mon site pour les moteurs de recherche ?",
+          "answer": "Oui, le SEO est notre spécialité. Nous optimisons votre site pour Google et autres moteurs de recherche, améliorons votre visibilité en ligne, et vous accompagnons dans votre stratégie de référencement naturel."
+        },
+        {
+          "question": "Proposez-vous une formation pour gérer mon site ?",
+          "answer": "Oui, nous formons vos équipes à l'utilisation de votre site web. Nous fournissons également des guides d'utilisation détaillés et restons disponibles pour le support technique après la livraison."
+        },
+        {
+          "question": "Quelles technologies utilisez-vous ?",
+          "answer": "Nous utilisons les technologies modernes : Next.js, React, TypeScript, Tailwind CSS, et des bases de données performantes. Ces technologies garantissent des sites rapides, sécurisés et évolutifs."
+        }
+      ]
+    }
+  },
+  "metadata": {
+    "title": "mon nouveau nom ",
+    "description": "mon nouveau nom",
+    "keywords": "kairo digital, agence web & développement digital, belfort, franche-comté",
+    "canonical": "https://www.kairo-digital.fr.fr"
+  },
+  "business": {
+    "name": "mon nouveau nom",
+    "description": "Agence web à Belfort spécialisée dans la création de sites web et l'amélioration de votre visibilité en ligne",
+    "phone": "+33+33766121696",
+    "email": "contact@kairo-digital.fr.fr",
+    "address": {
+      "street": "29 Faubourg de Montbéliard, 90000 Belfort",
+      "city": "Belfort",
+      "postalCode": "90000",
+      "country": "FR",
+      "region": "[VOTRE REGION]"
+    },
+    "coordinates": {
+      "latitude": [47.6379],
+      "longitude": [6.8628]
+    },
+    "openingHours": {
+      "days": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+      "opens": "09:00",
+      "closes": "18:00"
+    },
+    "social": [
+      "https://www.facebook.com/kairodigital",
+      "https://www.instagram.com/kairodigital",
+      "https://www.linkedin.com/company/kairodigital",
+      "https://twitter.com/kairodigital"
+    ]
+  },
+  "header": {
+    "logo": "Logo de l'entreprise",
+    "companyName": "mon nouveau nom",
+    "navigation": [
+      {
+        "name": "Accueil",
+        "href": "/",
+        "icon": "home"
+      },
+      {
+        "name": "Méthodes",
+        "href": "/freelance",
+        "icon": "users"
+      },
+      {
+        "name": "Services",
+        "href": "/services",
+        "icon": "layers"
+      },
+      {
+        "name": "À propos",
+        "href": "/about",
+        "icon": "check-circle"
+      },
+      {
+        "name": "Contact",
+        "href": "/contact",
+        "icon": "user"
+      }
+    ],
+    "buttons": {
+      "booking": "Réserver",
+      "bookingUrl": "/consultation",
+      "bookingAriaLabel": "Réserver une consultation"
+    }
+  },
+  "footer": {
+    "company": "Mon nouveau nom",
+    "description": "mon nouveau nom",
+    "tagline": "Votre succès digital commence ici",
+    "contact": {
+      "phone": "+33 2222222222",
+      "email": "contact@kairo-digital.fr",
+      "address": "29 Faubourg de Montbéliard, 90000 Belfort, France",
+      "openingHours": "Lundi - Vendredi: 9h00 - 18h00"
+    },
+    "legal": {
+      "companyName": "KAIRO Digital",
+      "siret": "123 456 789 00012",
+      "tva": "FR 12 345678901",
+      "capital": "10 000 €",
+      "rcs": "RCS Belfort",
+      "director": "Bryan Hilaire"
+    },
+    "stats": {
+      "projects": "50+",
+      "clients": "30+",
+      "satisfaction": "98%",
+      "experience": "5 ans"
+    },
+    "certifications": [
+      "Google Partner",
+      "Certified Developer",
+      "Web Performance Expert"
+    ],
+    "sections": [
+      {
+        "title": "Services",
+        "links": [
+          { "name": "Sites Vitrines", "href": "/services#vitrine" },
+          { "name": "E-commerce", "href": "/services#ecommerce" },
+          { "name": "Applications Web", "href": "/services#webapp" },
+          { "name": "Maintenance", "href": "/services#maintenance" }
+        ]
+      },
+      {
+        "title": "Entreprise",
+        "links": [
+          { "name": "À propos", "href": "/about" },
+          { "name": "Notre méthode", "href": "/methodes" },
+          { "name": "Portfolio", "href": "/portfolio" },
+          { "name": "Contact", "href": "/contact" }
+        ]
+      },
+      {
+        "title": "Légal",
+        "links": [
+          { "name": "Mentions légales", "href": "/mentions-legales" },
+          {
+            "name": "Politique de confidentialité",
+            "href": "/confidentialite"
+          },
+          { "name": "CGV", "href": "/cgv" },
+          { "name": "Cookies", "href": "/cookies" }
+        ]
+      }
+    ],
+    "quickProjects": [
+      {
+        "title": "Site Vitrine",
+        "description": "Site web professionnel pour présenter votre activité",
+        "icon": "code",
+        "link": "/contact?projet=vitrine",
+        "linkText": "Demander un devis →"
+      },
+      {
+        "title": "E-commerce",
+        "description": "Boutique en ligne clé en main pour vendre vos produits",
+        "icon": "shop",
+        "link": "/contact?projet=ecommerce",
+        "linkText": "Commencer →"
+      },
+      {
+        "title": "Application Web",
+        "description": "Solutions web personnalisées pour vos besoins spécifiques",
+        "icon": "code",
+        "link": "/contact?projet=application",
+        "linkText": "Discuter du projet →"
+      }
+    ],
+    "social": [
+      "https://www.facebook.com/kairodigital",
+      "https://www.instagram.com/kairodigital",
+      "https://www.linkedin.com/company/kairodigital",
+      "https://twitter.com/kairodigital"
+    ],
+    "copyright": "© {year} KAIRO Digital. Tous droits réservés.",
+    "customMessage": "Besoin d'un devis personnalisé ? Contactez-nous dès aujourd'hui !",
+    "ctaButton": "Devis gratuit",
+    "ctaButtonUrl": "/contact"
+  },
+  "global": {
+    "theme": {
+      "primary": "#007aff",
+      "secondary": "#8b5cf6",
+      "accent": "#f59e0b"
+    },
+    "meta": {
+      "title": "mon nouveau nom | Agence web à Belfort spécialisée dans la création de sites web et l'amélioration de votre visibilité en ligne",
+      "description": "mon nouveau nom est une Agence Web & Développement Digital à Belfort spécialisée dans Agence web à Belfort spécialisée dans la création de sites web et l'amélioration de votre visibilité en ligne",
+      "canonical": "https://www.kairo-digital.fr.fr"
+    }
+  },
+  "design": {
+    "colors": {
+      "primary": "#007aff",
+      "primaryHover": "#0066cc",
+      "secondary": "#8b5cf6",
+      "secondaryHover": "#7c3aed",
+      "accent": "#f59e0b",
+      "accentHover": "#d97706",
+      "text": {
+        "primary": "#0a0a0a",
+        "secondary": "#6b7280",
+        "tertiary": "#9ca3af",
+        "light": "#ffffff"
+      },
+      "background": {
+        "primary": "#ffffff",
+        "secondary": "#f9fafb",
+        "dark": "#0a0a0a",
+        "gradient": "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
+      },
+      "border": {
+        "light": "#e5e7eb",
+        "medium": "#d1d5db",
+        "dark": "#9ca3af"
+      },
+      "status": {
+        "success": "#10b981",
+        "warning": "#f59e0b",
+        "error": "#ef4444",
+        "info": "#3b82f6"
+      }
+    },
+    "typography": {
+      "fontFamily": {
+        "heading": "Inter, system-ui, -apple-system, sans-serif",
+        "body": "Inter, system-ui, -apple-system, sans-serif",
+        "mono": "Menlo, Monaco, Courier New, monospace"
+      },
+      "fontSize": {
+        "xs": "0.75rem",
+        "sm": "0.875rem",
+        "base": "1rem",
+        "lg": "1.125rem",
+        "xl": "1.25rem",
+        "2xl": "1.5rem",
+        "3xl": "1.875rem",
+        "4xl": "2.25rem",
+        "5xl": "3rem"
+      },
+      "fontWeight": {
+        "light": "300",
+        "normal": "400",
+        "medium": "500",
+        "semibold": "600",
+        "bold": "700",
+        "black": "900"
+      },
+      "lineHeight": {
+        "tight": "1.25",
+        "normal": "1.5",
+        "relaxed": "1.75"
+      }
+    },
+    "spacing": {
+      "section": "5rem",
+      "sectionMobile": "3rem",
+      "container": "1.5rem",
+      "containerMobile": "1rem",
+      "card": "2rem",
+      "cardMobile": "1.5rem"
+    },
+    "effects": {
+      "borderRadius": {
+        "sm": "0.375rem",
+        "md": "0.5rem",
+        "lg": "0.75rem",
+        "xl": "1rem",
+        "2xl": "1.5rem",
+        "full": "9999px"
+      },
+      "shadow": {
+        "sm": "0 1px 2px 0 rgba(0, 0, 0, 0.05)",
+        "base": "0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1)",
+        "md": "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1)",
+        "lg": "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1)",
+        "xl": "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)"
+      },
+      "blur": {
+        "sm": "4px",
+        "base": "8px",
+        "md": "12px",
+        "lg": "16px",
+        "xl": "24px"
+      },
+      "transition": {
+        "fast": "150ms",
+        "base": "200ms",
+        "slow": "300ms",
+        "slower": "500ms"
+      }
+    },
+    "breakpoints": {
+      "mobile": "640px",
+      "tablet": "768px",
+      "laptop": "1024px",
+      "desktop": "1280px",
+      "wide": "1536px"
+    },
+    "animations": {
+      "carouselInterval": 5000,
+      "toastDuration": 3000,
+      "scrollRevealDelay": 100,
+      "modalFadeIn": 200,
+      "hoverTransition": 200,
+      "stickyCtaScroll": 300
+    }
+  },
+  "freelance": {
+    "hero": {
+      "title": "Méthode Agence Web & Développement Digital Professionnelle",
+      "subtitle": "Une approche structurée et transparente",
+      "heroDescription": "Découvrez notre processus de développement en 5 étapes qui garantit des résultats optimaux et une transparence totale sur votre projet."
+    },
+    "introduction": {
+      "title": "Notre Méthode Agence Web & Développement Digital",
+      "subtitle": "Une approche structurée pour des résultats garantis",
+      "description": "Découvrez notre processus de développement qui garantit des résultats optimaux",
+      "details": "Nous utilisons une méthodologie éprouvée basée sur les meilleures pratiques du développement web moderne."
+    },
+    "etapes": [
+      {
+        "nom": "Analyse & Conception",
+        "duree": "1-2 semaines",
+        "description": "Analyse approfondie de vos besoins et conception de l'architecture",
+        "livrables": "Cahier des charges détaillé, maquettes, planning",
+        "details": "Nous analysons vos objectifs, votre audience et vos contraintes pour concevoir la solution optimale.",
+        "icone": "search"
+      },
+      {
+        "nom": "Design & UX",
+        "duree": "2-3 semaines",
+        "description": "Création d'interfaces utilisateur modernes et intuitives",
+        "livrables": "Designs complets, prototypes interactifs",
+        "details": "Design centré utilisateur avec une attention particulière à l'expérience et à l'accessibilité.",
+        "icone": "design"
+      },
+      {
+        "nom": "Développement",
+        "duree": "3-6 semaines",
+        "description": "Développement technique avec les dernières technologies",
+        "livrables": "Site web fonctionnel, code source",
+        "details": "Développement en utilisant Next.js, React et les meilleures pratiques du web moderne.",
+        "icone": "code"
+      },
+      {
+        "nom": "Tests & Optimisation",
+        "duree": "1-2 semaines",
+        "description": "Tests complets et optimisation des performances",
+        "livrables": "Site testé, optimisé et documenté",
+        "details": "Tests de qualité, optimisation SEO et des performances pour un site parfaitement fonctionnel.",
+        "icone": "test"
+      },
+      {
+        "nom": "Mise en ligne",
+        "duree": "1 semaine",
+        "description": "Déploiement et configuration finale",
+        "livrables": "Site en ligne, formation utilisateur",
+        "details": "Déploiement sécurisé et formation de votre équipe pour la gestion du contenu.",
+        "icone": "rocket"
+      }
+    ],
+    "avantages": {
+      "title": "Pourquoi Choisir Notre Méthode ?",
+      "items": [
+        {
+          "titre": "Transparence Totale",
+          "description": "Suivez chaque étape de votre projet en temps réel"
+        },
+        {
+          "titre": "Qualité Garantie",
+          "description": "Code propre, tests exhaustifs et documentation complète"
+        },
+        {
+          "titre": "Support Continu",
+          "description": "Accompagnement et maintenance après la livraison"
+        }
+      ]
+    },
+    "cta": {
+      "titre": "Prêt à Démarrer Votre Projet ?",
+      "subtitle": "Contactez-nous pour un devis personnalisé",
+      "bouton_principal": "Demander un devis",
+      "bouton_principal_url": "/contact",
+      "bouton_secondaire": "Voir nos réalisations",
+      "bouton_secondaire_url": "/portfolio"
+    },
+    "garanties": [
+      {
+        "titre": "Qualité Garantie",
+        "description": "Code propre et maintenable",
+        "details": "Nous garantissons un code de qualité professionnelle, bien documenté et facilement maintenable."
+      },
+      {
+        "titre": "Livraison à Temps",
+        "description": "Respect des délais convenus",
+        "details": "Nous nous engageons à respecter les délais fixés dans le planning de votre projet."
+      },
+      {
+        "titre": "Support Post-Livraison",
+        "description": "Accompagnement continu",
+        "details": "Bénéficiez de notre support technique et de nos conseils après la mise en ligne."
+      },
+      {
+        "titre": "Satisfaction Client",
+        "description": "100% satisfait ou remboursé",
+        "details": "Votre satisfaction est notre priorité. Si vous n'êtes pas satisfait, nous corrigeons jusqu'à ce que vous le soyez."
+      }
+    ]
+  },
+  "about": {
+    "hero": {
+      "title": "À propos de mon nouveau nom",
+      "subtitle": "Votre partenaire digital à Belfort",
+      "description": "Agence Web & Développement Digital spécialisée dans Agence web à Belfort spécialisée dans la création de sites web et l'amélioration de votre visibilité en ligne en Franche-Comté"
+    },
+    "foundedText": "Fondée en 2020 par Bryan Hilaire, mon nouveau nom est née d'une vision simple : démocratiser l'accès à des solutions web de qualité pour les entreprises de Belfort et de la Franche-Comté. Notre mission est de transformer vos idées en succès digitaux grâce à une approche personnalisée et des technologies modernes.",
+    "story": {
+      "title": "Notre Histoire",
+      "subtitle": "Une passion pour l'excellence digitale",
+      "content": "mon nouveau nom est né de la passion pour Agence Web & Développement Digital et l'innovation digitale. Basée à Belfort, notre Agence Web & Développement Digital accompagne les entreprises dans leur transformation numérique avec expertise et créativité.",
+      "image": "/images/team-member.jpg",
+      "alt": "Notre histoire - Équipe de développeurs web passionnés à Belfort"
+    },
+    "values": {
+      "title": "Nos Valeurs",
+      "subtitle": "Les principes qui guident notre travail au quotidien",
+      "items": [
+        {
+          "icon": "award",
+          "title": "Excellence Technique",
+          "description": "Code propre, technologies modernes et bonnes pratiques pour des solutions robustes et pérennes."
+        },
+        {
+          "icon": "heart",
+          "title": "Transparence",
+          "description": "Communication claire, devis détaillés et suivi régulier de l'avancement de vos projets."
+        },
+        {
+          "icon": "zap",
+          "title": "Innovation",
+          "description": "Veille technologique constante et adoption des dernières innovations du web moderne."
+        },
+        {
+          "icon": "users",
+          "title": "Proximité",
+          "description": "Accompagnement personnalisé et construction d'une relation de confiance durable."
+        }
+      ]
+    },
+    "team": {
+      "title": "L'Équipe",
+      "description": "Une équipe passionnée et expérimentée à votre service",
+      "members": [
+        {
+          "name": "[VOTRE NOM]",
+          "role": "Fondateur chez KAIRO Digital",
+          "description": "Expert en Agence web à Belfort spécialisée dans la création de sites web et l'amélioration de votre visibilité en ligne",
+          "image": "/images/team-member.jpg",
+          "alt": "Photo professionnelle du fondateur - Expert en développement web"
+        }
+      ]
+    },
+    "stats": {
+      "title": "Chiffres Clés",
+      "subtitle": "Des résultats qui parlent d'eux-mêmes",
+      "items": [
+        {
+          "label": "Projets Réalisés",
+          "number": "50+",
+          "description": "Sites web et applications développés avec succès"
+        },
+        {
+          "label": "Satisfaction Client",
+          "number": "98%",
+          "description": "Taux de satisfaction basé sur les retours clients"
+        },
+        {
+          "label": "Années d'Expérience",
+          "number": "5",
+          "description": "Expertise acquise depuis la création en 2020"
+        },
+        {
+          "label": "Support Disponible",
+          "number": "24/7",
+          "description": "Accompagnement et maintenance continue"
+        }
+      ]
+    },
+    "location": {
+      "title": "Basé à Belfort",
+      "subtitle": "Au cœur de la Franche-Comté",
+      "content": "Notre positionnement à Belfort nous permet d'offrir un service de proximité exceptionnel aux entreprises de la région. Nous comprenons les spécificités du marché local et nous adaptons nos solutions à vos besoins.",
+      "advantages": [
+        "Proximité géographique avec vos équipes",
+        "Compréhension du marché local",
+        "Réactivité et disponibilité immédiate",
+        "Accompagnement sur site possible",
+        "Connaissance des spécificités régionales"
+      ]
+    }
+  },
+  "services": {
+    "hero": {
+      "title": "Nos Services",
+      "subtitle": "Solutions digitales complètes pour votre entreprise",
+      "description": "Découvrez notre gamme complète de services pour booster votre présence en ligne"
+    },
+    "services": {
+      "title": "Nos Expertises",
+      "subtitle": "Des solutions sur mesure pour chaque besoin",
+      "items": [
+        {
+          "title": "Développement Web",
+          "description": "Sites web modernes, responsives et performants avec les dernières technologies",
+          "features": [
+            "React/Next.js",
+            "Design responsive",
+            "Optimisation SEO",
+            "Performance optimale"
+          ],
+          "price": "À partir de 1500€",
+          "icon": "code"
+        },
+        {
+          "title": "E-commerce",
+          "description": "Boutiques en ligne sécurisées avec gestion complète des commandes et paiements",
+          "features": [
+            "Panier intelligent",
+            "Paiement sécurisé",
+            "Gestion stock",
+            "Analytics"
+          ],
+          "price": "À partir de 2500€",
+          "icon": "shopping-cart"
+        },
+        {
+          "title": "Optimisation SEO",
+          "description": "Amélioration de votre visibilité sur les moteurs de recherche",
+          "features": [
+            "Audit SEO",
+            "Optimisation technique",
+            "Contenu optimisé",
+            "Suivi rankings"
+          ],
+          "price": "À partir de 500€",
+          "icon": "search"
+        },
+        {
+          "title": "Maintenance & Support",
+          "description": "Support technique continu et maintenance de votre site web",
+          "features": [
+            "Mises à jour",
+            "Sauvegardes",
+            "Monitoring",
+            "Support technique"
+          ],
+          "price": "À partir de 100€/mois",
+          "icon": "wrench"
+        }
+      ]
+    },
+    "process": {
+      "title": "Notre Processus",
+      "subtitle": "Une méthode éprouvée en 5 étapes",
+      "steps": [
+        {
+          "number": "01",
+          "title": "Analyse",
+          "description": "Audit de vos besoins et définition de la stratégie"
+        },
+        {
+          "number": "02",
+          "title": "Design",
+          "description": "Création des maquettes et de l'expérience utilisateur"
+        },
+        {
+          "number": "03",
+          "title": "Développement",
+          "description": "Codage et intégration avec les meilleures pratiques"
+        },
+        {
+          "number": "04",
+          "title": "Tests",
+          "description": "Tests approfondis et optimisation des performances"
+        },
+        {
+          "number": "05",
+          "title": "Lancement",
+          "description": "Mise en ligne et formation de votre équipe"
+        }
+      ]
+    }
+  },
+  "contact": {
+    "hero": {
+      "title": "Contactez-nous",
+      "subtitle": "Parlons de votre projet",
+      "description": "Prêt à donner vie à vos idées ? Contactez-nous pour discuter de votre projet web."
+    },
+    "contact": {
+      "title": "Informations de Contact",
+      "subtitle": "Plusieurs moyens de nous joindre",
+      "email": "contact@kairo-digital.fr.fr",
+      "phone": "+33+33766121696",
+      "address": "29 Faubourg de Montbéliard, 90000 Belfort, France",
+      "hours": "Lundi - Vendredi: 9h00 - 18h00"
+    },
+    "form": {
+      "title": "Envoyez-nous un message",
+      "subtitle": "Nous vous répondrons dans les plus brefs délais",
+      "fields": {
+        "firstName": "Prénom",
+        "lastName": "Nom",
+        "email": "Email",
+        "phone": "Téléphone",
+        "subject": "Sujet",
+        "message": "Message"
+      },
+      "submitButton": "Envoyer le message"
+    },
+    "cta": {
+      "title": "Prêt à démarrer ?",
+      "subtitle": "Réservez un appel découverte gratuit",
+      "primaryButton": "Réserver un appel",
+      "primaryButtonUrl": "/consultation",
+      "secondaryButton": "Voir nos réalisations",
+      "secondaryButtonUrl": "/portfolio"
+    },
+    "faq": {
+      "title": "Questions Fréquentes",
+      "subtitle": "Trouvez rapidement des réponses à vos questions",
+      "items": [
+        {
+          "question": "Combien de temps faut-il pour créer un site web ?",
+          "answer": "La durée varie selon la complexité du projet. Un site vitrine prend généralement 2-4 semaines, un e-commerce 4-8 semaines. Nous établissons un planning détaillé dès le début du projet."
+        },
+        {
+          "question": "Quels sont vos tarifs ?",
+          "answer": "Nos tarifs varient selon le type de projet. Site vitrine à partir de 450€, e-commerce à partir de 1500€. Nous proposons un devis personnalisé gratuit pour chaque projet."
+        },
+        {
+          "question": "Proposez-vous la maintenance après la livraison ?",
+          "answer": "Oui, nous proposons des services de maintenance continue incluant mises à jour, sauvegardes, support technique et optimisations. Tarifs à partir de 150€/mois."
+        },
+        {
+          "question": "Travaillez-vous avec des entreprises de toute taille ?",
+          "answer": "Absolument ! Nous accompagnons des startups, PME et grandes entreprises. Chaque projet est adapté aux besoins et contraintes spécifiques de votre entreprise."
+        }
+      ]
+    }
+  },
+  "chatbot": {
+    "welcomeMessage": "Bonjour ! Je suis l'assistant mon nouveau nom. Comment puis-je vous aider avec votre projet web ?",
+    "placeholder": "Tapez votre message...",
+    "sessionTimeoutMessage": "Session expirée. N'hésitez pas à rouvrir le chat si vous avez d'autres questions !"
+  },
+  "stickyCTA": {
+    "title": "Prêt à développer votre présence en ligne ?",
+    "subtitle": "Réponse garantie sous 24h — Devis gratuit et sans engagement",
+    "primaryButton": "Obtenir mon devis gratuit",
+    "primaryButtonUrl": "/contact",
+    "secondaryButton": "Contactez-nous",
+    "secondaryButtonUrl": "/contact"
+  },
+  "notFound": {
+    "title": "404",
+    "heading": "Page non trouvée",
+    "message": "Désolé, la page que vous recherchez n'existe pas.",
+    "button": "Retour à l'accueil",
+    "buttonUrl": "/"
+  },
+  "consultation": {
+    "metadata": {
+      "title": "Consultation | Mon nouveau nom - Réservez un appel avec un expert web",
+      "description": "Réservez une consultation gratuite avec Mon nouveau nom, votre expert en développement web. Discutons de vos besoins spécifiques pour votre site internet et votre présence en ligne.",
+      "keywords": "consultation développeur web, réserver appel expert web, rendez-vous développeur, conseil site internet, consultation gratuite web"
+    },
+    "hero": {
+      "title": "Réservez une consultation gratuite",
+      "subtitle": "Discutons de votre projet web et explorons ensemble les meilleures solutions pour votre présence en ligne."
+    },
+    "benefits": {
+      "title": "Découvrez comment je peux vous aider",
+      "items": [
+        "Conseils stratégiques adaptés à votre projet",
+        "Estimation budgétaire et délais",
+        "Recommandations technologiques adaptées",
+        "Stratégies SEO et marketing digital"
+      ],
+      "footer": "Consultation 100% gratuite et sans engagement"
+    },
+    "bookingForm": {
+      "steps": {
+        "selectDate": "1. Choisissez une date",
+        "selectTime": "2. Sélectionnez un créneau horaire",
+        "fillDetails": "3. Complétez vos informations",
+        "confirmation": "Réservation confirmée"
+      },
+      "instructions": {
+        "selectDate": "Sélectionnez une date disponible pour votre consultation.",
+        "selectTime": "Sélectionnez l'heure qui vous convient le mieux.",
+        "noSlots": "Aucun créneau disponible pour cette date.",
+        "chooseAnotherDate": "Choisir une autre date",
+        "duration": "Durée:"
+      },
+      "reservationTypes": [
+        {
+          "id": "DISCOVERY",
+          "label": "Découverte",
+          "description": "Premier contact pour discuter de votre projet"
+        },
+        {
+          "id": "CONSULTATION",
+          "label": "Consultation",
+          "description": "Conseils stratégiques sur un projet existant"
+        },
+        {
+          "id": "PRESENTATION",
+          "label": "Présentation",
+          "description": "Présentation de solutions ou de propositions"
+        },
+        {
+          "id": "FOLLOWUP",
+          "label": "Suivi",
+          "description": "Point d'avancement sur un projet en cours"
+        }
+      ],
+      "labels": {
+        "reservationType": "Type de consultation",
+        "communicationMethod": "Mode de communication",
+        "visio": "Visioconférence",
+        "phone": "Téléphone",
+        "name": "Nom complet",
+        "email": "Email",
+        "phoneNumber": "Téléphone",
+        "projectDescription": "Description de votre projet",
+        "required": "*"
+      },
+      "placeholders": {
+        "name": "Jean Dupont",
+        "email": "jean.dupont@exemple.com",
+        "phone": "06 12 34 56 78",
+        "projectDescription": "Décrivez brièvement votre projet ou vos besoins..."
+      },
+      "errors": {
+        "required": "Ce champ est requis",
+        "phoneRequired": "Ce champ est requis pour un appel téléphonique",
+        "invalidEmail": "Adresse email invalide",
+        "minLength": "Veuillez entrer au moins 20 caractères",
+        "noSlotSelected": "Aucun créneau sélectionné",
+        "loadingSlotsError": "Impossible de charger les créneaux disponibles. Veuillez réessayer.",
+        "loadingDaysError": "Impossible de charger les dates disponibles. Veuillez réessayer.",
+        "bookingError": "Une erreur est survenue lors de la réservation. Veuillez réessayer."
+      },
+      "buttons": {
+        "back": "Retour",
+        "submit": "Confirmer la réservation",
+        "submitting": "En cours...",
+        "newBooking": "Réserver un autre créneau"
+      },
+      "confirmation": {
+        "title": "Votre réservation est confirmée !",
+        "message": "Un email de confirmation a été envoyé à votre adresse. Vous recevrez également un rappel 24h avant la consultation.",
+        "visioMessage": "Lien de visioconférence dans l'email",
+        "phoneMessage": "Nous vous appellerons au numéro fourni"
+      },
+      "loading": {
+        "settings": "Chargement des paramètres de réservation...",
+        "slots": "Chargement des créneaux..."
+      },
+      "toast": {
+        "success": "Votre réservation a été enregistrée avec succès !",
+        "noSlotsAvailable": "Aucun créneau disponible pour cette date. Veuillez choisir une autre date."
+      }
+    }
+  },
+  "admin": {
+    "navigation": {
+      "dashboard": "Dashboard",
+      "reservations": "Réservations",
+      "clients": "Base Clients",
+      "contentManagement": "Gestion de Contenu",
+      "headerFooter": "Header & Footer",
+      "users": "Utilisateurs",
+      "settings": "Paramètres"
+    },
+    "roles": {
+      "admin": "Administrateur",
+      "superAdmin": "Super Administrateur"
+    },
+    "messages": {
+      "connectedAs": "Connecté en tant que",
+      "logout": "Déconnexion",
+      "loading": "Chargement...",
+      "saving": "Sauvegarde...",
+      "saved": "Sauvegardé",
+      "error": "Erreur",
+      "success": "Succès"
+    },
+    "actions": {
+      "save": "Sauvegarder",
+      "edit": "Modifier",
+      "delete": "Supprimer",
+      "add": "Ajouter",
+      "preview": "Prévisualiser",
+      "hide": "Masquer",
+      "cancel": "Annuler",
+      "confirm": "Confirmer"
+    },
+    "dashboard": {
+      "title": "Tableau de bord",
+      "stats": {
+        "totalReservations": "Réservations totales",
+        "pendingReservations": "Réservations en attente",
+        "totalClients": "Clients total",
+        "activeUsers": "Utilisateurs actifs",
+        "totalUsers": "Utilisateurs"
+      }
+    },
+    "settings": {
+      "title": "Paramètres",
+      "sections": {
+        "general": "Général",
+        "social": "Réseaux",
+        "booking": "Réservations",
+        "seo": "SEO"
+      },
+      "messages": {
+        "savedSuccessfully": "Paramètres sauvegardés avec succès - Les modifications sont appliquées en temps réel sur le site",
+        "syncSuccess": "Paramètres de réservation synchronisés"
+      }
+    },
+    "contentEditor": {
+      "title": "Éditeur de contenu",
+      "preview": "Prévisualiser en temps réel",
+      "editPage": "Modifier la page",
+      "previewMessage": "Cliquez sur \"Prévisualiser\" pour voir vos modifications"
+    },
+    "forms": {
+      "addLink": "Ajouter un lien",
+      "addButton": "Ajouter un bouton",
+      "addSocialNetwork": "Ajouter un réseau social",
+      "saveHeader": "Sauvegarder le Header",
+      "saveFooter": "Sauvegarder le Footer",
+      "modifyTheme": "Modifier le thème"
+    },
+    "assistant": {
+      "quickActions": [
+        {
+          "text": "Ajouter client",
+          "message": "Comment ajouter un nouveau client ?"
+        },
+        {
+          "text": "Modifier contenu",
+          "message": "Comment modifier le contenu du site ?"
+        }
+      ]
+    }
+  }
+}

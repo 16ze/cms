@@ -1,0 +1,30 @@
+[
+  {
+    "id": "res-1760131096780-175",
+    "clientName": "Bryan Test",
+    "clientEmail": "bryan.test@example.com",
+    "clientPhone": "0673124302",
+    "projectDescription": "Test de réservation depuis le script de test - vérification du flux complet client → admin",
+    "communicationMethod": "VISIO",
+    "reservationType": "CONSULTATION",
+    "startTime": "2025-10-14T10:11:00.000Z",
+    "endTime": "2025-10-14T10:18:00.000Z",
+    "status": "CONFIRMED",
+    "createdAt": "2025-10-10T21:18:16.780Z",
+    "userId": "test-user-1760131096563"
+  },
+  {
+    "id": "res-1760131120819-134",
+    "clientName": "Client Final Test",
+    "clientEmail": "client.final@example.com",
+    "clientPhone": "0673124302",
+    "projectDescription": "Test final du système - vérification complète du flux client → admin",
+    "communicationMethod": "VISIO",
+    "reservationType": "PRESENTATION",
+    "startTime": "2025-10-12T21:18:40.720Z",
+    "endTime": "2025-10-12T22:18:40.720Z",
+    "status": "CONFIRMED",
+    "createdAt": "2025-10-10T21:18:40.819Z",
+    "userId": "final-test-user-1760131120720"
+  }
+]

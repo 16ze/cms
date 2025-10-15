@@ -1,0 +1,464 @@
+/* Styles spécifiques pour l'interface mobile des réservations admin */
+
+/* Amélioration du header mobile */
+@media (max-width: 768px) {
+  .admin-reservations-header {
+    @apply px-3 py-4;
+  }
+
+  .admin-reservations-title {
+    @apply text-lg font-bold mb-1;
+  }
+
+  .admin-reservations-subtitle {
+    @apply text-sm;
+  }
+}
+
+/* Amélioration des filtres mobiles */
+@media (max-width: 768px) {
+  .admin-reservations-filters {
+    @apply flex-col space-y-3;
+  }
+
+  .admin-reservations-search {
+    @apply w-full;
+  }
+
+  .admin-reservations-filter-buttons {
+    @apply flex-wrap gap-1;
+  }
+
+  .admin-reservations-filter-buttons button {
+    @apply flex-1 min-w-0 text-xs px-2 py-1.5;
+  }
+}
+
+/* Amélioration du tableau mobile */
+@media (max-width: 768px) {
+  .admin-reservations-table {
+    @apply text-xs;
+  }
+
+  .admin-reservations-table th,
+  .admin-reservations-table td {
+    @apply px-2 py-2;
+  }
+
+  /* Masquer certaines colonnes sur mobile */
+  .admin-reservations-table .mobile-hide {
+    @apply hidden;
+  }
+
+  /* Afficher les informations importantes dans une seule colonne */
+  .admin-reservations-table .mobile-stack {
+    @apply block;
+  }
+
+  .admin-reservations-table .mobile-stack .mobile-label {
+    @apply block text-xs text-slate-500 font-medium;
+  }
+
+  .admin-reservations-table .mobile-stack .mobile-value {
+    @apply block text-sm font-medium;
+  }
+}
+
+/* Amélioration de l'UX du tableau - Toutes tailles d'écran */
+
+/* Header du tableau avec gradient subtil */
+.admin-reservations-table thead {
+  @apply sticky top-0 z-10;
+  background: linear-gradient(
+    to bottom,
+    rgba(248, 250, 252, 0.95) 0%,
+    rgba(248, 250, 252, 0.98) 100%
+  );
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.admin-reservations-table thead th {
+  @apply text-slate-700 font-semibold text-sm uppercase tracking-wider;
+  transition: all 0.2s ease;
+}
+
+/* Lignes du tableau avec animations subtiles */
+.admin-reservations-table tbody tr {
+  @apply transition-all duration-200 ease-in-out;
+  border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+}
+
+.admin-reservations-table tbody tr:hover {
+  @apply bg-blue-50/30;
+  transform: translateX(2px);
+  box-shadow: inset 3px 0 0 0 #3b82f6;
+}
+
+.admin-reservations-table tbody tr:active {
+  @apply bg-blue-50/50;
+  transform: translateX(1px);
+}
+
+/* Cellules avec meilleure hiérarchie visuelle */
+.admin-reservations-table tbody td {
+  @apply align-middle;
+}
+
+/* Colonne Client - Amélioration visuelle */
+.admin-reservations-table tbody td:first-child {
+  @apply font-medium;
+}
+
+.admin-reservations-table tbody td:first-child > div:first-child {
+  @apply text-slate-900 font-semibold text-sm mb-0.5;
+}
+
+.admin-reservations-table tbody td:first-child > div:nth-child(2) {
+  @apply text-slate-500 text-xs flex items-center gap-1;
+}
+
+.admin-reservations-table tbody td:first-child > div:nth-child(2)::before {
+  content: "✉";
+  @apply text-slate-400 text-xs;
+}
+
+/* Date et heure mobile avec icône */
+.admin-reservations-table tbody td:first-child > div:nth-child(3) {
+  @apply text-slate-600 text-xs flex items-center gap-1 mt-1.5;
+}
+
+.admin-reservations-table tbody td:first-child > div:nth-child(3)::before {
+  content: "📅";
+  @apply text-xs;
+}
+
+/* Colonne Type avec badge amélioré */
+.admin-reservations-table tbody td:nth-child(2) {
+  @apply font-medium text-sm text-slate-700;
+}
+
+/* Badges de statut améliorés */
+.admin-reservations-table .admin-reservations-status {
+  @apply inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold;
+  @apply transition-all duration-200 ease-in-out;
+  @apply shadow-sm;
+}
+
+.admin-reservations-table .admin-reservations-status:hover {
+  @apply shadow-md transform scale-105;
+}
+
+/* Statut En attente - Amber avec animation pulse */
+.admin-reservations-table .admin-reservations-status.status-pending {
+  @apply bg-gradient-to-r from-amber-100 to-amber-200 text-amber-900;
+  @apply border border-amber-300;
+}
+
+.admin-reservations-table .admin-reservations-status.status-pending::before {
+  content: "";
+  @apply w-1.5 h-1.5 rounded-full bg-amber-500;
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Statut Confirmé - Green */
+.admin-reservations-table .admin-reservations-status.status-confirmed {
+  @apply bg-gradient-to-r from-emerald-100 to-emerald-200 text-emerald-900;
+  @apply border border-emerald-300;
+}
+
+.admin-reservations-table .admin-reservations-status.status-confirmed::before {
+  content: "✓";
+  @apply text-emerald-600 font-bold;
+}
+
+/* Statut Annulé - Red */
+.admin-reservations-table .admin-reservations-status.status-cancelled {
+  @apply bg-gradient-to-r from-red-100 to-red-200 text-red-900;
+  @apply border border-red-300;
+}
+
+.admin-reservations-table .admin-reservations-status.status-cancelled::before {
+  content: "✕";
+  @apply text-red-600 font-bold;
+}
+
+/* Actions - Boutons avec meilleurs états */
+.admin-reservations-actions button {
+  @apply relative overflow-hidden;
+  @apply transition-all duration-200 ease-in-out;
+  @apply hover:shadow-lg hover:scale-110;
+  @apply active:scale-95;
+}
+
+.admin-reservations-actions button::before {
+  content: "";
+  @apply absolute inset-0 opacity-0;
+  @apply transition-opacity duration-200;
+  @apply bg-gradient-to-br from-white/50 to-transparent;
+}
+
+.admin-reservations-actions button:hover::before {
+  @apply opacity-100;
+}
+
+/* Bouton Voir - Blue accent */
+.admin-reservations-actions button:first-child {
+  @apply hover:bg-blue-50 hover:border-blue-300 hover:text-blue-700;
+}
+
+/* Bouton Confirmer - Green accent */
+.admin-reservations-actions button:nth-child(2) {
+  @apply hover:border-green-400 hover:shadow-green-200;
+}
+
+/* Bouton Annuler - Red accent */
+.admin-reservations-actions button:nth-child(3) {
+  @apply hover:border-red-400 hover:shadow-red-200;
+}
+
+/* Effet de survol de ligne avec indicateur coloré */
+.admin-reservations-table tbody tr {
+  @apply relative;
+}
+
+.admin-reservations-table tbody tr::before {
+  content: "";
+  @apply absolute left-0 top-0 h-full w-0;
+  @apply bg-gradient-to-r from-blue-500 to-blue-400;
+  @apply transition-all duration-300 ease-out;
+  @apply opacity-0;
+}
+
+.admin-reservations-table tbody tr:hover::before {
+  @apply w-1 opacity-100;
+}
+
+/* Animation de chargement pour les lignes */
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+.admin-reservations-table tbody tr.loading {
+  background: linear-gradient(
+    90deg,
+    rgba(248, 250, 252, 0.5) 0%,
+    rgba(226, 232, 240, 0.5) 50%,
+    rgba(248, 250, 252, 0.5) 100%
+  );
+  background-size: 1000px 100%;
+  animation: shimmer 2s infinite;
+}
+
+/* Amélioration du focus pour l'accessibilité */
+.admin-reservations-table tbody tr:focus-within {
+  @apply outline-none ring-2 ring-blue-500 ring-offset-2;
+}
+
+.admin-reservations-actions button:focus-visible {
+  @apply outline-none ring-2 ring-blue-500 ring-offset-2;
+}
+
+/* État vide du tableau */
+.admin-reservations-table tbody tr.empty-state td {
+  @apply text-center py-12;
+}
+
+.admin-reservations-table tbody tr.empty-state td::before {
+  content: "📋";
+  @apply block text-4xl mb-3 opacity-50;
+}
+
+/* Optimisations pour le mode sombre (si activé) */
+.dark .admin-reservations-table thead {
+  background: linear-gradient(
+    to bottom,
+    rgba(15, 23, 42, 0.95) 0%,
+    rgba(15, 23, 42, 0.98) 100%
+  );
+}
+
+.dark .admin-reservations-table tbody tr {
+  border-bottom-color: rgba(51, 65, 85, 0.8);
+}
+
+.dark .admin-reservations-table tbody tr:hover {
+  @apply bg-slate-800/30;
+}
+
+/* Amélioration des actions mobiles */
+@media (max-width: 768px) {
+  .admin-reservations-actions {
+    @apply flex gap-1;
+  }
+
+  .admin-reservations-actions button {
+    @apply h-7 w-7 p-0;
+  }
+
+  .admin-reservations-actions button svg {
+    @apply w-3 h-3;
+  }
+}
+
+/* Amélioration de la modal mobile */
+@media (max-width: 768px) {
+  .admin-reservations-modal {
+    @apply mx-2 my-4 max-h-[95vh] overflow-y-auto;
+  }
+
+  .admin-reservations-modal .modal-header {
+    @apply px-3 py-3;
+  }
+
+  .admin-reservations-modal .modal-body {
+    @apply px-3 py-3;
+  }
+
+  .admin-reservations-modal .modal-footer {
+    @apply px-3 py-3;
+  }
+
+  .admin-reservations-modal .modal-footer button {
+    @apply w-full;
+  }
+
+  /* Sections d'informations plus compactes */
+  .admin-reservations-info-section {
+    @apply p-3 mb-3;
+  }
+
+  .admin-reservations-info-section h3 {
+    @apply text-base mb-2;
+  }
+
+  .admin-reservations-info-section .grid {
+    @apply gap-2;
+  }
+
+  .admin-reservations-info-section .flex {
+    @apply gap-2;
+  }
+
+  .admin-reservations-info-section p {
+    @apply text-xs;
+  }
+}
+
+@media (max-width: 480px) {
+  /* Optimisations pour très petits écrans */
+  .admin-reservations-header {
+    @apply px-2 py-3;
+  }
+
+  .admin-reservations-title {
+    @apply text-base;
+  }
+
+  .admin-reservations-subtitle {
+    @apply text-xs;
+  }
+
+  /* Filtres encore plus compacts */
+  .admin-reservations-filter-buttons button {
+    @apply px-1 py-1 text-xs;
+  }
+
+  /* Tableau encore plus compact */
+  .admin-reservations-table th,
+  .admin-reservations-table td {
+    @apply px-1 py-1;
+  }
+
+  /* Actions encore plus petites */
+  .admin-reservations-actions button {
+    @apply h-6 w-6;
+  }
+
+  .admin-reservations-actions button svg {
+    @apply w-2.5 h-2.5;
+  }
+
+  /* Modal encore plus compacte */
+  .admin-reservations-modal {
+    @apply mx-1 my-2;
+  }
+
+  .admin-reservations-modal .modal-header,
+  .admin-reservations-modal .modal-body,
+  .admin-reservations-modal .modal-footer {
+    @apply px-2 py-2;
+  }
+
+  /* Sections d'informations ultra-compactes */
+  .admin-reservations-info-section {
+    @apply p-2 mb-2;
+  }
+
+  .admin-reservations-info-section h3 {
+    @apply text-sm mb-1;
+  }
+}
+
+/* Amélioration des statuts sur mobile */
+@media (max-width: 768px) {
+  .admin-reservations-status {
+    @apply text-xs px-2 py-1;
+  }
+
+  .admin-reservations-status .status-dot {
+    @apply w-1.5 h-1.5 mr-1;
+  }
+}
+
+/* Amélioration des badges de type de réservation */
+@media (max-width: 768px) {
+  .admin-reservations-type-badge {
+    @apply text-xs px-2 py-1;
+  }
+}
+
+/* Amélioration des boutons de filtrage */
+@media (max-width: 768px) {
+  .admin-reservations-filter-btn {
+    @apply text-xs px-2 py-1.5 min-w-0 flex-1;
+  }
+
+  .admin-reservations-filter-btn .status-dot {
+    @apply w-1.5 h-1.5 mr-1;
+  }
+}
+
+/* Amélioration du scroll horizontal du tableau */
+.admin-reservations-table-container {
+  @apply overflow-x-auto;
+}
+
+.admin-reservations-table-container::-webkit-scrollbar {
+  @apply h-2;
+}
+
+.admin-reservations-table-container::-webkit-scrollbar-track {
+  @apply bg-slate-100 rounded;
+}
+
+.admin-reservations-table-container::-webkit-scrollbar-thumb {
+  @apply bg-slate-300 rounded;
+}
+
+.admin-reservations-table-container::-webkit-scrollbar-thumb:hover {
+  @apply bg-slate-400;
+}
+
+/* Indicateur de scroll pour mobile */
+@media (max-width: 768px) {
+  .admin-reservations-table-container::after {
+    content: "← Faites défiler pour voir plus →";
+    @apply block text-xs text-center text-slate-500 mt-2;
+  }
+}

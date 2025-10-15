@@ -1,0 +1,129 @@
+/* Styles modernisés pour tous les boutons de l'interface admin */
+
+/* Boutons principaux avec bordures subtiles et coins arrondis */
+.admin-button {
+  @apply px-4 py-2.5 rounded-xl border border-slate-200 bg-white/80 backdrop-blur-sm text-slate-700 font-medium transition-all duration-300 shadow-sm hover:shadow-md hover:bg-white hover:border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500;
+}
+
+/* Boutons outline modernisés */
+.admin-button-outline {
+  @apply px-4 py-2.5 rounded-xl border border-slate-200 bg-white/60 backdrop-blur-sm text-slate-700 font-medium transition-all duration-300 shadow-sm hover:shadow-md hover:bg-white/80 hover:border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500;
+}
+
+/* Boutons primaires (bleus) */
+.admin-button-primary {
+  @apply px-4 py-2.5 rounded-xl border border-blue-500 bg-blue-600 text-white font-medium transition-all duration-300 shadow-sm hover:shadow-md hover:bg-blue-700 hover:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500/30;
+}
+
+/* Boutons destructifs (rouges) */
+.admin-button-destructive {
+  @apply px-4 py-2.5 rounded-xl border border-red-200 bg-red-600 text-white font-medium transition-all duration-300 shadow-sm hover:shadow-md hover:bg-red-700 hover:border-red-300 focus:outline-none focus:ring-2 focus:ring-red-500/30;
+}
+
+/* Boutons de succès (verts) */
+.admin-button-success {
+  @apply px-4 py-2.5 rounded-xl border border-green-200 bg-green-600 text-white font-medium transition-all duration-300 shadow-sm hover:shadow-md hover:bg-green-700 hover:border-green-300 focus:outline-none focus:ring-2 focus:ring-green-500/30;
+}
+
+/* Boutons de taille small */
+.admin-button-sm {
+  @apply px-3 py-2 text-sm rounded-lg;
+}
+
+/* Boutons de taille large */
+.admin-button-lg {
+  @apply px-6 py-3 text-lg rounded-xl;
+}
+
+/* Boutons avec icônes */
+.admin-button-icon {
+  @apply inline-flex items-center gap-2;
+}
+
+/* Boutons dans les tableaux */
+.admin-table-button {
+  @apply w-8 h-8 p-0 rounded-lg border border-slate-200 bg-white/80 backdrop-blur-sm transition-all duration-200 hover:shadow-sm hover:bg-white hover:border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500/20;
+}
+
+/* Boutons de fermeture de modales */
+.admin-close-button {
+  @apply p-2 rounded-lg border border-slate-200 bg-white/80 backdrop-blur-sm text-slate-500 hover:text-slate-700 hover:bg-white hover:border-slate-300 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20;
+}
+
+/* Boutons de retour */
+.admin-back-button {
+  @apply inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-slate-200 bg-white/60 backdrop-blur-sm text-slate-600 font-medium transition-all duration-300 hover:shadow-sm hover:bg-white hover:text-slate-900 hover:border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500/20;
+}
+
+/* Override des styles Button de shadcn/ui pour l'admin */
+.light .admin-button,
+.light .admin-button-outline,
+.light .admin-button-primary,
+.light .admin-button-destructive,
+.light .admin-button-success {
+  /* S'assurer que les styles s'appliquent même en mode light */
+  color-scheme: light;
+}
+
+/* Animation de chargement pour les boutons */
+.admin-button-loading {
+  @apply relative;
+}
+
+.admin-button-loading::after {
+  content: "";
+  @apply absolute inset-0 rounded-xl bg-white/20 backdrop-blur-sm animate-pulse;
+}
+
+/* Responsive mobile pour les boutons */
+@media (max-width: 768px) {
+  .admin-button,
+  .admin-button-outline,
+  .admin-button-primary,
+  .admin-button-destructive,
+  .admin-button-success {
+    @apply px-3 py-2 text-sm;
+  }
+
+  .admin-button-sm {
+    @apply px-2 py-1.5 text-xs;
+  }
+
+  .admin-button-lg {
+    @apply px-4 py-2.5 text-base;
+  }
+
+  /* Boutons en pleine largeur sur mobile pour les actions importantes */
+  .admin-button-mobile-full {
+    @apply w-full;
+  }
+
+  /* Réduction de l'espacement entre les boutons */
+  .admin-button-group {
+    @apply gap-1;
+  }
+}
+
+@media (max-width: 480px) {
+  /* Boutons encore plus compacts sur très petits écrans */
+  .admin-button,
+  .admin-button-outline,
+  .admin-button-primary,
+  .admin-button-destructive,
+  .admin-button-success {
+    @apply px-2 py-1.5 text-xs;
+  }
+
+  .admin-button-sm {
+    @apply px-1.5 py-1 text-xs;
+  }
+
+  /* Masquer le texte des boutons d'icônes sur très petits écrans */
+  .admin-button-icon-mobile {
+    @apply px-2 py-1.5;
+  }
+
+  .admin-button-icon-mobile span:not(.icon) {
+    @apply hidden;
+  }
+}

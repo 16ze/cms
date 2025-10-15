@@ -1,0 +1,110 @@
+{
+  "projects": [
+    {
+      "id": "1",
+      "title": "Purple Nails Studio ",
+      "slug": "patisserie-locale",
+      "description": "\"Purple Nails Studio\" est un site-vitrine dynamique, conçu pour mettre en valeur les services de notre client. Développé avec des technologies de pointe, notamment React, Next.js, Tailwind CSS et Shadcn/ui, ce projet offre une interface utilisateur fluide et réactive. À travers cette réalisation, le client a pu augmenter sa visibilité en ligne, attirer de nouveaux clients et ainsi booster son activité.",
+      "summary": "\"Purple Nails Studio\" est un site-vitrine dynamique, conçu pour mettre en valeur les services de notre client. Développé avec des technologies de poin...",
+      "client": "Purple Nails Studio",
+      "year": "2023",
+      "coverImage": "/uploads/portfolio/6022c415-65eb-471e-bdd7-91f5f6dea186.png",
+      "images": [
+        "/images/portfolio/patisserie-1.jpg",
+        "/images/portfolio/patisserie-2.jpg"
+      ],
+      "categories": [
+        "site-vitrine"
+      ],
+      "technologies": [
+        "React",
+        "Next.js",
+        "Tailwind CSS",
+        "Shadcn/ui"
+      ],
+      "featured": true,
+      "published": true,
+      "order": 1,
+      "createdAt": "2025-04-08T15:57:20.899Z",
+      "updatedAt": "2025-04-08T16:51:15.141Z"
+    },
+    {
+      "id": "1744128921329",
+      "title": "KAIRO Digital",
+      "slug": "kairo-digital",
+      "description": "\"KAIRO Digital est un site-vitrine conçu pour présenter les services de l'entreprise. Le site a été développé en utilisant des technologies de pointe telles que React, Next.js, TailwindCSS, Shadcn/ui, Node.js et Prisma, garantissant une performance optimale et une expérience utilisateur fluide. Cette réalisation a permis à KAIRO Digital d'augmenter sa visibilité en ligne et d'offrir une interface intuitive à ses clients, tout en mettant en avant l'expertise technique du développeur.\"",
+      "summary": "\"KAIRO Digital est un site-vitrine conçu pour présenter les services de l'entreprise. Le site a été développé en utilisant des technologies de pointe ...",
+      "client": "KAIRO Digital",
+      "year": "2025",
+      "coverImage": "/uploads/portfolio/13e935b5-aef2-4fda-8455-846b3ff3b4c4.png",
+      "images": [],
+      "categories": [
+        "site-vitrine"
+      ],
+      "technologies": [
+        "React",
+        "Next.js",
+        "TailwindCSS",
+        "Shadcn/ui",
+        "Node.js",
+        "Prisma"
+      ],
+      "featured": false,
+      "published": true,
+      "order": 2,
+      "createdAt": "2025-04-08T16:15:21.330Z",
+      "updatedAt": "2025-04-08T16:42:51.139Z"
+    },
+    {
+      "id": "1744131318676",
+      "title": "HOLY Beauty",
+      "slug": "holy-beauty",
+      "description": "\"HOLY Beauty\" est un site vitrine dynamique et performant que j'ai conçu pour le compte de l'entreprise HOLY Beauty. Ce site, développé avec React et Next.js, met en valeur les technologies front-end modernes et offre une expérience utilisateur fluide et attrayante. Grâce à l'utilisation de Tailwind CSS et Shadcn/ui, le site possède une interface esthétiquement plaisante et facile à utiliser. Un projet qui a permis à mon client d'augmenter sa visibilité en ligne et d'attirer une clientèle plus large.",
+      "summary": "\"HOLY Beauty\" est un site vitrine dynamique et performant que j'ai conçu pour le compte de l'entreprise HOLY Beauty. Ce site, développé avec React et ...",
+      "client": "HOLY Beauty",
+      "year": "2025",
+      "coverImage": "/uploads/portfolio/b4f1ed4d-532a-4d60-8e82-29b9a07ce3a1.png",
+      "images": [],
+      "categories": [
+        "site-vitrine"
+      ],
+      "technologies": [
+        "React",
+        "Next.js",
+        "Tailwind CSS",
+        "Shadcn/ui"
+      ],
+      "featured": false,
+      "published": true,
+      "order": 3,
+      "createdAt": "2025-04-08T16:55:18.676Z",
+      "updatedAt": "2025-04-08T16:55:18.676Z"
+    }
+  ],
+  "categories": [
+    {
+      "id": "1",
+      "name": "Site Vitrine",
+      "slug": "site-vitrine",
+      "order": 1
+    },
+    {
+      "id": "2",
+      "name": "E-commerce",
+      "slug": "e-commerce",
+      "order": 2
+    },
+    {
+      "id": "3",
+      "name": "Application Web",
+      "slug": "application-web",
+      "order": 3
+    },
+    {
+      "id": "4",
+      "name": "Application Mobile",
+      "slug": "application-mobile",
+      "order": 4
+    }
+  ]
+}

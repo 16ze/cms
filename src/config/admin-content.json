@@ -1,0 +1,1068 @@
+{
+  "meta": {
+    "version": "1.0.0",
+    "lastUpdated": "2025-10-10",
+    "description": "Configuration complète du contenu de l'espace administration"
+  },
+  "common": {
+    "buttons": {
+      "save": "Enregistrer",
+      "cancel": "Annuler",
+      "delete": "Supprimer",
+      "edit": "Modifier",
+      "create": "Créer",
+      "update": "Mettre à jour",
+      "close": "Fermer",
+      "confirm": "Confirmer",
+      "refresh": "Actualiser",
+      "loading": "Chargement...",
+      "submit": "Soumettre",
+      "reset": "Réinitialiser",
+      "search": "Rechercher",
+      "filter": "Filtrer",
+      "export": "Exporter",
+      "import": "Importer",
+      "download": "Télécharger",
+      "upload": "Téléverser",
+      "preview": "Aperçu",
+      "back": "Retour",
+      "next": "Suivant",
+      "previous": "Précédent",
+      "viewDetails": "Voir détails",
+      "addNew": "Ajouter nouveau"
+    },
+    "messages": {
+      "success": "Opération réussie",
+      "error": "Une erreur est survenue",
+      "loading": "Chargement en cours...",
+      "noData": "Aucune donnée disponible",
+      "confirmDelete": "Êtes-vous sûr de vouloir supprimer cet élément ?",
+      "confirmAction": "Êtes-vous sûr de vouloir effectuer cette action ?",
+      "saveSuccess": "Modifications enregistrées avec succès",
+      "saveError": "Erreur lors de l'enregistrement",
+      "deleteSuccess": "Élément supprimé avec succès",
+      "deleteError": "Erreur lors de la suppression",
+      "required": "Ce champ est requis",
+      "invalidEmail": "Email invalide",
+      "invalidFormat": "Format invalide",
+      "unauthorized": "Accès non autorisé",
+      "sessionExpired": "Votre session a expiré. Veuillez vous reconnecter."
+    },
+    "labels": {
+      "name": "Nom",
+      "email": "Email",
+      "phone": "Téléphone",
+      "address": "Adresse",
+      "date": "Date",
+      "time": "Heure",
+      "status": "Statut",
+      "actions": "Actions",
+      "description": "Description",
+      "type": "Type",
+      "role": "Rôle",
+      "createdAt": "Créé le",
+      "updatedAt": "Modifié le",
+      "id": "Identifiant"
+    }
+  },
+  "login": {
+    "meta": {
+      "title": "Connexion Admin - KAIRO Digital",
+      "description": "Connectez-vous à l'espace d'administration"
+    },
+    "header": {
+      "title": "Espace Administration",
+      "subtitle": "Connectez-vous pour accéder au tableau de bord",
+      "companyName": "KAIRO",
+      "companySuffix": "Digital",
+      "pageTitle": "KAIRO Digital Administration"
+    },
+    "form": {
+      "emailLabel": "Email",
+      "emailPlaceholder": "admin@kairo-digital.fr",
+      "passwordLabel": "Mot de passe",
+      "passwordPlaceholder": "••••••••",
+      "submitButton": "Se connecter",
+      "loadingButton": "Connexion en cours...",
+      "demoButton": "Pré-remplir les champs"
+    },
+    "messages": {
+      "errorRequired": "Veuillez remplir tous les champs",
+      "errorInvalidCredentials": "Identifiants incorrects. Utilisez admin@kairodigital.com / admin123",
+      "errorServer": "Erreur serveur, veuillez réessayer",
+      "infoDemo": "🔄 Champs pré-remplis avec les identifiants de test",
+      "infoTemporary": "Accès temporaire pour le développement. Ce système doit être sécurisé pour la production.",
+      "accessGranted": "✅ Accès autorisé - Redirection vers le dashboard",
+      "copyrightText": "KAIRO Digital © {year} - Tous droits réservés"
+    },
+    "links": {
+      "forgotPassword": "Mot de passe oublié ?",
+      "backToSite": "Retour au site"
+    }
+  },
+  "dashboard": {
+    "meta": {
+      "title": "Tableau de bord - Admin KAIRO Digital",
+      "description": "Vue d'ensemble de l'activité et des statistiques"
+    },
+    "header": {
+      "title": "Tableau de bord",
+      "welcome": "Bienvenue",
+      "subtitle": "Vue d'ensemble de votre activité",
+      "refresh": "Actualiser",
+      "refreshing": "Actualisation en cours..."
+    },
+    "stats": {
+      "reservations": {
+        "title": "Réservations",
+        "titleFull": "Réservations totales",
+        "total": "Total",
+        "pending": "En attente",
+        "toConfirm": "À confirmer",
+        "confirmed": "Confirmées",
+        "cancelled": "Annulées",
+        "thisWeek": "Cette semaine",
+        "description": "Nouvelles cette semaine",
+        "titleShort": "Rés."
+      },
+      "clients": {
+        "title": "Clients",
+        "total": "Total",
+        "active": "Actifs",
+        "activeLabel": "Actives",
+        "inactive": "Inactifs",
+        "description": "Base de données clients"
+      },
+      "revenue": {
+        "title": "Revenus",
+        "thisMonth": "Ce mois",
+        "lastMonth": "Mois dernier",
+        "description": "Revenus du mois"
+      },
+      "users": {
+        "title": "Utilisateurs",
+        "admins": "Administrateurs",
+        "superAdmins": "Super administrateurs",
+        "description": "Comptes administrateurs"
+      }
+    },
+    "recentActivity": {
+      "title": "Activité récente",
+      "viewAll": "Voir toutes les réservations",
+      "noActivity": "Aucune activité récente",
+      "loading": "Chargement de l'activité...",
+      "types": {
+        "reservationCreated": "Nouvelle réservation",
+        "reservationConfirmed": "Réservation confirmée",
+        "reservationCancelled": "Réservation annulée",
+        "userCreated": "Nouvel utilisateur créé"
+      }
+    },
+    "quickActions": {
+      "title": "Actions rapides",
+      "newReservation": "Nouvelle réservation",
+      "manageClients": "Gérer les clients",
+      "manageReservations": "Gérer les réservations",
+      "viewStats": "Voir les statistiques"
+    },
+    "messages": {
+      "accessDenied": "Accès refusé",
+      "accessDeniedMessage": "Vous n'avez pas les permissions nécessaires pour accéder à la page {page}. Cette section est réservée à l'administrateur principal.",
+      "loadingStats": "Chargement des statistiques...",
+      "errorLoadingStats": "Erreur lors du chargement des statistiques",
+      "errorLogout": "Erreur lors de la déconnexion",
+      "loadingActivity": "Chargement de l'activité...",
+      "noActivity": "Aucune activité récente"
+    }
+  },
+  "reservations": {
+    "meta": {
+      "title": "Gestion des Réservations - Admin",
+      "description": "Gérez et suivez toutes les réservations"
+    },
+    "header": {
+      "title": "Gestion des réservations",
+      "subtitle": "Gérez les demandes de consultation et de rendez-vous",
+      "refreshing": "Actualisation...",
+      "refresh": "Actualiser"
+    },
+    "filters": {
+      "searchPlaceholder": "Rechercher par nom, email...",
+      "all": "Toutes",
+      "pending": "En attente",
+      "confirmed": "Confirmées",
+      "cancelled": "Annulées"
+    },
+    "table": {
+      "headers": {
+        "client": "Client",
+        "type": "Type",
+        "date": "Date",
+        "time": "Horaire",
+        "status": "Statut",
+        "actions": "Actions"
+      },
+      "empty": "Aucune réservation trouvée",
+      "emptyFiltered": "Aucune réservation ne correspond à vos critères.",
+      "loading": "Chargement des réservations..."
+    },
+    "status": {
+      "pending": "En attente",
+      "confirmed": "Confirmée",
+      "cancelled": "Annulée"
+    },
+    "types": {
+      "discovery": "Découverte",
+      "consultation": "Consultation",
+      "presentation": "Présentation",
+      "followup": "Suivi"
+    },
+    "communicationMethods": {
+      "visio": "Visioconférence",
+      "phone": "Téléphone"
+    },
+    "actions": {
+      "view": "Voir",
+      "viewDetails": "Voir détails",
+      "confirm": "Confirmer",
+      "cancel": "Annuler",
+      "reschedule": "Reprogrammer",
+      "rescheduleSlot": "Déplacer le créneau",
+      "cancelDefinitive": "Annuler définitivement",
+      "delete": "Supprimer",
+      "edit": "Modifier"
+    },
+    "modal": {
+      "details": {
+        "title": "Détails de la réservation",
+        "clientInfo": "Informations du client",
+        "consultationInfo": "Détails de la consultation",
+        "reservationStatus": "Statut de la réservation",
+        "projectDescription": "Description du projet",
+        "adminNotes": "Notes administrateur",
+        "quickActions": "Actions rapides",
+        "confirmReservation": "Confirmer la réservation",
+        "cancelReservation": "Refuser la réservation",
+        "closeModal": "Fermer",
+        "labels": {
+          "fullName": "Nom complet",
+          "email": "Email",
+          "phone": "Téléphone",
+          "type": "Type de consultation",
+          "method": "Mode de communication",
+          "date": "Date",
+          "time": "Horaire",
+          "duration": "Durée",
+          "status": "Statut actuel",
+          "createdAt": "Créé le",
+          "createdOn": "Demande créée le"
+        }
+      },
+      "reschedule": {
+        "title": "Déplacer la réservation",
+        "client": "Client :",
+        "type": "Type :",
+        "newDate": "Nouvelle date",
+        "startTime": "Heure de début",
+        "endTime": "Heure de fin",
+        "reason": "Raison du déplacement *",
+        "reasonPlaceholder": "Expliquez pourquoi le créneau doit être déplacé...",
+        "submitButton": "Déplacer la réservation",
+        "submitting": "Déplacement...",
+        "cancelButton": "Annuler",
+        "newTime": "Nouvelle heure"
+      },
+      "cancel": {
+        "title": "Annuler la réservation",
+        "warning": "⚠️ Attention :",
+        "warningMessage": "Cette action annulera définitivement la réservation et enverra un email d'annulation au client.",
+        "reason": "Raison de l'annulation *",
+        "reasonPlaceholder": "Expliquez la raison de l'annulation (visible par le client)...",
+        "submitButton": "Confirmer l'annulation",
+        "submitting": "Annulation...",
+        "cancelButton": "Annuler"
+      }
+    },
+    "messages": {
+      "confirmSuccess": "✅ Réservation confirmée avec succès",
+      "confirmError": "❌ Erreur lors de la confirmation de la réservation",
+      "cancelSuccess": "✅ Réservation annulée avec succès",
+      "cancelError": "❌ Erreur lors de l'annulation de la réservation",
+      "rescheduleSuccess": "✅ Réservation déplacée avec succès",
+      "rescheduleError": "❌ Erreur lors du déplacement de la réservation",
+      "rescheduleErrorAlert": "Erreur lors du déplacement de la réservation",
+      "cancelErrorAlert": "Erreur lors de l'annulation de la réservation",
+      "deleteSuccess": "Réservation supprimée avec succès",
+      "deleteError": "Erreur lors de la suppression",
+      "updateSuccess": "Réservation mise à jour avec succès",
+      "updateError": "Erreur lors de la mise à jour",
+      "loadingError": "Erreur lors du chargement des réservations",
+      "refreshError": "Erreur lors du rafraîchissement",
+      "requiredDateFields": "Veuillez remplir tous les champs de date et heure",
+      "requiredRescheduleReason": "Veuillez indiquer une raison pour le déplacement",
+      "requiredCancelReason": "Veuillez indiquer une raison pour l'annulation",
+      "devModeBypass": "🔓 Mode développement : authentification bypassée"
+    }
+  },
+  "clients": {
+    "meta": {
+      "title": "Gestion des Clients - Admin",
+      "description": "Base de données et gestion des clients"
+    },
+    "header": {
+      "title": "Base de Données Clients",
+      "subtitle": "Gérez vos clients, prospects et leur historique",
+      "backToDashboard": "Retour au dashboard",
+      "addClient": "Ajouter un client"
+    },
+    "stats": {
+      "total": {
+        "label": "Total clients",
+        "description": "Nombre total de clients"
+      },
+      "active": {
+        "label": "Clients actifs",
+        "description": "Clients avec projets en cours"
+      },
+      "thisMonth": {
+        "label": "Ce mois",
+        "description": "Nouveaux clients ce mois"
+      }
+    },
+    "filters": {
+      "searchPlaceholder": "Rechercher un client...",
+      "sortBy": "Trier par",
+      "sortOptions": {
+        "nameAsc": "Nom (A-Z)",
+        "nameDesc": "Nom (Z-A)",
+        "dateAsc": "Plus anciens",
+        "dateDesc": "Plus récents"
+      },
+      "statusFilter": {
+        "all": "Tous les statuts",
+        "allStatuses": "Tous",
+        "client": "Clients",
+        "prospect": "Prospects",
+        "inactive": "Inactifs"
+      },
+      "sourceFilter": {
+        "all": "Toutes les sources",
+        "website": "Site Web",
+        "recommendation": "Recommandation",
+        "socialMedia": "Réseaux Sociaux",
+        "directContact": "Contact Direct"
+      },
+      "all": "Tous",
+      "prospects": "Prospects",
+      "clients": "Clients",
+      "inactive": "Inactifs"
+    },
+    "table": {
+      "headers": {
+        "name": "Nom",
+        "email": "Email",
+        "phone": "Téléphone",
+        "projects": "Projets",
+        "status": "Statut",
+        "lastContact": "Dernier contact",
+        "actions": "Actions"
+      },
+      "empty": "Aucun client trouvé",
+      "loading": "Chargement des clients..."
+    },
+    "statusLabels": {
+      "client": "Client",
+      "prospect": "Prospect",
+      "inactive": "Inactif"
+    },
+    "modal": {
+      "add": {
+        "title": "Ajouter un nouveau client",
+        "submitButton": "Créer le client",
+        "submitting": "Création...",
+        "cancelButton": "Annuler"
+      },
+      "edit": {
+        "title": "Modifier le client",
+        "submitButton": "Enregistrer",
+        "submitting": "Enregistrement...",
+        "cancelButton": "Annuler"
+      },
+      "view": {
+        "title": "Détails du client",
+        "editButton": "Modifier",
+        "deleteButton": "Supprimer",
+        "closeButton": "Fermer"
+      },
+      "labels": {
+        "firstName": "Prénom",
+        "firstNameRequired": "Prénom *",
+        "lastName": "Nom",
+        "lastNameRequired": "Nom *",
+        "company": "Entreprise",
+        "companyName": "Nom de l'entreprise",
+        "email": "Email",
+        "emailRequired": "Email *",
+        "phone": "Téléphone",
+        "address": "Adresse",
+        "addressFull": "Adresse complète",
+        "city": "Ville",
+        "postalCode": "Code postal",
+        "country": "Pays",
+        "status": "Statut",
+        "source": "Source",
+        "notes": "Notes",
+        "notesPlaceholder": "Notes ou informations supplémentaires...",
+        "tags": "Tags",
+        "createdAt": "Date de création",
+        "notSpecified": "Non renseigné"
+      },
+      "placeholders": {
+        "firstName": "Prénom",
+        "lastName": "Nom",
+        "email": "email@exemple.com",
+        "phone": "06 12 34 56 78",
+        "company": "Nom de l'entreprise",
+        "address": "Adresse complète"
+      },
+      "deleteConfirm": "Êtes-vous sûr de vouloir supprimer ce client ?"
+    },
+    "actions": {
+      "viewProfile": "Voir le profil",
+      "viewDetails": "Voir les détails",
+      "edit": "Modifier",
+      "delete": "Supprimer",
+      "sendEmail": "Envoyer un email",
+      "addNew": "Ajouter un client"
+    },
+    "messages": {
+      "createSuccess": "🎉 Client créé avec succès !",
+      "createError": "Erreur lors de la création",
+      "updateSuccess": "🎉 Client modifié avec succès !",
+      "updateError": "Erreur lors de la modification",
+      "deleteSuccess": "Client supprimé avec succès",
+      "deleteError": "Erreur lors de la suppression",
+      "loadingError": "Erreur lors du chargement des clients",
+      "loadSuccess": "✅ Clients chargés",
+      "requiredFields": "Prénom, nom et email sont requis",
+      "devModeBypass": "🔓 Mode développement : authentification bypassée",
+      "loadError": "Erreur lors du chargement des clients"
+    },
+    "status": {
+      "prospect": "Prospect",
+      "client": "Client",
+      "inactive": "Inactif"
+    },
+    "source": {
+      "website": "Site web",
+      "referral": "Recommandation",
+      "social": "Réseaux sociaux",
+      "direct": "Contact direct"
+    }
+  },
+  "users": {
+    "meta": {
+      "title": "Gestion des Utilisateurs - Admin",
+      "description": "Gérez les comptes administrateurs"
+    },
+    "header": {
+      "title": "Gestion des utilisateurs",
+      "subtitle": "Administrez les comptes utilisateurs de la plateforme",
+      "addUser": "Ajouter un utilisateur"
+    },
+    "form": {
+      "title": "Ajouter un utilisateur",
+      "editTitle": "Modifier un utilisateur",
+      "submitButton": "Ajouter",
+      "submitting": "Création...",
+      "cancelButton": "Annuler",
+      "labels": {
+        "name": "Nom complet",
+        "nameSimple": "Nom",
+        "email": "Adresse email",
+        "emailSimple": "Email",
+        "password": "Mot de passe",
+        "confirmPassword": "Confirmer le mot de passe",
+        "role": "Rôle"
+      },
+      "placeholders": {
+        "name": "Nom",
+        "email": "Email",
+        "password": "Mot de passe",
+        "searchUser": "Rechercher un utilisateur...",
+        "confirmPassword": "********"
+      }
+    },
+    "roles": {
+      "admin": "Administrateur",
+      "superAdmin": "Super Administrateur",
+      "descriptions": {
+        "admin": "Accès aux fonctionnalités de base",
+        "superAdmin": "Accès complet à toutes les fonctionnalités"
+      }
+    },
+    "table": {
+      "headers": {
+        "name": "Nom",
+        "email": "Email",
+        "role": "Rôle",
+        "lastLogin": "Dernière connexion",
+        "lastUpdate": "Dernière mise à jour",
+        "actions": "Actions"
+      },
+      "empty": "Aucun utilisateur trouvé",
+      "loading": "Chargement des utilisateurs..."
+    },
+    "messages": {
+      "createSuccess": "Utilisateur créé avec succès",
+      "createError": "Erreur lors de la création",
+      "createErrorFull": "Impossible de créer l'utilisateur.",
+      "updateSuccess": "Utilisateur mis à jour avec succès",
+      "updateError": "Erreur lors de la mise à jour",
+      "deleteSuccess": "Utilisateur supprimé avec succès",
+      "deleteError": "Erreur lors de la suppression",
+      "deleteErrorFull": "Impossible de supprimer l'utilisateur.",
+      "loadError": "Impossible de charger les utilisateurs. Veuillez réessayer plus tard.",
+      "passwordMismatch": "Les mots de passe ne correspondent pas",
+      "emailExists": "Cet email est déjà utilisé",
+      "requiredFields": "Veuillez remplir tous les champs obligatoires.",
+      "deleteConfirm": "Êtes-vous sûr de vouloir supprimer cet utilisateur ?",
+      "devModeBypass": "🔓 Mode développement : authentification bypassée",
+      "errorLogout": "Erreur lors de la déconnexion"
+    },
+    "filters": {
+      "all": "Tous",
+      "superAdmins": "Super Admin",
+      "admins": "Admin",
+      "searchPlaceholder": "Rechercher par nom, email..."
+    },
+    "actions": {
+      "edit": "Modifier",
+      "delete": "Supprimer",
+      "changePassword": "Changer le mot de passe"
+    }
+  },
+  "settings": {
+    "meta": {
+      "title": "Paramètres - Admin",
+      "description": "Configurez les paramètres du site"
+    },
+    "header": {
+      "title": "Paramètres",
+      "subtitle": "Configurez les paramètres globaux du site"
+    },
+    "tabs": {
+      "general": "Informations",
+      "social": "Réseaux Sociaux",
+      "booking": "Réservation",
+      "seo": "SEO",
+      "theme": "Apparence",
+      "maintenance": "Maintenance"
+    },
+    "defaults": {
+      "siteName": "KAIRO Digital",
+      "tagline": "Agence de développement web et consulting digital",
+      "keywords": "web, digital, développement, consulting, kairo",
+      "maintenanceMessage": "Site en maintenance. Nous serons de retour bientôt..."
+    },
+    "seo": {
+      "title": "SEO",
+      "description": "Configuration du référencement",
+      "fields": {
+        "metaTitle": "Titre meta",
+        "metaDescription": "Description meta",
+        "keywords": "Mots-clés",
+        "ogImage": "Image Open Graph"
+      },
+      "buttons": {
+        "analyzeSEO": "Analyser le SEO",
+        "analyzing": "Analyse en cours..."
+      },
+      "messages": {
+        "analyzeSuccess": "Analyse SEO terminée - Score: {score}/100 - {pagesCount} pages analysées",
+        "analyzeError": "Erreur lors de l'analyse SEO",
+        "analyzing": "Analyse en cours..."
+      },
+      "indicators": {
+        "technicalAnalysis": {
+          "title": "Analyse Technique",
+          "description": "Vérifications automatiques des fichiers et balises SEO",
+          "status": "Toujours disponible",
+          "icon": "🔧"
+        },
+        "googleData": {
+          "title": "Données Google",
+          "description": "Métriques réelles depuis Google Analytics et PageSpeed",
+          "statusConnected": "Connecté à Google",
+          "statusDisconnected": "Non connecté à Google",
+          "iconConnected": "✅",
+          "iconDisconnected": "⚠️",
+          "setupRequired": "Configurez Google Analytics pour obtenir des données réelles"
+        },
+        "mixedResults": {
+          "title": "Résultats Mixtes",
+          "description": "Combinaison d'analyse technique et de données Google",
+          "technicalScore": "Score technique",
+          "googleScore": "Score Google",
+          "combinedScore": "Score combiné"
+        }
+      }
+    },
+    "performance": {
+      "title": "Performance",
+      "description": "Tests de performance et Core Web Vitals",
+      "buttons": {
+        "testPerformance": "Test Performance",
+        "testing": "Test en cours..."
+      },
+      "results": {
+        "title": "Résultats de Performance",
+        "coreWebVitals": "Core Web Vitals",
+        "pageSpeed": "PageSpeed Insights",
+        "recommendations": "Recommandations",
+        "lcp": "LCP (Largest Contentful Paint)",
+        "fid": "FID (First Input Delay)",
+        "cls": "CLS (Cumulative Layout Shift)"
+      },
+      "messages": {
+        "testSuccess": "Test de performance terminé",
+        "testError": "Erreur lors du test de performance"
+      }
+    },
+    "sections": {
+      "general": {
+        "title": "Paramètres généraux",
+        "description": "Configuration de base du site",
+        "fields": {
+          "siteName": {
+            "label": "Nom du site",
+            "placeholder": "KAIRO Digital",
+            "help": "Nom affiché dans le header et le footer"
+          },
+          "siteDescription": {
+            "label": "Description du site",
+            "placeholder": "Votre description...",
+            "help": "Description pour le SEO"
+          },
+          "siteUrl": {
+            "label": "URL du site",
+            "placeholder": "https://www.kairodigital.com",
+            "help": "URL complète de votre site"
+          }
+        }
+      },
+      "contact": {
+        "title": "Informations de contact",
+        "description": "Coordonnées de l'entreprise",
+        "fields": {
+          "email": {
+            "label": "Email de contact",
+            "placeholder": "contact@kairodigital.com"
+          },
+          "phone": {
+            "label": "Téléphone",
+            "placeholder": "+33 6 12 34 56 78"
+          },
+          "address": {
+            "label": "Adresse",
+            "placeholder": "123 Rue Example, Paris"
+          }
+        }
+      },
+      "email": {
+        "title": "Configuration Email (SMTP)",
+        "description": "Paramètres d'envoi d'emails",
+        "fields": {
+          "smtpHost": {
+            "label": "Hôte SMTP",
+            "placeholder": "smtp.gmail.com",
+            "help": "Serveur SMTP pour l'envoi d'emails"
+          },
+          "smtpPort": {
+            "label": "Port SMTP",
+            "placeholder": "587",
+            "help": "Port du serveur SMTP (587 ou 465)"
+          },
+          "smtpUser": {
+            "label": "Utilisateur SMTP",
+            "placeholder": "votre-email@gmail.com",
+            "help": "Adresse email pour l'authentification"
+          },
+          "smtpPassword": {
+            "label": "Mot de passe SMTP",
+            "placeholder": "********",
+            "help": "Mot de passe d'application (Gmail) ou mot de passe SMTP"
+          },
+          "emailFrom": {
+            "label": "Email expéditeur",
+            "placeholder": "noreply@kairodigital.com",
+            "help": "Adresse email affichée comme expéditeur"
+          }
+        },
+        "testButton": "Tester la configuration email",
+        "testing": "Test en cours...",
+        "testSuccess": "Email de test envoyé avec succès !",
+        "testError": "Erreur lors du test d'email"
+      },
+      "maintenance": {
+        "title": "Mode maintenance",
+        "description": "Activer ou désactiver le mode maintenance",
+        "toggle": "Activer le mode maintenance",
+        "messageLabel": "Message de maintenance",
+        "messagePlaceholder": "Site en maintenance. Nous serons de retour bientôt !",
+        "messageHelp": "Message affiché aux visiteurs pendant la maintenance",
+        "warningTitle": "Mode maintenance actif",
+        "warningMessage": "Seuls les administrateurs peuvent accéder au site",
+        "infoMessage": "En mode maintenance, le site affiche un message aux visiteurs"
+      },
+      "security": {
+        "title": "Sécurité",
+        "description": "Paramètres de sécurité et d'authentification",
+        "fields": {
+          "sessionTimeout": {
+            "label": "Durée de session (minutes)",
+            "help": "Durée avant déconnexion automatique"
+          },
+          "maxLoginAttempts": {
+            "label": "Tentatives de connexion max",
+            "help": "Nombre de tentatives avant blocage"
+          },
+          "requireStrongPassword": {
+            "label": "Exiger des mots de passe forts",
+            "help": "Impose des règles strictes pour les mots de passe"
+          }
+        }
+      },
+      "notifications": {
+        "title": "Notifications",
+        "description": "Gérer les notifications par email",
+        "fields": {
+          "newReservation": {
+            "label": "Nouvelle réservation",
+            "help": "Recevoir un email pour chaque nouvelle réservation"
+          },
+          "reservationConfirmed": {
+            "label": "Réservation confirmée",
+            "help": "Notification lorsqu'une réservation est confirmée"
+          },
+          "reservationCancelled": {
+            "label": "Réservation annulée",
+            "help": "Notification lorsqu'une réservation est annulée"
+          },
+          "newContact": {
+            "label": "Nouveau contact",
+            "help": "Recevoir un email pour chaque formulaire de contact"
+          }
+        }
+      }
+    },
+    "buttons": {
+      "save": "Enregistrer les paramètres",
+      "saving": "Enregistrement...",
+      "reset": "Réinitialiser",
+      "testEmail": "Tester l'email"
+    },
+    "messages": {
+      "saveSuccess": "Paramètres enregistrés avec succès",
+      "saveError": "Erreur lors de l'enregistrement des paramètres",
+      "loadError": "Impossible de charger les paramètres. Valeurs par défaut utilisées.",
+      "maintenanceUpdateError": "Erreur lors de la mise à jour du mode maintenance",
+      "maintenanceDisableError": "Erreur lors de la désactivation du mode maintenance",
+      "resetConfirm": "Voulez-vous vraiment réinitialiser les paramètres ?",
+      "resetSuccess": "Paramètres réinitialisés",
+      "resetError": "Erreur lors de la réinitialisation",
+      "devModeBypass": "🔓 Mode développement : authentification bypassée"
+    }
+  },
+  "site": {
+    "meta": {
+      "title": "Gestion du Site - Admin",
+      "description": "Gérez le header, footer et éléments globaux"
+    },
+    "header": {
+      "title": "Configuration du site",
+      "subtitle": "Gérez le header, footer et éléments de navigation"
+    },
+    "sections": {
+      "header": {
+        "title": "Header",
+        "description": "Configuration de l'en-tête du site",
+        "fields": {
+          "logo": "Logo",
+          "companyName": "Nom de l'entreprise",
+          "navigation": "Éléments de navigation",
+          "ctaButton": "Bouton CTA"
+        }
+      },
+      "footer": {
+        "title": "Footer",
+        "description": "Configuration du pied de page",
+        "fields": {
+          "tagline": "Slogan",
+          "copyright": "Copyright",
+          "links": "Liens rapides",
+          "social": "Réseaux sociaux"
+        }
+      }
+    },
+    "buttons": {
+      "save": "Enregistrer les modifications",
+      "preview": "Aperçu",
+      "reset": "Réinitialiser"
+    },
+    "messages": {
+      "saveSuccess": "Modifications enregistrées avec succès",
+      "saveError": "Erreur lors de l'enregistrement",
+      "previewInfo": "Prévisualisez vos modifications avant de sauvegarder"
+    }
+  },
+  "content": {
+    "meta": {
+      "title": "Gestion de Contenu - Admin",
+      "description": "Éditez le contenu des pages du site"
+    },
+    "header": {
+      "title": "Gestion du contenu",
+      "subtitle": "Modifiez le contenu de toutes les pages du site"
+    },
+    "pages": {
+      "home": "Page d'accueil",
+      "about": "À propos",
+      "services": "Services",
+      "portfolio": "Portfolio",
+      "contact": "Contact",
+      "consultation": "Consultation"
+    },
+    "editor": {
+      "title": "Éditeur de contenu",
+      "preview": "Aperçu",
+      "edit": "Édition",
+      "saveDraft": "Enregistrer le brouillon",
+      "publish": "Publier",
+      "cancel": "Annuler les modifications"
+    },
+    "sections": {
+      "hero": "Hero Section",
+      "features": "Fonctionnalités",
+      "testimonials": "Témoignages",
+      "cta": "Call to Action",
+      "faq": "FAQ"
+    },
+    "filters": {
+      "searchPlaceholder": "Rechercher une page...",
+      "showAll": "Toutes les pages",
+      "showPublished": "Publiées uniquement",
+      "showDrafts": "Brouillons uniquement"
+    },
+    "emptyStates": {
+      "noResults": "Aucune page ne correspond à votre recherche.",
+      "noResultsAction": "Réinitialiser les filtres",
+      "noPages": "Commencez par créer votre première page.",
+      "noPagesAction": "Créer une page"
+    },
+    "messages": {
+      "loadSuccess": "📊 Pages chargées avec succès",
+      "loadError": "Erreur lors du chargement des pages",
+      "saveSuccess": "Contenu enregistré avec succès",
+      "saveError": "Erreur lors de l'enregistrement",
+      "publishSuccess": "Contenu publié avec succès",
+      "publishError": "Erreur lors de la publication",
+      "deleteSuccess": "Page supprimée avec succès",
+      "deleteError": "Erreur lors de la suppression",
+      "unsavedChanges": "Vous avez des modifications non enregistrées. Voulez-vous continuer ?"
+    }
+  },
+  "navigation": {
+    "main": {
+      "dashboard": "Tableau de bord",
+      "reservations": "Réservations",
+      "clients": "Base Clients",
+      "users": "Utilisateurs",
+      "content": "Contenu",
+      "site": "Site",
+      "settings": "Paramètres",
+      "assistant": "Assistant IA"
+    },
+    "tooltips": {
+      "dashboard": "Vue d'ensemble et statistiques",
+      "reservations": "Gérer les réservations de consultation",
+      "clients": "Base de données clients",
+      "users": "Gestion des comptes administrateurs",
+      "content": "Éditer le contenu du site",
+      "site": "Configuration Header/Footer",
+      "settings": "Paramètres globaux"
+    }
+  },
+  "layout": {
+    "header": {
+      "connectedAs": "Connecté en tant que",
+      "logout": "Déconnexion",
+      "profile": "Profil",
+      "help": "Aide",
+      "notifications": "Notifications"
+    },
+    "sidebar": {
+      "logo": "Logo",
+      "logoSuffix": "entreprise",
+      "adminPanel": "Panel d'administration",
+      "collapse": "Réduire",
+      "expand": "Développer"
+    },
+    "mobileMenu": {
+      "open": "Ouvrir le menu",
+      "close": "Fermer le menu",
+      "navigation": "Navigation"
+    }
+  },
+  "permissions": {
+    "roles": {
+      "admin": "Administrateur",
+      "superAdmin": "Super Administrateur"
+    },
+    "descriptions": {
+      "admin": "Accès limité aux fonctionnalités de gestion courantes",
+      "superAdmin": "Accès complet à toutes les fonctionnalités d'administration"
+    },
+    "messages": {
+      "accessDenied": "Accès refusé",
+      "insufficientPermissions": "Vous n'avez pas les permissions nécessaires pour accéder à cette page",
+      "superAdminOnly": "Cette page est réservée aux super administrateurs"
+    }
+  },
+  "notifications": {
+    "types": {
+      "success": "Succès",
+      "error": "Erreur",
+      "warning": "Attention",
+      "info": "Information"
+    },
+    "titles": {
+      "newReservation": "Nouvelle réservation",
+      "reservationConfirmed": "Réservation confirmée",
+      "reservationCancelled": "Réservation annulée",
+      "systemUpdate": "Mise à jour système",
+      "securityAlert": "Alerte de sécurité"
+    }
+  },
+  "assistant": {
+    "title": "Assistant Admin",
+    "subtitle": "Posez vos questions",
+    "placeholder": "Comment puis-je vous aider ?",
+    "send": "Envoyer",
+    "thinking": "Réflexion en cours...",
+    "suggestions": [
+      "Comment modifier le contenu de la page d'accueil ?",
+      "Où se trouvent les paramètres généraux ?",
+      "Comment ajouter un administrateur ?",
+      "Comment gérer les réservations ?"
+    ],
+    "quickActions": {
+      "title": "Actions rapides",
+      "items": [
+        "Modifier le header",
+        "Gérer les réservations",
+        "Ajouter un client",
+        "Voir les statistiques"
+      ]
+    }
+  },
+  "errors": {
+    "generic": "Une erreur inattendue s'est produite",
+    "network": "Erreur de connexion au serveur",
+    "unauthorized": "Vous devez être connecté pour accéder à cette ressource",
+    "forbidden": "Vous n'avez pas l'autorisation d'effectuer cette action",
+    "notFound": "Ressource non trouvée",
+    "validation": "Erreur de validation des données",
+    "serverError": "Erreur interne du serveur",
+    "timeout": "La requête a expiré. Veuillez réessayer."
+  },
+  "emptyStates": {
+    "reservations": {
+      "title": "Aucune réservation",
+      "message": "Les nouvelles réservations apparaîtront ici",
+      "action": "Voir toutes les réservations"
+    },
+    "clients": {
+      "title": "Aucun client",
+      "message": "Commencez par ajouter votre premier client",
+      "action": "Ajouter un client"
+    },
+    "users": {
+      "title": "Aucun utilisateur",
+      "message": "Aucun utilisateur administrateur pour le moment",
+      "action": "Ajouter un utilisateur"
+    },
+    "activity": {
+      "title": "Aucune activité récente",
+      "message": "L'activité récente apparaîtra ici",
+      "action": null
+    }
+  },
+  "confirmations": {
+    "delete": {
+      "title": "Confirmer la suppression",
+      "message": "Cette action est irréversible. Êtes-vous sûr ?",
+      "confirm": "Oui, supprimer",
+      "cancel": "Non, annuler"
+    },
+    "logout": {
+      "title": "Se déconnecter",
+      "message": "Êtes-vous sûr de vouloir vous déconnecter ?",
+      "confirm": "Oui, me déconnecter",
+      "cancel": "Rester connecté"
+    },
+    "unsavedChanges": {
+      "title": "Modifications non enregistrées",
+      "message": "Vous avez des modifications non enregistrées. Que souhaitez-vous faire ?",
+      "save": "Enregistrer",
+      "discard": "Abandonner",
+      "cancel": "Continuer l'édition"
+    }
+  },
+  "tooltips": {
+    "refresh": "Actualiser les données",
+    "export": "Exporter les données",
+    "filter": "Filtrer les résultats",
+    "sort": "Trier",
+    "view": "Voir les détails",
+    "edit": "Modifier",
+    "delete": "Supprimer",
+    "confirm": "Confirmer",
+    "cancel": "Annuler",
+    "help": "Aide et documentation",
+    "settings": "Paramètres"
+  },
+  "loading": {
+    "page": "Chargement de la page...",
+    "data": "Chargement des données...",
+    "saving": "Enregistrement en cours...",
+    "deleting": "Suppression en cours...",
+    "uploading": "Téléversement en cours...",
+    "processing": "Traitement en cours..."
+  },
+  "pagination": {
+    "previous": "Précédent",
+    "next": "Suivant",
+    "first": "Premier",
+    "last": "Dernier",
+    "showing": "Affichage de",
+    "to": "à",
+    "of": "sur",
+    "results": "résultats",
+    "perPage": "par page"
+  },
+  "dateTime": {
+    "today": "Aujourd'hui",
+    "yesterday": "Hier",
+    "tomorrow": "Demain",
+    "thisWeek": "Cette semaine",
+    "thisMonth": "Ce mois",
+    "thisYear": "Cette année",
+    "formats": {
+      "short": "DD/MM/YYYY",
+      "long": "dddd DD MMMM YYYY",
+      "time": "HH:mm",
+      "datetime": "DD/MM/YYYY à HH:mm"
+    }
+  }
+}

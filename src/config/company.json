@@ -1,0 +1,84 @@
+{
+  "company": {
+    "name": "KAIRO Digital",
+    "legalName": "KAIRO Digital",
+    "slug": "kairo-digital",
+    "foundedYear": 2020,
+    "founder": "Bryan Hilaire",
+    "industry": "Agence Web & Développement Digital",
+    "description": "Agence web à Belfort spécialisée dans la création de sites web et l'amélioration de votre visibilité en ligne",
+
+    "contact": {
+      "email": "contact@kairo-digital.fr",
+      "emailAlternate": "contact.kairodigital@gmail.com",
+      "phone": "+33766121696",
+      "phoneDisplay": "07 66 12 16 96",
+      "address": {
+        "street": "29 Faubourg de Montbéliard",
+        "city": "Belfort",
+        "postalCode": "90000",
+        "country": "France",
+        "countryCode": "FR",
+        "region": "Franche-Comté",
+        "coordinates": {
+          "latitude": 47.6379,
+          "longitude": 6.8628
+        }
+      }
+    },
+
+    "hours": {
+      "days": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+      "opens": "09:00",
+      "closes": "18:00",
+      "timezone": "Europe/Paris"
+    },
+
+    "social": {
+      "facebook": "https://www.facebook.com/kairodigital",
+      "instagram": "https://www.instagram.com/kairodigital",
+      "linkedin": "https://www.linkedin.com/company/kairodigital",
+      "twitter": "https://twitter.com/kairodigital"
+    },
+
+    "branding": {
+      "primaryColor": "#007aff",
+      "secondaryColor": "#8b5cf6",
+      "accentColor": "#f59e0b",
+      "logo": "/logo-court.svg",
+      "logoAlt": "KAIRO Digital Logo",
+      "favicon": "/favicon/favicon.ico",
+      "ogImage": "/images/kairo-og-image.jpg"
+    },
+
+    "seo": {
+      "siteUrl": "https://www.kairo-digital.fr",
+      "defaultTitle": "KAIRO Digital | Développeur web freelance et expert en visibilité web à Belfort",
+      "defaultDescription": "KAIRO Digital est un développeur web freelance à Belfort spécialisé dans la création de sites web et l'amélioration de votre visibilité en ligne. Nous créons des sites web performants, élégants et optimisés pour les moteurs de recherche en Franche-Comté.",
+      "keywords": [
+        "développeur web Belfort",
+        "sites web Belfort",
+        "référencement web Belfort",
+        "visibilité en ligne Franche-Comté",
+        "développement web Territoire de Belfort",
+        "responsive design"
+      ],
+      "googleAnalyticsId": "G-58FT91034E",
+      "googleTagManagerId": "GTM-T7G7LSDZ",
+      "googleSiteVerification": "G-58FT91034E",
+      "twitterHandle": "@kairodigital"
+    },
+
+    "services": {
+      "areaServed": {
+        "radius": "50000",
+        "description": "Belfort et Franche-Comté"
+      },
+      "mainServices": [
+        "Développement Web à Belfort",
+        "Amélioration du référencement local",
+        "Sites Vitrines & E-commerce en Franche-Comté"
+      ]
+    }
+  }
+}

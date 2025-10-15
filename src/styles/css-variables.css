@@ -1,0 +1,293 @@
+/* 🎨 VARIABLES CSS STANDARDISÉES - KAIRO WEBSITE */
+
+:root {
+  /* ===== COULEURS PRINCIPALES ===== */
+  --primary-color: #007aff; /* Bleu principal KAIRO */
+  --secondary-color: #8b5cf6; /* Violet secondaire */
+  --accent-color: #f59e0b; /* Orange accent */
+  --success-color: #34c759; /* Vert succès */
+  --warning-color: #ff9500; /* Orange avertissement */
+  --error-color: #ff3b30; /* Rouge erreur */
+
+  /* ===== COULEURS DE TEXTE ===== */
+  --text-primary: #1d1d1f; /* Texte principal */
+  --text-secondary: #6b7280; /* Texte secondaire - Amélioré pour contraste */
+  --text-muted: #6b7280; /* Texte atténué - Amélioré pour contraste */
+  --text-inverse: #ffffff; /* Texte inversé */
+  --text-link: #007aff; /* Liens */
+  --text-link-hover: #0056cc; /* Liens au survol */
+
+  /* ===== COULEURS D'ARRIÈRE-PLAN ===== */
+  --background-primary: #ffffff; /* Arrière-plan principal */
+  --background-secondary: #f5f5f7; /* Arrière-plan secondaire */
+  --background-tertiary: #e5e5e7; /* Arrière-plan tertiaire */
+  --background-dark: #1d1d1f; /* Arrière-plan sombre */
+  --background-overlay: rgba(0, 0, 0, 0.7); /* Overlay sombre */
+
+  /* ===== COULEURS DE BORDURE ===== */
+  --border-primary: #d1d5db; /* Bordure principale */
+  --border-secondary: #e5e7eb; /* Bordure secondaire */
+  --border-accent: #007aff; /* Bordure accent */
+  --border-focus: #007aff; /* Bordure focus */
+
+  /* ===== COULEURS DE SHADOW ===== */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+  --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+
+  /* ===== ESPACEMENT STANDARDISÉ ===== */
+  --spacing-xs: 0.25rem; /* 4px */
+  --spacing-sm: 0.5rem; /* 8px */
+  --spacing-md: 1rem; /* 16px */
+  --spacing-lg: 1.5rem; /* 24px */
+  --spacing-xl: 2rem; /* 32px */
+  --spacing-2xl: 3rem; /* 48px */
+  --spacing-3xl: 4rem; /* 64px */
+
+  /* ===== TAILLES DE POLICE STANDARDISÉES ===== */
+  --font-size-xs: 0.75rem; /* 12px */
+  --font-size-sm: 0.875rem; /* 14px */
+  --font-size-base: 1rem; /* 16px */
+  --font-size-lg: 1.125rem; /* 18px */
+  --font-size-xl: 1.25rem; /* 20px */
+  --font-size-2xl: 1.5rem; /* 24px */
+  --font-size-3xl: 1.875rem; /* 30px */
+  --font-size-4xl: 2.25rem; /* 36px */
+  --font-size-5xl: 3rem; /* 48px */
+  --font-size-6xl: 3.75rem; /* 60px */
+  --font-size-7xl: 4.5rem; /* 72px */
+
+  /* ===== POIDS DE POLICE STANDARDISÉS ===== */
+  --font-weight-light: 300;
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  --font-weight-extrabold: 800;
+  --font-weight-black: 900;
+
+  /* ===== RAYONS DE BORDURE STANDARDISÉS ===== */
+  --radius-sm: 0.25rem; /* 4px */
+  --radius-md: 0.375rem; /* 6px */
+  --radius-lg: 0.5rem; /* 8px */
+  --radius-xl: 0.75rem; /* 12px */
+  --radius-2xl: 1rem; /* 16px */
+  --radius-3xl: 1.5rem; /* 24px */
+  --radius-full: 9999px; /* Cercle parfait */
+
+  /* ===== TRANSITIONS STANDARDISÉES ===== */
+  --transition-fast: 150ms ease;
+  --transition-normal: 300ms ease;
+  --transition-slow: 500ms ease;
+  --transition-bounce: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-smooth: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* ===== Z-INDEX STANDARDISÉS ===== */
+  --z-content: 1; /* Contenu de base */
+  --z-content-elevated: 10; /* Contenu surélevé */
+  --z-interface: 100; /* Éléments d'interface */
+  --z-interface-elevated: 200; /* Interface surélevée */
+  --z-navigation: 1000; /* Navigation */
+  --z-navigation-elevated: 2000; /* Navigation surélevée */
+  --z-modal: 9999; /* Modal/Overlay */
+  --z-modal-content: 10000; /* Contenu modal */
+  --z-modal-controls: 10001; /* Contrôles modal */
+}
+
+/* ===== THÈME SOMBRE DÉSACTIVÉ ===== */
+/* Mode sombre désactivé - le site est toujours en mode clair
+@media (prefers-color-scheme: dark) {
+  :root {
+    --text-primary: #ffffff;
+    --text-secondary: #a1a1a6;
+    --text-muted: #86868b;
+    --text-inverse: #1d1d1f;
+    --background-primary: #1d1d1f;
+    --background-secondary: #2d2d30;
+    --background-tertiary: #3d3d40;
+    --background-dark: #000000;
+    --border-primary: #3d3d40;
+    --border-secondary: #4d4d50;
+    --shadow-sm: 0 1px 2px 0 rgba(255, 255, 255, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(255, 255, 255, 0.1);
+    --shadow-lg: 0 10px 15px -3px rgba(255, 255, 255, 0.1);
+    --shadow-xl: 0 20px 25px -5px rgba(255, 255, 255, 0.1);
+    --shadow-2xl: 0 25px 50px -12px rgba(255, 255, 255, 0.25);
+  }
+}
+*/
+
+/* ===== UTILITAIRES CSS ===== */
+.text-primary {
+  color: var(--primary-color);
+}
+.text-secondary {
+  color: var(--secondary-color);
+}
+.text-accent {
+  color: var(--accent-color);
+}
+.text-success {
+  color: var(--success-color);
+}
+.text-warning {
+  color: var(--warning-color);
+}
+.text-error {
+  color: var(--error-color);
+}
+
+.bg-primary {
+  background-color: var(--primary-color);
+}
+.bg-secondary {
+  background-color: var(--secondary-color);
+}
+.bg-accent {
+  background-color: var(--accent-color);
+}
+.bg-success {
+  background-color: var(--success-color);
+}
+.bg-warning {
+  background-color: var(--warning-color);
+}
+.bg-error {
+  background-color: var(--error-color);
+}
+
+.border-primary {
+  border-color: var(--border-primary);
+}
+.border-secondary {
+  border-color: var(--border-secondary);
+}
+.border-accent {
+  border-color: var(--border-accent);
+}
+
+.shadow-sm {
+  box-shadow: var(--shadow-sm);
+}
+.shadow-md {
+  box-shadow: var(--shadow-md);
+}
+.shadow-lg {
+  box-shadow: var(--shadow-lg);
+}
+.shadow-xl {
+  box-shadow: var(--shadow-xl);
+}
+.shadow-2xl {
+  box-shadow: var(--shadow-2xl);
+}
+
+/* ===== ANIMATIONS STANDARDISÉES ===== */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slide-in-left {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes slide-in-right {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes slide-in-up {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+@keyframes slide-in-down {
+  from {
+    transform: translateY(-100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+@keyframes scale-in {
+  from {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* ===== CLASSES D'ANIMATION ===== */
+.animate-fade-in {
+  animation: fade-in 0.3s ease-out;
+}
+.animate-slide-in-left {
+  animation: slide-in-left 0.3s ease-out;
+}
+.animate-slide-in-right {
+  animation: slide-in-right 0.3s ease-out;
+}
+.animate-slide-in-up {
+  animation: slide-in-up 0.3s ease-out;
+}
+.animate-slide-in-down {
+  animation: slide-in-down 0.3s ease-out;
+}
+.animate-scale-in {
+  animation: scale-in 0.3s ease-out;
+}
+
+/* ===== RESPONSIVE UTILITIES ===== */
+@media (max-width: 640px) {
+  :root {
+    --spacing-xl: 1.5rem; /* Réduction sur mobile */
+    --spacing-2xl: 2rem;
+    --spacing-3xl: 3rem;
+
+    --font-size-4xl: 1.875rem; /* Tailles adaptées mobile */
+    --font-size-5xl: 2.25rem;
+    --font-size-6xl: 3rem;
+    --font-size-7xl: 3.75rem;
+  }
+}
+
+/* ===== FOCUS VISIBLE ===== */
+.focus-visible:focus {
+  outline: 2px solid var(--border-focus);
+  outline-offset: 2px;
+}
+
+/* ===== REDUCED MOTION ===== */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

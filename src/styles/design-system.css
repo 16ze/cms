@@ -1,0 +1,473 @@
+/**
+ * SYSTÈME DE DESIGN DYNAMIQUE
+ * 
+ * Ce fichier définit des classes utilitaires qui utilisent les CSS variables
+ * injectées depuis content.json via DynamicStyleInjector
+ * 
+ * Modifiez content.json → design pour changer les couleurs, polices, etc.
+ * Hot reload automatique !
+ */
+
+/* ============================================================================
+   COULEURS
+   ============================================================================ */
+
+/* Couleurs de fond */
+.bg-dynamic-primary {
+  background-color: var(--color-primary);
+}
+.bg-dynamic-secondary {
+  background-color: var(--color-secondary);
+}
+.bg-dynamic-accent {
+  background-color: var(--color-accent);
+}
+
+.hover\:bg-dynamic-primary:hover {
+  background-color: var(--color-primary-hover);
+}
+.hover\:bg-dynamic-secondary:hover {
+  background-color: var(--color-secondary-hover);
+}
+.hover\:bg-dynamic-accent:hover {
+  background-color: var(--color-accent-hover);
+}
+
+/* Couleurs de texte */
+.text-dynamic-primary {
+  color: var(--color-text-primary);
+}
+.text-dynamic-secondary {
+  color: var(--color-text-secondary);
+}
+.text-dynamic-tertiary {
+  color: var(--color-text-tertiary);
+}
+.text-dynamic-light {
+  color: var(--color-text-light);
+}
+
+/* Couleurs de bordure */
+.border-dynamic-light {
+  border-color: var(--color-border-light);
+}
+.border-dynamic-medium {
+  border-color: var(--color-border-medium);
+}
+.border-dynamic-dark {
+  border-color: var(--color-border-dark);
+}
+
+/* Couleurs de statut */
+.text-success {
+  color: var(--color-success);
+}
+.text-warning {
+  color: var(--color-warning);
+}
+.text-error {
+  color: var(--color-error);
+}
+.text-info {
+  color: var(--color-info);
+}
+
+.bg-success {
+  background-color: var(--color-success);
+}
+.bg-warning {
+  background-color: var(--color-warning);
+}
+.bg-error {
+  background-color: var(--color-error);
+}
+.bg-info {
+  background-color: var(--color-info);
+}
+
+/* ============================================================================
+   TYPOGRAPHIE
+   ============================================================================ */
+
+.font-dynamic-heading {
+  font-family: var(--font-heading);
+}
+.font-dynamic-body {
+  font-family: var(--font-body);
+}
+.font-dynamic-mono {
+  font-family: var(--font-mono);
+}
+
+/* Tailles de texte */
+.text-dynamic-xs {
+  font-size: var(--text-xs);
+}
+.text-dynamic-sm {
+  font-size: var(--text-sm);
+}
+.text-dynamic-base {
+  font-size: var(--text-base);
+}
+.text-dynamic-lg {
+  font-size: var(--text-lg);
+}
+.text-dynamic-xl {
+  font-size: var(--text-xl);
+}
+.text-dynamic-2xl {
+  font-size: var(--text-2xl);
+}
+.text-dynamic-3xl {
+  font-size: var(--text-3xl);
+}
+.text-dynamic-4xl {
+  font-size: var(--text-4xl);
+}
+.text-dynamic-5xl {
+  font-size: var(--text-5xl);
+}
+
+/* Poids de police */
+.font-dynamic-light {
+  font-weight: var(--font-light);
+}
+.font-dynamic-normal {
+  font-weight: var(--font-normal);
+}
+.font-dynamic-medium {
+  font-weight: var(--font-medium);
+}
+.font-dynamic-semibold {
+  font-weight: var(--font-semibold);
+}
+.font-dynamic-bold {
+  font-weight: var(--font-bold);
+}
+.font-dynamic-black {
+  font-weight: var(--font-black);
+}
+
+/* Hauteur de ligne */
+.leading-dynamic-tight {
+  line-height: var(--leading-tight);
+}
+.leading-dynamic-normal {
+  line-height: var(--leading-normal);
+}
+.leading-dynamic-relaxed {
+  line-height: var(--leading-relaxed);
+}
+
+/* ============================================================================
+   ESPACEMENT
+   ============================================================================ */
+
+.section-spacing {
+  padding-top: var(--spacing-section);
+  padding-bottom: var(--spacing-section);
+}
+
+.section-spacing-mobile {
+  padding-top: var(--spacing-section-mobile);
+  padding-bottom: var(--spacing-section-mobile);
+}
+
+.container-spacing {
+  padding-left: var(--spacing-container);
+  padding-right: var(--spacing-container);
+}
+
+.card-spacing {
+  padding: var(--spacing-card);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .section-spacing-responsive {
+    padding-top: var(--spacing-section-mobile);
+    padding-bottom: var(--spacing-section-mobile);
+  }
+
+  .container-spacing-responsive {
+    padding-left: var(--spacing-container-mobile);
+    padding-right: var(--spacing-container-mobile);
+  }
+
+  .card-spacing-responsive {
+    padding: var(--spacing-card-mobile);
+  }
+}
+
+/* ============================================================================
+   EFFETS
+   ============================================================================ */
+
+/* Border Radius */
+.rounded-dynamic-sm {
+  border-radius: var(--radius-sm);
+}
+.rounded-dynamic-md {
+  border-radius: var(--radius-md);
+}
+.rounded-dynamic-lg {
+  border-radius: var(--radius-lg);
+}
+.rounded-dynamic-xl {
+  border-radius: var(--radius-xl);
+}
+.rounded-dynamic-2xl {
+  border-radius: var(--radius-2xl);
+}
+.rounded-dynamic-full {
+  border-radius: var(--radius-full);
+}
+
+/* Shadows */
+.shadow-dynamic-sm {
+  box-shadow: var(--shadow-sm);
+}
+.shadow-dynamic-base {
+  box-shadow: var(--shadow-base);
+}
+.shadow-dynamic-md {
+  box-shadow: var(--shadow-md);
+}
+.shadow-dynamic-lg {
+  box-shadow: var(--shadow-lg);
+}
+.shadow-dynamic-xl {
+  box-shadow: var(--shadow-xl);
+}
+
+/* Blur */
+.backdrop-blur-dynamic-sm {
+  backdrop-filter: blur(var(--blur-sm));
+}
+.backdrop-blur-dynamic-base {
+  backdrop-filter: blur(var(--blur-base));
+}
+.backdrop-blur-dynamic-md {
+  backdrop-filter: blur(var(--blur-md));
+}
+.backdrop-blur-dynamic-lg {
+  backdrop-filter: blur(var(--blur-lg));
+}
+.backdrop-blur-dynamic-xl {
+  backdrop-filter: blur(var(--blur-xl));
+}
+
+/* Transitions */
+.transition-dynamic {
+  transition: all var(--transition-base) ease-in-out;
+}
+.transition-dynamic-fast {
+  transition: all var(--transition-fast) ease-in-out;
+}
+.transition-dynamic-slow {
+  transition: all var(--transition-slow) ease-in-out;
+}
+.transition-dynamic-slower {
+  transition: all var(--transition-slower) ease-in-out;
+}
+
+/* ============================================================================
+   COMPOSANTS PRÉDÉFINIS
+   ============================================================================ */
+
+/* Bouton primaire avec design dynamique */
+.btn-dynamic-primary {
+  background-color: var(--color-primary);
+  color: var(--color-text-light);
+  padding: 0.75rem 1.5rem;
+  border-radius: var(--radius-lg);
+  font-weight: var(--font-semibold);
+  transition: all var(--transition-base) ease-in-out;
+  box-shadow: var(--shadow-sm);
+}
+
+.btn-dynamic-primary:hover {
+  background-color: var(--color-primary-hover);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
+}
+
+/* Bouton secondaire */
+.btn-dynamic-secondary {
+  background-color: var(--color-secondary);
+  color: var(--color-text-light);
+  padding: 0.75rem 1.5rem;
+  border-radius: var(--radius-lg);
+  font-weight: var(--font-semibold);
+  transition: all var(--transition-base) ease-in-out;
+  box-shadow: var(--shadow-sm);
+}
+
+.btn-dynamic-secondary:hover {
+  background-color: var(--color-secondary-hover);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
+}
+
+/* Carte avec design dynamique */
+.card-dynamic {
+  background-color: var(--color-bg-primary);
+  border-radius: var(--radius-xl);
+  padding: var(--spacing-card);
+  box-shadow: var(--shadow-base);
+  transition: all var(--transition-base) ease-in-out;
+}
+
+.card-dynamic:hover {
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-2px);
+}
+
+/* Section avec espacement dynamique */
+.section-dynamic {
+  padding-top: var(--spacing-section);
+  padding-bottom: var(--spacing-section);
+}
+
+@media (max-width: 768px) {
+  .section-dynamic {
+    padding-top: var(--spacing-section-mobile);
+    padding-bottom: var(--spacing-section-mobile);
+  }
+
+  .card-dynamic {
+    padding: var(--spacing-card-mobile);
+  }
+}
+
+/* Titre avec typographie dynamique */
+.heading-dynamic {
+  font-family: var(--font-heading);
+  font-weight: var(--font-bold);
+  color: var(--color-text-primary);
+  line-height: var(--leading-tight);
+}
+
+/* Texte corps avec typographie dynamique */
+.body-dynamic {
+  font-family: var(--font-body);
+  font-weight: var(--font-normal);
+  color: var(--color-text-secondary);
+  line-height: var(--leading-normal);
+}
+
+/* Bordure avec couleur dynamique */
+.border-dynamic {
+  border-width: 1px;
+  border-style: solid;
+  border-color: var(--color-border-light);
+}
+
+/* Gradient de fond dynamique */
+.bg-dynamic-gradient {
+  background: var(--color-bg-gradient);
+}
+
+/* ============================================================================
+   UTILITAIRES DE COMPOSITION
+   ============================================================================ */
+
+/* Hero section dynamique */
+.hero-dynamic {
+  background: var(--color-bg-gradient);
+  color: var(--color-text-light);
+  padding-top: var(--spacing-section);
+  padding-bottom: var(--spacing-section);
+  text-align: center;
+}
+
+@media (max-width: 768px) {
+  .hero-dynamic {
+    padding-top: var(--spacing-section-mobile);
+    padding-bottom: var(--spacing-section-mobile);
+  }
+}
+
+/* Container responsive dynamique */
+.container-dynamic {
+  max-width: 1280px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: var(--spacing-container);
+  padding-right: var(--spacing-container);
+}
+
+@media (max-width: 768px) {
+  .container-dynamic {
+    padding-left: var(--spacing-container-mobile);
+    padding-right: var(--spacing-container-mobile);
+  }
+}
+
+/* Badge de statut dynamique */
+.badge-success {
+  background-color: var(--color-success);
+  color: var(--color-text-light);
+  padding: 0.25rem 0.75rem;
+  border-radius: var(--radius-full);
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+}
+
+.badge-warning {
+  background-color: var(--color-warning);
+  color: var(--color-text-light);
+  padding: 0.25rem 0.75rem;
+  border-radius: var(--radius-full);
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+}
+
+.badge-error {
+  background-color: var(--color-error);
+  color: var(--color-text-light);
+  padding: 0.25rem 0.75rem;
+  border-radius: var(--radius-full);
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+}
+
+/* ============================================================================
+   ANIMATIONS ET INTERACTIONS
+   ============================================================================ */
+
+.hover-lift {
+  transition: transform var(--transition-base) ease-in-out,
+    box-shadow var(--transition-base) ease-in-out;
+}
+
+.hover-lift:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+}
+
+.hover-scale {
+  transition: transform var(--transition-base) ease-in-out;
+}
+
+.hover-scale:hover {
+  transform: scale(1.02);
+}
+
+/* ============================================================================
+   MODE SOMBRE (Support futur)
+   ============================================================================ */
+
+.dark .bg-dynamic-primary {
+  background-color: var(--color-bg-dark);
+}
+.dark .text-dynamic-primary {
+  color: var(--color-text-light);
+}
+.dark .border-dynamic-light {
+  border-color: var(--color-border-dark);
+}
+.dark .card-dynamic {
+  background-color: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--color-border-dark);
+}

@@ -1,0 +1,56 @@
+# Dependencies
+node_modules
+.pnpm-store
+
+# Testing
+coverage
+.nyc_output
+
+# Debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Local env files
+.env*.local
+.env
+
+# IDE
+.idea
+.vscode
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Build
+.next
+out
+dist
+
+# Git
+.git
+.gitignore
+
+# Documentation
+README.md
+LICENSE
+*.md
+
+# Autres
+*.log
+*.sqlite
+*.sqlite3
+
+# Exclusions
+.github
+.vercel
+documentation
+test-results
+playwright-report
+tests-examples
+prisma/migrations
+public/videos
+public/uploads 

@@ -1,0 +1,84 @@
+/* SEO optimizations for KAIRO Digital */
+
+/* Critical CSS for above-the-fold content */
+.hero-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Optimize image loading for better CLS (Cumulative Layout Shift) */
+.img-container {
+  position: relative;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16/9;
+}
+
+/* Optimize heading hierarchy for SEO */
+h1 {
+  font-size: clamp(2.5rem, 5vw, 4.5rem);
+  line-height: 1.1;
+  margin-bottom: 1rem;
+}
+
+h2 {
+  font-size: clamp(1.8rem, 4vw, 3rem);
+  line-height: 1.2;
+  margin-bottom: 1rem;
+}
+
+h3 {
+  font-size: clamp(1.2rem, 3vw, 1.8rem);
+  line-height: 1.3;
+  margin-bottom: 0.75rem;
+}
+
+/* Optimize link accessibility for SEO */
+a:focus {
+  outline: 2px solid #0066cc;
+  outline-offset: 2px;
+}
+
+/* Optimize text readability */
+p,
+li {
+  font-size: 1rem;
+  line-height: 1.6;
+  max-width: 70ch; /* Optimal reading length */
+}
+
+/* Optimize focus states for keyboard navigation */
+:focus-visible {
+  outline: 2px solid #0066cc;
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+/* Optimize for print */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+
+  body {
+    font-size: 12pt;
+    line-height: 1.5;
+    color: #000;
+    background: #fff;
+  }
+
+  a {
+    text-decoration: underline;
+    color: #000;
+  }
+
+  a::after {
+    content: " (" attr(href) ")";
+    font-size: 0.8em;
+  }
+}

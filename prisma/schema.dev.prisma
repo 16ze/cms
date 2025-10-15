@@ -1,0 +1,23 @@
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum AdminRole {
+  ADMIN
+  SUPER_ADMIN
+}
+
+model AdminUser {
+  id             String    @id @default(cuid())
+  email          String    @unique
+  hashedPassword String
+  role           AdminRole @default(ADMIN)
+  lastLogin      DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+}

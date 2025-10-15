@@ -1,0 +1,78 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+/node_modules
+/.pnp
+.pnp.js
+.yarn/install-state.gz
+
+# testing
+/coverage
+
+# next.js
+/.next/
+/out/
+
+# production
+/build
+
+# misc
+.DS_Store
+*.pem
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# local env files
+.env*.local
+.env
+.env.development
+.env.production
+.env.test
+
+# credentials et secrets
+*.key
+*.pem
+*.cert
+*.p12
+**/credentials.json
+**/service-account.json
+
+# documentation et informations sensibles
+/documentation/
+/docs/
+/docs_web/
+lighthouse-report.html
+test-email.js
+
+# vercel
+.vercel
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+
+# éditeurs
+.vscode/
+.idea/
+*.sublime-*
+*.swp
+*.swo
+
+# Playwright
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+
+# Large Media Files
+!public/images/69371-533801345.mp4
+*.mp4
+*.mov
+*.avi
+*.mkv
+*.zip
+*.tar.gz
+*.rar

@@ -1,0 +1,394 @@
+/* Corrections responsive mobile pour l'interface admin */
+
+/* Animations pour la sidebar mobile */
+@keyframes slideInFromLeft {
+  from {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideOutToLeft {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+/* Effet de rebond subtil à l'ouverture */
+@keyframes bounceIn {
+  0% {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  60% {
+    transform: translateX(10px);
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+/* Classes d'animation pour la sidebar */
+.sidebar-enter {
+  animation: slideInFromLeft 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.sidebar-exit {
+  animation: slideOutToLeft 0.25s cubic-bezier(0.4, 0, 1, 1) forwards;
+}
+
+.sidebar-bounce-enter {
+  animation: bounceIn 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
+}
+
+.overlay-enter {
+  animation: fadeIn 0.3s ease-out forwards;
+}
+
+.overlay-exit {
+  animation: fadeOut 0.25s ease-in forwards;
+}
+
+/* Amélioration de la sidebar mobile avec transitions */
+.admin-mobile-sidebar {
+  @apply transition-all duration-300 ease-out;
+  transform: translateX(-100%);
+  opacity: 0;
+}
+
+.admin-mobile-sidebar.open {
+  transform: translateX(0);
+  opacity: 1;
+}
+
+.admin-mobile-overlay {
+  @apply transition-all duration-300 ease-out;
+  opacity: 0;
+  pointer-events: none;
+  backdrop-filter: blur(0px);
+}
+
+.admin-mobile-overlay.open {
+  opacity: 1;
+  pointer-events: auto;
+  backdrop-filter: blur(8px);
+}
+
+/* Amélioration des éléments de la sidebar avec stagger */
+.admin-mobile-sidebar.open .sidebar-item {
+  animation: fadeInUp 0.3s ease-out backwards;
+}
+
+.admin-mobile-sidebar.open .sidebar-item:nth-child(1) {
+  animation-delay: 0.1s;
+}
+
+.admin-mobile-sidebar.open .sidebar-item:nth-child(2) {
+  animation-delay: 0.15s;
+}
+
+.admin-mobile-sidebar.open .sidebar-item:nth-child(3) {
+  animation-delay: 0.2s;
+}
+
+.admin-mobile-sidebar.open .sidebar-item:nth-child(4) {
+  animation-delay: 0.25s;
+}
+
+.admin-mobile-sidebar.open .sidebar-item:nth-child(5) {
+  animation-delay: 0.3s;
+}
+
+.admin-mobile-sidebar.open .sidebar-item:nth-child(6) {
+  animation-delay: 0.35s;
+}
+
+.admin-mobile-sidebar.open .sidebar-item:nth-child(7) {
+  animation-delay: 0.4s;
+}
+
+/* Animation fadeInUp pour les items */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Layout principal mobile */
+@media (max-width: 768px) {
+  .admin-mobile-layout {
+    @apply px-3 py-4;
+  }
+
+  /* Réduction des marges et paddings */
+  .admin-mobile-container {
+    @apply mx-2 px-2;
+  }
+
+  /* Titres adaptés mobile */
+  .admin-mobile-title {
+    @apply text-xl font-bold;
+  }
+
+  .admin-mobile-subtitle {
+    @apply text-sm;
+  }
+}
+
+/* Tableaux responsive */
+@media (max-width: 768px) {
+  .admin-table-mobile {
+    @apply text-xs;
+  }
+
+  .admin-table-mobile th,
+  .admin-table-mobile td {
+    @apply px-2 py-2;
+  }
+
+  /* Masquer certaines colonnes sur mobile */
+  .admin-table-mobile .mobile-hide {
+    @apply hidden;
+  }
+
+  /* Afficher les données importantes dans une seule colonne */
+  .admin-table-mobile .mobile-stack {
+    @apply block;
+  }
+
+  .admin-table-mobile .mobile-stack .mobile-label {
+    @apply block text-xs text-slate-500 font-medium;
+  }
+
+  .admin-table-mobile .mobile-stack .mobile-value {
+    @apply block text-sm font-medium;
+  }
+}
+
+/* Formulaires responsive */
+@media (max-width: 768px) {
+  .admin-form-mobile {
+    @apply space-y-4;
+  }
+
+  .admin-form-mobile .form-group {
+    @apply space-y-2;
+  }
+
+  .admin-form-mobile .form-row {
+    @apply flex-col space-y-2;
+  }
+
+  .admin-form-mobile .form-row .form-col {
+    @apply w-full;
+  }
+
+  /* Labels et inputs plus compacts */
+  .admin-form-mobile label {
+    @apply text-sm font-medium;
+  }
+
+  .admin-form-mobile input,
+  .admin-form-mobile select,
+  .admin-form-mobile textarea {
+    @apply text-sm py-2;
+  }
+}
+
+/* Modales responsive */
+@media (max-width: 768px) {
+  .admin-modal-mobile {
+    @apply mx-2 my-4 max-h-[90vh] overflow-y-auto;
+  }
+
+  .admin-modal-mobile .modal-header {
+    @apply px-4 py-3;
+  }
+
+  .admin-modal-mobile .modal-body {
+    @apply px-4 py-3;
+  }
+
+  .admin-modal-mobile .modal-footer {
+    @apply px-4 py-3 flex-col space-y-2;
+  }
+
+  .admin-modal-mobile .modal-footer button {
+    @apply w-full;
+  }
+}
+
+/* Cartes et statistiques responsive */
+@media (max-width: 768px) {
+  .admin-stats-mobile {
+    @apply grid-cols-2 gap-3;
+  }
+
+  .admin-stats-mobile .stat-card {
+    @apply p-4 text-center;
+  }
+
+  .admin-stats-mobile .stat-number {
+    @apply text-2xl font-bold;
+  }
+
+  .admin-stats-mobile .stat-label {
+    @apply text-xs mt-1;
+  }
+}
+
+/* Navigation mobile */
+@media (max-width: 768px) {
+  .admin-nav-mobile {
+    @apply flex-wrap gap-1;
+  }
+
+  .admin-nav-mobile .nav-item {
+    @apply flex-1 min-w-0;
+  }
+
+  .admin-nav-mobile .nav-item button {
+    @apply w-full text-xs;
+  }
+}
+
+/* Filtres et recherche mobile */
+@media (max-width: 768px) {
+  .admin-filters-mobile {
+    @apply flex-col space-y-3;
+  }
+
+  .admin-filters-mobile .filter-group {
+    @apply w-full;
+  }
+
+  .admin-filters-mobile .search-bar {
+    @apply w-full;
+  }
+
+  .admin-filters-mobile .filter-buttons {
+    @apply flex-wrap gap-1;
+  }
+
+  .admin-filters-mobile .filter-buttons button {
+    @apply flex-1 min-w-0 text-xs;
+  }
+}
+
+/* Actions rapides mobile */
+@media (max-width: 768px) {
+  .admin-actions-mobile {
+    @apply flex-col space-y-2;
+  }
+
+  .admin-actions-mobile .action-button {
+    @apply w-full justify-center;
+  }
+}
+
+/* Très petits écrans */
+@media (max-width: 480px) {
+  .admin-mobile-layout {
+    @apply px-2 py-3;
+  }
+
+  .admin-mobile-container {
+    @apply mx-1 px-1;
+  }
+
+  .admin-mobile-title {
+    @apply text-lg;
+  }
+
+  .admin-stats-mobile {
+    @apply grid-cols-1 gap-2;
+  }
+
+  .admin-table-mobile {
+    @apply text-xs;
+  }
+
+  .admin-table-mobile th,
+  .admin-table-mobile td {
+    @apply px-1 py-1;
+  }
+
+  /* Boutons d'action en colonne sur très petits écrans */
+  .admin-actions-mobile {
+    @apply space-y-1;
+  }
+
+  .admin-actions-mobile .action-button {
+    @apply text-xs py-2;
+  }
+}
+
+/* Amélioration de la lisibilité sur mobile */
+@media (max-width: 768px) {
+  .admin-mobile-text {
+    @apply text-sm leading-relaxed;
+  }
+
+  .admin-mobile-text-small {
+    @apply text-xs;
+  }
+
+  /* Espacement optimisé */
+  .admin-mobile-spacing {
+    @apply space-y-3;
+  }
+
+  .admin-mobile-spacing-tight {
+    @apply space-y-2;
+  }
+}
+
+/* Scroll horizontal pour les tableaux larges */
+@media (max-width: 768px) {
+  .admin-table-container {
+    @apply overflow-x-auto;
+  }
+
+  .admin-table-container table {
+    @apply min-w-full;
+  }
+
+  /* Indicateur de scroll */
+  .admin-table-container::after {
+    content: "← Faites défiler pour voir plus →";
+    @apply block text-xs text-center text-slate-500 mt-2;
+  }
+}

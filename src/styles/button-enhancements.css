@@ -1,0 +1,105 @@
+/**
+ * Améliorations visuelles pour tous les boutons du site
+ * Appliquées automatiquement sans modifier le code existant
+ */
+
+/* Amélioration de tous les boutons */
+button,
+.btn,
+[role="button"] {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Désactivé : effet de pression et hover trop intrusifs */
+
+/* Focus ring amélioré */
+button:focus-visible,
+.btn:focus-visible {
+  outline: 3px solid #3b82f6;
+  outline-offset: 3px;
+}
+
+/* Loading state pour les boutons */
+button[disabled]::after,
+button[aria-busy="true"]::after {
+  content: "";
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 14px;
+  height: 14px;
+  border: 2px solid currentColor;
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+/* Désactivé : effets hover sur les cartes trop intrusifs */
+
+/* Focus subtil pour les inputs */
+input:focus,
+textarea:focus,
+select:focus {
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* Désactivé : effets hover sur liens et images */
+
+/* Modal backdrop avec blur */
+[class*="modal-backdrop"],
+.modal-overlay {
+  backdrop-filter: blur(4px);
+  animation: fade-in 0.2s ease-out;
+}
+
+/* Toast notifications avec slide */
+[data-sonner-toast] {
+  animation: slide-in-right 0.3s ease-out;
+}
+
+@keyframes slide-in-right {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* Pulse effect pour les éléments importants */
+.pulse-effect {
+  animation: pulse-gentle 2s ease-in-out infinite;
+}
+
+@keyframes pulse-gentle {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+/* Gradient animé pour les backgrounds */
+.animated-gradient {
+  background-size: 200% 200%;
+  animation: gradient-shift 8s ease infinite;
+}
+
+@keyframes gradient-shift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}

@@ -1,0 +1,30 @@
+# Robots.txt pour https://www.kairo-digital.fr
+# Généré automatiquement par KAIRO Digital
+
+User-agent: *
+Allow: /
+
+# Pages principales
+Allow: /about
+Allow: /services
+Allow: /portfolio
+Allow: /blog
+Allow: /contact
+
+# Ressources statiques
+Allow: /images/
+Allow: /css/
+Allow: /js/
+Allow: /fonts/
+
+# Pages à exclure
+Disallow: /admin/
+Disallow: /api/
+Disallow: /_next/
+Disallow: /private/
+
+# Sitemap
+Sitemap: https://www.kairo-digital.fr/sitemap.xml
+
+# Temps de crawl recommandé
+Crawl-delay: 1

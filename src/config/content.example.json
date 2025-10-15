@@ -1,0 +1,516 @@
+{
+  "homepage": {
+    "hero": {
+      "title": "Conception & Développement web",
+      "subtitle": "Transformons vos idées en succès digital",
+      "ctaButton": "Réserver une consultation",
+      "ctaButtonUrl": "/consultation"
+    },
+    "education": {
+      "bubble1": "Développez votre site web professionnel pour faire croître votre entreprise",
+      "bubble2": "avec un accompagnement personnalisé",
+      "bubble3": "Choisissez une solution web ou mobile adaptée à vos besoins",
+      "ctaButton": "Découvrir nos services",
+      "ctaButtonUrl": "/services"
+    },
+    "services": {
+      "title": "Solutions Digitales",
+      "subtitle": "Découvrez toute notre expertise en développement.",
+      "slogan": "Conçues pour votre croissance digitale.",
+      "primaryButton": "En savoir plus",
+      "secondaryButton": "Voir notre portfolio",
+      "primaryButtonUrl": "/services",
+      "secondaryButtonUrl": "/portfolio",
+      "mockups": {
+        "vitrine": {
+          "label": "Site Vitrine"
+        },
+        "ecommerce": {
+          "label": "E-commerce"
+        },
+        "application": {
+          "label": "Application"
+        }
+      }
+    },
+    "grid": {
+      "visibility": {
+        "title": "Visibilité 24/7",
+        "subtitle": "Augmentez votre présence en ligne à tout moment.",
+        "image": "/images/visibilité24sur7.png",
+        "primaryButton": "En savoir plus",
+        "secondaryButton": "Audit gratuit"
+      },
+      "performance": {
+        "title": "Performance Optimale",
+        "subtitle": "Sites ultra-rapides. Toujours plus efficaces.",
+        "image": "/images/performance-optimal.jpg",
+        "primaryButton": "En savoir plus",
+        "secondaryButton": "Test de vitesse"
+      },
+      "conversion": {
+        "title": "Génération de leads",
+        "subtitle": "Transformez vos visiteurs en clients fidèles.",
+        "image": "/images/generation-de-lead.png",
+        "primaryButton": "En savoir plus",
+        "secondaryButton": "Voir les résultats"
+      },
+      "responsive": {
+        "title": "Design Adaptatif",
+        "subtitle": "Parfait sur tous les appareils et écrans.",
+        "image": "/images/design-adaptatif.png",
+        "primaryButton": "En savoir plus",
+        "secondaryButton": "Voir les démos"
+      },
+      "security": {
+        "title": "Sécurité Avancée",
+        "subtitle": "Protection maximale validée par nos experts.",
+        "image": "/images/securité-avance.png",
+        "primaryButton": "En savoir plus",
+        "secondaryButton": "Audit sécurité"
+      },
+      "roi": {
+        "title": "Retour sur Investissement",
+        "subtitle": "ROI moyen de 300% sur vos projets digitaux.",
+        "image": "/images/retour-sur-investissement.png",
+        "primaryButton": "En savoir plus",
+        "secondaryButton": "Calculer mon ROI"
+      }
+    },
+    "portfolio": {
+      "slides": [
+        {
+          "title": "E-commerce",
+          "subtitle": "E-commerce beauté avec parcours d'achat optimisé",
+          "category": "E-commerce",
+          "image": "/images/projects/holy-beauty.jpg"
+        },
+        {
+          "title": "Site vitrine",
+          "subtitle": "Site vitrine premium avec réservation intégrée",
+          "category": "Site vitrine",
+          "image": "/images/projects/purple-nails.jpg"
+        },
+        {
+          "title": "Application web",
+          "subtitle": "Plateforme corporate orientée conversion B2B",
+          "category": "Corporate",
+          "image": "/images/projects/kairo-digital.jpg"
+        }
+      ]
+    },
+    "finalCta": {
+      "title": "Prêt à démarrer votre projet ?",
+      "subtitle": "Transformons vos idées en succès digital",
+      "primaryButton": "Démarrer un projet",
+      "secondaryButton": "Voir notre portfolio"
+    },
+    "faq": {
+      "title": "Questions Fréquentes",
+      "items": [
+        {
+          "question": "Combien de temps faut-il pour créer un site web ?",
+          "answer": "Le délai varie selon la complexité du projet : 2-3 semaines pour un site vitrine simple, 4-6 semaines pour un site e-commerce, et 6-8 semaines pour une application web complexe. Nous respectons toujours les délais convenus et vous tenons informés de l'avancement."
+        },
+        {
+          "question": "Proposez-vous la maintenance et l'hébergement ?",
+          "answer": "Oui, nous proposons des forfaits de maintenance complète incluant l'hébergement, les mises à jour de sécurité, les sauvegardes automatiques, et le support technique. Nos forfaits sont adaptés à tous les budgets et besoins."
+        },
+        {
+          "question": "Quels sont vos tarifs pour un site web ?",
+          "answer": "Nos tarifs varient selon la complexité et les fonctionnalités demandées. Un site vitrine démarre à 500€, un site e-commerce à partir de 3000€, et une application web sur mesure à partir de 5000€. Nous proposons des devis personnalisés gratuits."
+        },
+        {
+          "question": "Travaillez-vous uniquement à [VILLE] ou partout en France ?",
+          "answer": "Bien que basés à [VILLE], nous travaillons avec des clients partout en France. La majorité de notre travail se fait à distance, et nous nous déplaçons si nécessaire pour les réunions importantes ou la formation."
+        },
+        {
+          "question": "Mes données seront-elles sécurisées ?",
+          "answer": "Absolument. Nous utilisons les dernières technologies de sécurité, des certificats SSL, des sauvegardes régulières, et respectons le RGPD. Vos données sont protégées et nous vous accompagnons dans la conformité légale."
+        },
+        {
+          "question": "Pouvez-vous optimiser mon site pour les moteurs de recherche ?",
+          "answer": "Oui, le SEO est notre spécialité. Nous optimisons votre site pour Google et autres moteurs de recherche, améliorons votre visibilité en ligne, et vous accompagnons dans votre stratégie de référencement naturel."
+        },
+        {
+          "question": "Proposez-vous une formation pour gérer mon site ?",
+          "answer": "Oui, nous formons vos équipes à l'utilisation de votre site web. Nous fournissons également des guides d'utilisation détaillés et restons disponibles pour le support technique après la livraison."
+        },
+        {
+          "question": "Quelles technologies utilisez-vous ?",
+          "answer": "Nous utilisons les technologies modernes : Next.js, React, TypeScript, Tailwind CSS, et des bases de données performantes. Ces technologies garantissent des sites rapides, sécurisés et évolutifs."
+        }
+      ]
+    }
+  },
+  "metadata": {
+    "title": "[NOM ENTREPRISE] | [DESCRIPTION METIER] à [VILLE]",
+    "description": "[NOM ENTREPRISE] est une [TYPE ENTREPRISE] à [VILLE] spécialisée dans [SERVICES PRINCIPAUX]. Nous créons des sites web performants, élégants et optimisés pour les moteurs de recherche en [REGION].",
+    "keywords": "[mots-clés spécifiques à votre activité et région]",
+    "canonical": "https://www.[votre-domaine].fr"
+  },
+  "business": {
+    "name": "[NOM ENTREPRISE]",
+    "description": "[DESCRIPTION DE VOTRE ENTREPRISE]",
+    "phone": "+33[VOTRE NUMERO]",
+    "email": "contact@[votre-domaine].fr",
+    "address": {
+      "street": "[VOTRE ADRESSE]",
+      "city": "[VOTRE VILLE]",
+      "postalCode": "[CODE POSTAL]",
+      "country": "FR",
+      "region": "[VOTRE REGION]"
+    },
+    "coordinates": {
+      "latitude": [VOTRE LATITUDE],
+      "longitude": [VOTRE LONGITUDE]
+    },
+    "openingHours": {
+      "days": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+      "opens": "09:00",
+      "closes": "18:00"
+    },
+    "social": [
+      "https://www.facebook.com/[votre-page]",
+      "https://www.instagram.com/[votre-compte]",
+      "https://www.linkedin.com/company/[votre-entreprise]",
+      "https://twitter.com/[votre-compte]"
+    ]
+  },
+  "header": {
+    "logo": "[NOM ENTREPRISE]",
+    "navigation": [
+      {
+        "name": "Accueil",
+        "href": "/"
+      },
+      {
+        "name": "Méthode",
+        "href": "/freelance"
+      },
+      {
+        "name": "Services",
+        "href": "/services"
+      },
+      {
+        "name": "À propos",
+        "href": "/about"
+      },
+      {
+        "name": "Contact",
+        "href": "/contact"
+      }
+    ],
+    "buttons": {
+      "booking": "Réserver"
+    }
+  },
+  "footer": {
+    "company": "[NOM ENTREPRISE]",
+    "description": "[DESCRIPTION DE VOTRE ENTREPRISE] à [VILLE], spécialisée dans [VOS SERVICES]",
+    "contact": {
+      "phone": "+33[VOTRE NUMERO]",
+      "email": "contact@[votre-domaine].fr",
+      "address": "[VOTRE ADRESSE COMPLETE]"
+    },
+    "social": [
+      "https://www.facebook.com/[votre-page]",
+      "https://www.instagram.com/[votre-compte]",
+      "https://www.linkedin.com/company/[votre-entreprise]",
+      "https://twitter.com/[votre-compte]"
+    ]
+  },
+  "global": {
+    "theme": {
+      "primary": "#007aff",
+      "secondary": "#8b5cf6",
+      "accent": "#f59e0b"
+    },
+    "meta": {
+      "title": "[NOM ENTREPRISE] | [DESCRIPTION METIER]",
+      "description": "[NOM ENTREPRISE] est une [TYPE ENTREPRISE] à [VILLE] spécialisée dans [SERVICES PRINCIPAUX]",
+      "canonical": "https://www.[votre-domaine].fr"
+    }
+  },
+  "freelance": {
+    "hero": {
+      "title": "Méthode [TYPE ENTREPRISE] Professionnelle",
+      "subtitle": "Une approche structurée et transparente",
+      "heroDescription": "Découvrez notre processus de développement en 5 étapes qui garantit des résultats optimaux et une transparence totale sur votre projet."
+    },
+    "introduction": {
+      "title": "Notre Méthode [TYPE ENTREPRISE]",
+      "subtitle": "Une approche structurée pour des résultats garantis",
+      "description": "Découvrez notre processus de développement qui garantit des résultats optimaux",
+      "details": "Nous utilisons une méthodologie éprouvée basée sur les meilleures pratiques du développement web moderne."
+    },
+    "etapes": [
+      {
+        "nom": "Analyse & Conception",
+        "duree": "1-2 semaines",
+        "description": "Analyse approfondie de vos besoins et conception de l'architecture",
+        "livrables": "Cahier des charges détaillé, maquettes, planning",
+        "details": "Nous analysons vos objectifs, votre audience et vos contraintes pour concevoir la solution optimale.",
+        "icone": "search"
+      },
+      {
+        "nom": "Design & UX",
+        "duree": "2-3 semaines",
+        "description": "Création d'interfaces utilisateur modernes et intuitives",
+        "livrables": "Designs complets, prototypes interactifs",
+        "details": "Design centré utilisateur avec une attention particulière à l'expérience et à l'accessibilité.",
+        "icone": "design"
+      },
+      {
+        "nom": "Développement",
+        "duree": "3-6 semaines",
+        "description": "Développement technique avec les dernières technologies",
+        "livrables": "Site web fonctionnel, code source",
+        "details": "Développement en utilisant Next.js, React et les meilleures pratiques du web moderne.",
+        "icone": "code"
+      },
+      {
+        "nom": "Tests & Optimisation",
+        "duree": "1-2 semaines",
+        "description": "Tests complets et optimisation des performances",
+        "livrables": "Site testé, optimisé et documenté",
+        "details": "Tests de qualité, optimisation SEO et des performances pour un site parfaitement fonctionnel.",
+        "icone": "test"
+      },
+      {
+        "nom": "Mise en ligne",
+        "duree": "1 semaine",
+        "description": "Déploiement et configuration finale",
+        "livrables": "Site en ligne, formation utilisateur",
+        "details": "Déploiement sécurisé et formation de votre équipe pour la gestion du contenu.",
+        "icone": "rocket"
+      }
+    ],
+    "avantages": {
+      "title": "Pourquoi Choisir Notre Méthode ?",
+      "items": [
+        {
+          "titre": "Transparence Totale",
+          "description": "Suivez chaque étape de votre projet en temps réel"
+        },
+        {
+          "titre": "Qualité Garantie",
+          "description": "Code propre, tests exhaustifs et documentation complète"
+        },
+        {
+          "titre": "Support Continu",
+          "description": "Accompagnement et maintenance après la livraison"
+        }
+      ]
+    },
+    "cta": {
+      "titre": "Prêt à Démarrer Votre Projet ?",
+      "subtitle": "Contactez-nous pour un devis personnalisé",
+      "bouton_principal": "Demander un devis",
+      "bouton_principal_url": "/contact",
+      "bouton_secondaire": "Voir nos réalisations",
+      "bouton_secondaire_url": "/portfolio"
+    },
+    "garanties": [
+      {
+        "titre": "Qualité Garantie",
+        "description": "Code propre et maintenable",
+        "details": "Nous garantissons un code de qualité professionnelle, bien documenté et facilement maintenable."
+      },
+      {
+        "titre": "Livraison à Temps",
+        "description": "Respect des délais convenus",
+        "details": "Nous nous engageons à respecter les délais fixés dans le planning de votre projet."
+      },
+      {
+        "titre": "Support Post-Livraison",
+        "description": "Accompagnement continu",
+        "details": "Bénéficiez de notre support technique et de nos conseils après la mise en ligne."
+      },
+      {
+        "titre": "Satisfaction Client",
+        "description": "100% satisfait ou remboursé",
+        "details": "Votre satisfaction est notre priorité. Si vous n'êtes pas satisfait, nous corrigeons jusqu'à ce que vous le soyez."
+      }
+    ]
+  },
+  "about": {
+    "hero": {
+      "title": "À propos de [NOM ENTREPRISE]",
+      "subtitle": "Votre partenaire digital à [VILLE]",
+      "description": "[TYPE ENTREPRISE] spécialisée dans [SERVICES PRINCIPAUX] en [REGION]"
+    },
+    "foundedText": "Fondée en [ANNEE] par [FONDATEUR], [NOM ENTREPRISE] est née d'une vision simple : démocratiser l'accès à des solutions web de qualité pour les entreprises de [VILLE] et de la [REGION]. Notre mission est de transformer vos idées en succès digitaux grâce à une approche personnalisée et des technologies modernes.",
+    "story": {
+      "title": "Notre Histoire",
+      "content": "[NOM ENTREPRISE] est né de la passion pour [VOTRE DOMAINE] et l'innovation digitale. Basée à [VILLE], notre [TYPE ENTREPRISE] accompagne les entreprises dans leur transformation numérique avec expertise et créativité.",
+      "image": "/images/[votre-photo].jpg"
+    },
+    "values": {
+      "title": "Nos Valeurs",
+      "items": [
+        {
+          "title": "Excellence",
+          "description": "Nous visons l'excellence dans chaque projet, en utilisant les meilleures pratiques et technologies modernes."
+        },
+        {
+          "title": "Transparence",
+          "description": "Une communication claire et transparente tout au long de votre projet, sans surprises."
+        },
+        {
+          "title": "Innovation",
+          "description": "Nous restons à la pointe des technologies pour vous offrir des solutions innovantes."
+        }
+      ]
+    },
+    "team": {
+      "title": "L'Équipe",
+      "description": "Une équipe passionnée et expérimentée à votre service",
+      "members": [
+        {
+          "name": "[VOTRE NOM]",
+          "role": "[VOTRE POSTE]",
+          "description": "Expert en [VOS COMPETENCES]",
+          "image": "/images/[votre-photo].jpg"
+        }
+      ]
+    }
+  },
+  "services": {
+    "hero": {
+      "title": "Nos Services",
+      "subtitle": "Solutions digitales complètes pour votre entreprise",
+      "description": "Découvrez notre gamme complète de services pour booster votre présence en ligne"
+    },
+    "services": {
+      "title": "Nos Expertises",
+      "subtitle": "Des solutions sur mesure pour chaque besoin",
+      "items": [
+        {
+          "title": "Développement Web",
+          "description": "Sites web modernes, responsives et performants avec les dernières technologies",
+          "features": [
+            "React/Next.js",
+            "Design responsive",
+            "Optimisation SEO",
+            "Performance optimale"
+          ],
+          "price": "À partir de 1500€",
+          "icon": "code"
+        },
+        {
+          "title": "E-commerce",
+          "description": "Boutiques en ligne sécurisées avec gestion complète des commandes et paiements",
+          "features": [
+            "Panier intelligent",
+            "Paiement sécurisé",
+            "Gestion stock",
+            "Analytics"
+          ],
+          "price": "À partir de 2500€",
+          "icon": "shopping-cart"
+        },
+        {
+          "title": "Optimisation SEO",
+          "description": "Amélioration de votre visibilité sur les moteurs de recherche",
+          "features": [
+            "Audit SEO",
+            "Optimisation technique",
+            "Contenu optimisé",
+            "Suivi rankings"
+          ],
+          "price": "À partir de 500€",
+          "icon": "search"
+        },
+        {
+          "title": "Maintenance & Support",
+          "description": "Support technique continu et maintenance de votre site web",
+          "features": [
+            "Mises à jour",
+            "Sauvegardes",
+            "Monitoring",
+            "Support technique"
+          ],
+          "price": "À partir de 100€/mois",
+          "icon": "wrench"
+        }
+      ]
+    },
+    "process": {
+      "title": "Notre Processus",
+      "subtitle": "Une méthode éprouvée en 5 étapes",
+      "steps": [
+        {
+          "number": "01",
+          "title": "Analyse",
+          "description": "Audit de vos besoins et définition de la stratégie"
+        },
+        {
+          "number": "02",
+          "title": "Design",
+          "description": "Création des maquettes et de l'expérience utilisateur"
+        },
+        {
+          "number": "03",
+          "title": "Développement",
+          "description": "Codage et intégration avec les meilleures pratiques"
+        },
+        {
+          "number": "04",
+          "title": "Tests",
+          "description": "Tests approfondis et optimisation des performances"
+        },
+        {
+          "number": "05",
+          "title": "Lancement",
+          "description": "Mise en ligne et formation de votre équipe"
+        }
+      ]
+    }
+  },
+  "contact": {
+    "hero": {
+      "title": "Contactez-nous",
+      "subtitle": "Parlons de votre projet",
+      "description": "Prêt à donner vie à vos idées ? Contactez-nous pour discuter de votre projet web."
+    },
+    "contact": {
+      "title": "Informations de Contact",
+      "subtitle": "Plusieurs moyens de nous joindre",
+      "email": "contact@[votre-domaine].fr",
+      "phone": "+33[VOTRE NUMERO]",
+      "address": "[VOTRE ADRESSE COMPLETE]",
+      "hours": "Lundi - Vendredi: 9h00 - 18h00"
+    },
+    "form": {
+      "title": "Envoyez-nous un message",
+      "subtitle": "Nous vous répondrons dans les plus brefs délais",
+      "fields": {
+        "firstName": "Prénom",
+        "lastName": "Nom",
+        "email": "Email",
+        "phone": "Téléphone",
+        "subject": "Sujet",
+        "message": "Message"
+      },
+      "submitButton": "Envoyer le message"
+    },
+    "cta": {
+      "title": "Prêt à démarrer ?",
+      "subtitle": "Réservez un appel découverte gratuit",
+      "primaryButton": "Réserver un appel",
+      "primaryButtonUrl": "/consultation",
+      "secondaryButton": "Voir nos réalisations",
+      "secondaryButtonUrl": "/portfolio"
+    }
+  },
+  "chatbot": {
+    "welcomeMessage": "Bonjour ! Je suis l'assistant [NOM ENTREPRISE]. Comment puis-je vous aider avec votre projet web ?",
+    "placeholder": "Tapez votre message...",
+    "sessionTimeoutMessage": "Session expirée. N'hésitez pas à rouvrir le chat si vous avez d'autres questions !"
+  }
+}
+
+
+
+
