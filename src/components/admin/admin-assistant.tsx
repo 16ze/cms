@@ -681,10 +681,10 @@ export default function AdminAssistant({
           position: absolute;
           bottom: 60px;
           right: 0;
-          width: 380px;
-          height: 550px;
-          max-height: calc(100vh - 100px);
-          min-height: 400px;
+          width: 420px;
+          height: 650px;
+          max-height: calc(100vh - 80px);
+          min-height: 500px;
           background: white;
           border-radius: 12px;
           box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
@@ -698,7 +698,7 @@ export default function AdminAssistant({
 
         .assistant-panel.minimized {
           height: auto;
-          max-height: 56px;
+          max-height: 60px;
           transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
@@ -849,13 +849,14 @@ export default function AdminAssistant({
         }
 
         .assistant-header {
-          padding: 12px 14px;
+          padding: 14px 16px;
           border-bottom: 1px solid #e5e5e7;
           display: flex;
           justify-content: space-between;
           align-items: center;
           background: #f8f9fa;
           flex-shrink: 0;
+          min-height: 60px;
         }
 
         .assistant-info {
@@ -865,8 +866,8 @@ export default function AdminAssistant({
         }
 
         .assistant-avatar {
-          width: 34px;
-          height: 34px;
+          width: 38px;
+          height: 38px;
           background: #007aff;
           border-radius: 50%;
           display: flex;
@@ -876,35 +877,35 @@ export default function AdminAssistant({
         }
 
         .bot-icon {
-          width: 18px;
-          height: 18px;
+          width: 20px;
+          height: 20px;
           color: white;
         }
 
         .assistant-details h3 {
           margin: 0;
-          font-size: 14px;
+          font-size: 15px;
           font-weight: 600;
           color: #1d1d1f;
         }
 
         .status.online {
           color: #34c759;
-          font-size: 11px;
+          font-size: 12px;
           font-weight: 500;
           display: flex;
           align-items: center;
-          gap: 4px;
+          gap: 6px;
         }
 
         .status-dot {
-          width: 6px;
-          height: 6px;
+          width: 8px;
+          height: 8px;
           background: #34c759;
           border-radius: 50%;
           display: inline-block;
           animation: pulse 2s ease-in-out infinite;
-          box-shadow: 0 0 4px rgba(52, 199, 89, 0.6);
+          box-shadow: 0 0 6px rgba(52, 199, 89, 0.6);
         }
 
         .header-actions {
@@ -955,7 +956,7 @@ export default function AdminAssistant({
         }
 
         .quick-help-section {
-          padding: 10px 14px;
+          padding: 12px 16px;
           border-bottom: 1px solid #e5e5e7;
           background: #f8f9fa;
           flex-shrink: 0;
@@ -965,13 +966,14 @@ export default function AdminAssistant({
           display: flex;
           justify-content: space-between;
           align-items: center;
-          margin-bottom: 6px;
+          margin-bottom: 8px;
           cursor: pointer;
+          padding: 4px 0;
         }
 
         .quick-help-header h4 {
           margin: 0;
-          font-size: 13px;
+          font-size: 14px;
           font-weight: 600;
           color: #1d1d1f;
         }
@@ -992,16 +994,36 @@ export default function AdminAssistant({
         .quick-help-buttons {
           display: grid;
           grid-template-columns: 1fr 1fr;
-          gap: 6px;
-          margin-top: 6px;
+          gap: 8px;
+          margin-top: 8px;
+          max-height: 200px;
+          overflow-y: auto;
+        }
+
+        .quick-help-buttons::-webkit-scrollbar {
+          width: 4px;
+        }
+
+        .quick-help-buttons::-webkit-scrollbar-track {
+          background: #f1f1f1;
+          border-radius: 2px;
+        }
+
+        .quick-help-buttons::-webkit-scrollbar-thumb {
+          background: #c1c1c1;
+          border-radius: 2px;
+        }
+
+        .quick-help-buttons::-webkit-scrollbar-thumb:hover {
+          background: #a8a8a8;
         }
 
         .quick-help-btn {
           background: white;
           border: 1px solid #e9ecef;
-          padding: 6px 10px;
-          border-radius: 6px;
-          font-size: 12px;
+          padding: 8px 12px;
+          border-radius: 8px;
+          font-size: 13px;
           cursor: pointer;
           transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
           color: #1d1d1f;
@@ -1048,18 +1070,18 @@ export default function AdminAssistant({
           flex: 1;
           display: flex;
           flex-direction: column;
+          min-height: 0;
         }
 
         .chat-messages {
           flex: 1;
-          padding: 12px;
+          padding: 16px;
           overflow-y: auto;
           overflow-x: hidden;
           scroll-behavior: smooth;
-          max-height: calc(100vh - 320px);
-          min-height: 180px;
           display: flex;
           flex-direction: column;
+          min-height: 0;
         }
 
         .chat-messages::-webkit-scrollbar {
@@ -1083,8 +1105,9 @@ export default function AdminAssistant({
         .messages-container {
           display: flex;
           flex-direction: column;
-          gap: 12px;
-          padding-bottom: 12px;
+          gap: 16px;
+          padding-bottom: 16px;
+          flex: 1;
         }
 
         .message {
@@ -1116,11 +1139,11 @@ export default function AdminAssistant({
 
         .assistant-message .message-content {
           background: #f8f9fa;
-          padding: 10px 12px;
-          border-radius: 10px;
-          margin-bottom: 3px;
-          font-size: 13px;
-          line-height: 1.5;
+          padding: 12px 14px;
+          border-radius: 12px;
+          margin-bottom: 4px;
+          font-size: 14px;
+          line-height: 1.6;
           color: #1d1d1f;
           white-space: pre-wrap;
           word-wrap: break-word;
@@ -1131,7 +1154,7 @@ export default function AdminAssistant({
         }
 
         .assistant-message .message-content:hover {
-          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+          box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
         }
 
         .copy-btn {
@@ -1220,24 +1243,24 @@ export default function AdminAssistant({
         .user-message .message-content {
           background: linear-gradient(135deg, #007aff 0%, #0056d6 100%);
           color: white;
-          padding: 10px 14px;
-          border-radius: 16px 16px 4px 16px;
-          margin-bottom: 3px;
+          padding: 12px 16px;
+          border-radius: 18px 18px 4px 18px;
+          margin-bottom: 4px;
           margin-left: auto;
           max-width: 80%;
-          font-size: 13px;
-          line-height: 1.5;
+          font-size: 14px;
+          line-height: 1.6;
           display: inline-block;
-          box-shadow: 0 2px 6px rgba(0, 122, 255, 0.2);
+          box-shadow: 0 2px 8px rgba(0, 122, 255, 0.2);
           transition: box-shadow 0.2s ease;
         }
 
         .user-message .message-content:hover {
-          box-shadow: 0 3px 10px rgba(0, 122, 255, 0.25);
+          box-shadow: 0 4px 12px rgba(0, 122, 255, 0.3);
         }
 
         .message-time {
-          font-size: 10px;
+          font-size: 11px;
           color: #8e8e93;
           display: block;
         }
@@ -1277,7 +1300,7 @@ export default function AdminAssistant({
         }
 
         .chat-input {
-          padding: 12px 14px;
+          padding: 16px;
           border-top: 1px solid #e5e5e7;
           background: white;
           position: sticky;
@@ -1288,21 +1311,21 @@ export default function AdminAssistant({
 
         .input-container {
           display: flex;
-          gap: 6px;
-          align-items: center;
+          gap: 8px;
+          align-items: end;
         }
 
         .user-input {
           flex: 1;
           border: 1px solid #e9ecef;
-          border-radius: 18px;
-          padding: 8px 14px;
+          border-radius: 20px;
+          padding: 10px 16px;
           resize: none;
-          font-size: 13px;
+          font-size: 14px;
           font-family: inherit;
           outline: none;
-          max-height: 60px;
-          height: 34px;
+          max-height: 80px;
+          min-height: 40px;
           transition: all 0.2s ease;
           background: white;
           line-height: 1.4;
@@ -1329,14 +1352,14 @@ export default function AdminAssistant({
           color: white;
           border: none;
           border-radius: 50%;
-          width: 34px;
-          height: 34px;
+          width: 40px;
+          height: 40px;
           display: flex;
           align-items: center;
           justify-content: center;
           cursor: pointer;
           transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-          box-shadow: 0 2px 6px rgba(0, 122, 255, 0.2);
+          box-shadow: 0 2px 8px rgba(0, 122, 255, 0.2);
           flex-shrink: 0;
         }
 
@@ -1356,30 +1379,30 @@ export default function AdminAssistant({
         }
 
         .send-icon {
-          width: 15px;
-          height: 15px;
+          width: 18px;
+          height: 18px;
           transition: transform 0.2s ease;
         }
 
         .send-btn:hover:not(:disabled) .send-icon {
-          transform: translateX(1px);
+          transform: translateX(2px);
         }
 
         .input-hint {
-          margin-top: 6px;
-          font-size: 10px;
+          margin-top: 8px;
+          font-size: 11px;
           color: #8e8e93;
           text-align: center;
-          opacity: 0.7;
+          opacity: 0.8;
         }
 
         .input-hint kbd {
           background: #f8f9fa;
           border: 1px solid #e5e5e7;
-          border-radius: 3px;
-          padding: 1px 4px;
+          border-radius: 4px;
+          padding: 2px 6px;
           font-family: monospace;
-          font-size: 9px;
+          font-size: 10px;
           box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
         }
 
