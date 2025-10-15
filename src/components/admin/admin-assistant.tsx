@@ -99,10 +99,17 @@ export default function AdminAssistant({
       if (lastMessage.sender === "assistant") {
         setUnreadCount((prev) => prev + 1);
       }
-    } else {
+    } else if (isOpen) {
       setUnreadCount(0);
     }
   }, [messages, isOpen]);
+
+  // Test du badge de notification (à supprimer en production)
+  useEffect(() => {
+    if (!isOpen) {
+      setUnreadCount(1); // Test avec 1 message non lu
+    }
+  }, [isOpen]);
 
   // Raccourcis clavier
   useEffect(() => {
@@ -421,17 +428,17 @@ export default function AdminAssistant({
                   {isExpanded ? <ChevronUp /> : <ChevronDown />}
                 </button>
               </div>
-            {isExpanded && (
-              <div className="quick-help-buttons">
-                {quickHelpActions.map((action, index) => (
-                  <button
-                    key={index}
-                    className="quick-help-btn"
-                    onClick={() => handleQuickAction(action.message)}
-                    disabled={isTyping}
-                  >
-                    {action.text}
-                  </button>
+              {isExpanded && (
+                <div className="quick-help-buttons">
+                  {quickHelpActions.map((action, index) => (
+                    <button
+                      key={index}
+                      className="quick-help-btn"
+                      onClick={() => handleQuickAction(action.message)}
+                      disabled={isTyping}
+                    >
+                      {action.text}
+                    </button>
                   ))}
                 </div>
               )}
@@ -497,24 +504,24 @@ export default function AdminAssistant({
               {/* Input */}
               <div className="chat-input">
                 <div className="input-container">
-                <textarea
-                  ref={inputRef}
-                  value={inputValue}
-                  onChange={(e) => setInputValue(e.target.value)}
-                  onKeyPress={handleKeyPress}
-                  placeholder="Posez votre question..."
-                  rows={1}
-                  disabled={isTyping}
-                  className="user-input"
-                  autoFocus={false}
-                  aria-label="Champ de saisie du message"
-                  style={{
-                    opacity: isTyping ? 0.7 : 1,
-                    pointerEvents: isTyping ? "none" : "auto",
-                    overflow: "hidden",
-                    resize: "none",
-                  }}
-                />
+                  <textarea
+                    ref={inputRef}
+                    value={inputValue}
+                    onChange={(e) => setInputValue(e.target.value)}
+                    onKeyPress={handleKeyPress}
+                    placeholder="Posez votre question..."
+                    rows={1}
+                    disabled={isTyping}
+                    className="user-input"
+                    autoFocus={false}
+                    aria-label="Champ de saisie du message"
+                    style={{
+                      opacity: isTyping ? 0.7 : 1,
+                      pointerEvents: isTyping ? "none" : "auto",
+                      overflow: "hidden",
+                      resize: "none",
+                    }}
+                  />
                   <button
                     onClick={() => handleSendMessage()}
                     disabled={!inputValue.trim() || isTyping}
@@ -561,7 +568,7 @@ export default function AdminAssistant({
           font-size: 14px;
           font-weight: 500;
           position: relative;
-          overflow: hidden;
+          overflow: visible;
         }
 
         .assistant-toggle::before {
@@ -649,20 +656,22 @@ export default function AdminAssistant({
 
         .unread-badge {
           position: absolute;
-          top: -8px;
-          right: -8px;
+          top: -6px;
+          right: -6px;
           background: #ff3b30;
           color: white;
           border-radius: 50%;
-          width: 20px;
-          height: 20px;
+          width: 22px;
+          height: 22px;
           display: flex;
           align-items: center;
           justify-content: center;
-          font-size: 11px;
+          font-size: 12px;
           font-weight: 700;
           box-shadow: 0 2px 8px rgba(255, 59, 48, 0.4);
           animation: bounce 0.5s ease-out, pulse 2s ease-in-out infinite 0.5s;
+          z-index: 10001;
+          border: 2px solid white;
         }
 
         @keyframes bounce {
