@@ -247,8 +247,14 @@ function SEOSettingsContent() {
             shootingDuration: data.bookingSettings?.shootingDuration || 120,
           },
           seo: {
-            metaTitle: data.seoSettings?.defaultMetaTitle || "",
-            metaDescription: data.seoSettings?.defaultMetaDescription || "",
+            metaTitle:
+              data.seoSettings?.defaultMetaTitle ||
+              data.seoSettings?.metaTitle ||
+              "",
+            metaDescription:
+              data.seoSettings?.defaultMetaDescription ||
+              data.seoSettings?.metaDescription ||
+              "",
             keywords: data.seoSettings?.keywords || "",
             ogTitle: data.seoSettings?.ogTitle || "",
             ogDescription: data.seoSettings?.ogDescription || "",
@@ -343,13 +349,26 @@ function SEOSettingsContent() {
       setSaving(true);
       setMessage(null);
 
+      // Préparer les données SEO avec valeurs par défaut si vides
+      const seoData = {
+        ...settings.seo,
+        metaTitle:
+          settings.seo?.metaTitle ||
+          "KAIRO Digital | Agence web & consulting digital",
+        metaDescription:
+          settings.seo?.metaDescription ||
+          "KAIRO Digital vous accompagne dans vos projets web et votre transformation digitale. Création de sites modernes, optimisation SEO et consulting digital.",
+        canonicalUrl:
+          settings.seo?.canonicalUrl || "https://www.kairo-digital.fr",
+      };
+
       const response = await fetch("/api/settings", {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          seo: settings.seo,
+          seo: seoData,
           business: settings.business,
         }),
       });
@@ -357,6 +376,12 @@ function SEOSettingsContent() {
       if (!response.ok) {
         throw new Error("Erreur lors de la sauvegarde");
       }
+
+      // Mettre à jour l'état local avec les données sauvegardées
+      setSettings((prev) => ({
+        ...prev,
+        seo: seoData,
+      }));
 
       setMessage({
         type: "success",
@@ -687,7 +712,7 @@ function SEOSettingsContent() {
                     handleInputChange("seo", "metaTitle", e.target.value)
                   }
                   className="mt-1"
-                  placeholder="Ex: KAIRO Digital | Agence web à Belfort"
+                  placeholder="KAIRO Digital | Agence web & consulting digital"
                 />
                 <p className="text-xs mt-1">
                   {(settings.seo?.metaTitle || "").length}/60 caractères
@@ -731,7 +756,7 @@ function SEOSettingsContent() {
                     handleInputChange("seo", "metaDescription", e.target.value)
                   }
                   className="mt-1"
-                  placeholder="Ex: KAIRO Digital est une agence web spécialisée dans la création de sites internet modernes et performants à Belfort et en Franche-Comté."
+                  placeholder="KAIRO Digital vous accompagne dans vos projets web et votre transformation digitale. Création de sites modernes, optimisation SEO et consulting digital."
                   rows={3}
                 />
                 <p className="text-xs mt-1">
@@ -1133,14 +1158,15 @@ function SEOSettingsContent() {
                 <div className="text-sm">
                   <p className="text-blue-600 text-xs mb-1">
                     {settings.seo?.canonicalUrl ||
-                      "https://www.votre-domaine.com"}
+                      "https://www.kairo-digital.fr"}
                   </p>
                   <h3 className="text-lg text-blue-800 font-medium mb-1 line-clamp-1">
-                    {settings.seo?.metaTitle || "Votre titre de page"}
+                    {settings.seo?.metaTitle ||
+                      "KAIRO Digital | Agence web & consulting digital"}
                   </h3>
                   <p className="text-gray-600 text-sm line-clamp-2">
                     {settings.seo?.metaDescription ||
-                      "Votre description de page qui apparaîtra dans les résultats de recherche Google"}
+                      "KAIRO Digital vous accompagne dans vos projets web et votre transformation digitale. Création de sites modernes, optimisation SEO et consulting digital."}
                   </p>
                 </div>
               </div>

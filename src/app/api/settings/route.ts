@@ -91,7 +91,14 @@ export async function GET() {
             },
       seoSettings:
         Object.keys(seoData).length > 0
-          ? seoData
+          ? {
+              ...seoData,
+              // Assurer la compatibilité avec les anciens noms
+              defaultMetaTitle:
+                seoData.defaultMetaTitle || seoData.metaTitle || "",
+              defaultMetaDescription:
+                seoData.defaultMetaDescription || seoData.metaDescription || "",
+            }
           : {
               defaultMetaTitle:
                 "KAIRO Digital | Agence web & consulting digital",
