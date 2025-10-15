@@ -46,17 +46,26 @@ export default function AdminAssistant({
       id: "welcome",
       sender: "assistant",
       message:
-        "Salut ! Je suis votre assistant admin 24/7. Posez-moi n'importe quelle question sur l'utilisation de l'espace admin ou client.",
+        "Salut ! 👋 Je suis votre assistant admin KAIRO 24/7.\n\n📚 J'ai accès au guide complet d'utilisation de l'espace admin. Je peux vous aider avec :\n\n• Comment gérer les réservations\n• Comment ajouter/modifier des clients\n• Comment modifier le contenu du site\n• Comment configurer Google Analytics\n• Dépannage et résolution de problèmes\n• Et bien plus encore !\n\nPosez-moi n'importe quelle question, je suis là pour vous guider étape par étape ! 🚀",
       timestamp: new Date(),
     };
     setMessages([welcomeMessage]);
   }, []);
 
-  // Auto-scroll vers le bas
+  // Auto-scroll vers le bas avec délai pour s'assurer que le DOM est mis à jour
   useEffect(() => {
-    if (messagesEndRef.current) {
-      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
-    }
+    const scrollToBottom = () => {
+      if (messagesEndRef.current) {
+        messagesEndRef.current.scrollIntoView({ 
+          behavior: "smooth",
+          block: "nearest"
+        });
+      }
+    };
+    
+    // Petit délai pour s'assurer que le DOM est mis à jour
+    const timeoutId = setTimeout(scrollToBottom, 150);
+    return () => clearTimeout(timeoutId);
   }, [messages]);
 
   // Gestion de la session timeout
@@ -79,28 +88,45 @@ export default function AdminAssistant({
     }
   }, [sessionId, sessionTimeout]);
 
-  // Actions rapides pour l'admin
+  // Actions rapides pour l'admin - Basées sur le guide complet
   const quickHelpActions = [
-    { text: "Ajouter client", message: "Comment ajouter un nouveau client ?" },
     {
-      text: "Modifier contenu",
+      text: "Ajouter un client",
+      message: "Comment ajouter un nouveau client ?",
+    },
+    {
+      text: "Confirmer une réservation",
+      message: "Comment confirmer une réservation ?",
+    },
+    {
+      text: "Modifier le contenu",
       message: "Comment modifier le contenu d'une page ?",
     },
     {
-      text: "Configurer header",
-      message: "Comment configurer le header du site ?",
+      text: "Gérer les réservations",
+      message: "Comment gérer les réservations ?",
     },
-    { text: "Gérer RDV", message: "Comment gérer les réservations ?" },
     {
-      text: "Permissions",
-      message: "Comment gérer les utilisateurs et permissions ?",
+      text: "Google Analytics",
+      message: "Comment configurer Google Analytics ?",
     },
-    { text: "Problème connexion", message: "J'ai un problème de connexion" },
     {
-      text: "Problème upload",
+      text: "Rôles et permissions",
+      message: "Quelle est la différence entre Admin et Super Admin ?",
+    },
+    { text: "Problème de connexion", message: "J'ai un problème de connexion" },
+    {
+      text: "Problème d'upload",
       message: "J'ai un problème d'upload de fichiers",
     },
-    { text: "Problème sauvegarde", message: "J'ai un problème de sauvegarde" },
+    {
+      text: "Lien Google Analytics",
+      message: "Donne-moi le lien vers Google Analytics",
+    },
+    {
+      text: "Lien Search Console",
+      message: "Donne-moi le lien vers Google Search Console",
+    },
   ];
 
   const handleQuickAction = (message: string) => {
@@ -267,32 +293,34 @@ export default function AdminAssistant({
           {/* Messages */}
           <div className="chat-section">
             <div className="chat-messages">
-              {messages.map((message) => (
-                <div
-                  key={message.id}
-                  className={`message ${message.sender}-message`}
-                >
-                  <div className="message-content">{message.message}</div>
-                  <span className="message-time">
-                    {formatTime(message.timestamp)}
-                  </span>
-                </div>
-              ))}
+              <div className="messages-container">
+                {messages.map((message) => (
+                  <div
+                    key={message.id}
+                    className={`message ${message.sender}-message`}
+                  >
+                    <div className="message-content">{message.message}</div>
+                    <span className="message-time">
+                      {formatTime(message.timestamp)}
+                    </span>
+                  </div>
+                ))}
 
-              {/* Indicateur de frappe */}
-              {isTyping && (
-                <div className="message assistant-message">
-                  <div className="message-content typing">
-                    <div className="typing-indicator">
-                      <span></span>
-                      <span></span>
-                      <span></span>
+                {/* Indicateur de frappe */}
+                {isTyping && (
+                  <div className="message assistant-message">
+                    <div className="message-content typing">
+                      <div className="typing-indicator">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                      </div>
                     </div>
                   </div>
-                </div>
-              )}
+                )}
 
-              <div ref={messagesEndRef} />
+                <div ref={messagesEndRef} />
+              </div>
             </div>
 
             {/* Input */}
@@ -407,6 +435,8 @@ export default function AdminAssistant({
           right: 0;
           width: 400px;
           height: 600px;
+          max-height: calc(100vh - 80px);
+          min-height: 400px;
           background: white;
           border-radius: 12px;
           box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
@@ -420,6 +450,7 @@ export default function AdminAssistant({
           .assistant-panel {
             width: calc(100vw - 40px);
             height: calc(100vh - 120px);
+            max-height: calc(100vh - 120px);
             bottom: 60px;
             right: 20px;
             left: 20px;
@@ -442,7 +473,13 @@ export default function AdminAssistant({
 
           .chat-messages {
             padding: 12px;
-            max-height: 300px;
+            max-height: calc(100vh - 250px);
+            min-height: 150px;
+          }
+
+          .messages-container {
+            gap: 12px;
+            padding-bottom: 12px;
           }
 
           .chat-input {
@@ -475,6 +512,7 @@ export default function AdminAssistant({
           .assistant-panel {
             width: calc(100vw - 20px);
             height: calc(100vh - 100px);
+            max-height: calc(100vh - 100px);
             bottom: 60px;
             right: 10px;
             left: 10px;
@@ -497,7 +535,13 @@ export default function AdminAssistant({
 
           .chat-messages {
             padding: 10px;
-            max-height: 250px;
+            max-height: calc(100vh - 200px);
+            min-height: 120px;
+          }
+
+          .messages-container {
+            gap: 10px;
+            padding-bottom: 10px;
           }
 
           .chat-input {
@@ -672,12 +716,39 @@ export default function AdminAssistant({
           padding: 16px;
           overflow-y: auto;
           scroll-behavior: smooth;
-          max-height: 400px;
+          max-height: calc(100vh - 300px);
           min-height: 200px;
+          display: flex;
+          flex-direction: column;
+        }
+
+        .chat-messages::-webkit-scrollbar {
+          width: 6px;
+        }
+
+        .chat-messages::-webkit-scrollbar-track {
+          background: #f1f1f1;
+          border-radius: 3px;
+        }
+
+        .chat-messages::-webkit-scrollbar-thumb {
+          background: #c1c1c1;
+          border-radius: 3px;
+        }
+
+        .chat-messages::-webkit-scrollbar-thumb:hover {
+          background: #a8a8a8;
+        }
+
+        .messages-container {
+          display: flex;
+          flex-direction: column;
+          gap: 16px;
+          padding-bottom: 16px;
         }
 
         .message {
-          margin-bottom: 16px;
+          margin-bottom: 0;
         }
 
         .assistant-message .message-content {
@@ -694,10 +765,6 @@ export default function AdminAssistant({
         }
 
         @media (max-width: 768px) {
-          .message {
-            margin-bottom: 12px;
-          }
-
           .assistant-message .message-content {
             padding: 10px;
             font-size: 13px;
@@ -713,10 +780,6 @@ export default function AdminAssistant({
         }
 
         @media (max-width: 480px) {
-          .message {
-            margin-bottom: 10px;
-          }
-
           .assistant-message .message-content {
             padding: 8px;
             font-size: 12px;
