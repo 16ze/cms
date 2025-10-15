@@ -184,6 +184,10 @@ export default function AdminAssistant({
   ];
 
   const handleQuickAction = (message: string) => {
+    // Ouvrir la section d'aide si elle est fermée
+    if (!isExpanded) {
+      setIsExpanded(true);
+    }
     setInputValue(message);
     handleSendMessage(message);
   };
@@ -343,14 +347,19 @@ export default function AdminAssistant({
       <button
         className="assistant-toggle"
         onClick={toggleAssistant}
-        aria-label={isOpen ? "Fermer l'assistant admin" : "Ouvrir l'assistant admin"}
+        aria-label={
+          isOpen ? "Fermer l'assistant admin" : "Ouvrir l'assistant admin"
+        }
         title="Assistant Admin (Ctrl+K)"
       >
         <HelpCircle className="help-icon" />
         <span className="assistant-label">Assistant</span>
         <span className="status-indicator">24/7</span>
         {unreadCount > 0 && !isOpen && (
-          <span className="unread-badge" aria-label={`${unreadCount} nouveau(x) message(s)`}>
+          <span
+            className="unread-badge"
+            aria-label={`${unreadCount} nouveau(x) message(s)`}
+          >
             {unreadCount}
           </span>
         )}
@@ -398,17 +407,20 @@ export default function AdminAssistant({
           </div>
 
           {/* Section d'aide rapide */}
-          <div className="quick-help-section">
-            <div className="quick-help-header">
-              <h4>Aide rapide</h4>
-              <button
-                className="expand-btn"
+          {!isMinimized && (
+            <div className="quick-help-section">
+              <div
+                className="quick-help-header"
                 onClick={() => setIsExpanded(!isExpanded)}
-                aria-label={isExpanded ? "Réduire" : "Développer"}
               >
-                {isExpanded ? <ChevronUp /> : <ChevronDown />}
-              </button>
-            </div>
+                <h4>Aide rapide</h4>
+                <button
+                  className="expand-btn"
+                  aria-label={isExpanded ? "Réduire" : "Développer"}
+                >
+                  {isExpanded ? <ChevronUp /> : <ChevronDown />}
+                </button>
+              </div>
             {isExpanded && (
               <div className="quick-help-buttons">
                 {quickHelpActions.map((action, index) => (
@@ -420,10 +432,11 @@ export default function AdminAssistant({
                   >
                     {action.text}
                   </button>
-                ))}
-              </div>
-            )}
-          </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
 
           {/* Messages */}
           {!isMinimized && (
@@ -484,22 +497,24 @@ export default function AdminAssistant({
               {/* Input */}
               <div className="chat-input">
                 <div className="input-container">
-                  <textarea
-                    ref={inputRef}
-                    value={inputValue}
-                    onChange={(e) => setInputValue(e.target.value)}
-                    onKeyPress={handleKeyPress}
-                    placeholder="Posez votre question... (Entrée pour envoyer)"
-                    rows={1}
-                    disabled={isTyping}
-                    className="user-input"
-                    autoFocus={false}
-                    aria-label="Champ de saisie du message"
-                    style={{
-                      opacity: isTyping ? 0.7 : 1,
-                      pointerEvents: isTyping ? "none" : "auto",
-                    }}
-                  />
+                <textarea
+                  ref={inputRef}
+                  value={inputValue}
+                  onChange={(e) => setInputValue(e.target.value)}
+                  onKeyPress={handleKeyPress}
+                  placeholder="Posez votre question..."
+                  rows={1}
+                  disabled={isTyping}
+                  className="user-input"
+                  autoFocus={false}
+                  aria-label="Champ de saisie du message"
+                  style={{
+                    opacity: isTyping ? 0.7 : 1,
+                    pointerEvents: isTyping ? "none" : "auto",
+                    overflow: "hidden",
+                    resize: "none",
+                  }}
+                />
                   <button
                     onClick={() => handleSendMessage()}
                     disabled={!inputValue.trim() || isTyping}
@@ -666,9 +681,9 @@ export default function AdminAssistant({
           position: absolute;
           bottom: 60px;
           right: 0;
-          width: 400px;
-          height: 600px;
-          max-height: calc(100vh - 80px);
+          width: 380px;
+          height: 550px;
+          max-height: calc(100vh - 100px);
           min-height: 400px;
           background: white;
           border-radius: 12px;
@@ -683,7 +698,7 @@ export default function AdminAssistant({
 
         .assistant-panel.minimized {
           height: auto;
-          max-height: 60px;
+          max-height: 56px;
           transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
@@ -834,12 +849,13 @@ export default function AdminAssistant({
         }
 
         .assistant-header {
-          padding: 16px;
+          padding: 12px 14px;
           border-bottom: 1px solid #e5e5e7;
           display: flex;
           justify-content: space-between;
           align-items: center;
           background: #f8f9fa;
+          flex-shrink: 0;
         }
 
         .assistant-info {
@@ -849,45 +865,46 @@ export default function AdminAssistant({
         }
 
         .assistant-avatar {
-          width: 40px;
-          height: 40px;
+          width: 34px;
+          height: 34px;
           background: #007aff;
           border-radius: 50%;
           display: flex;
           align-items: center;
           justify-content: center;
+          flex-shrink: 0;
         }
 
         .bot-icon {
-          width: 20px;
-          height: 20px;
+          width: 18px;
+          height: 18px;
           color: white;
         }
 
         .assistant-details h3 {
           margin: 0;
-          font-size: 16px;
+          font-size: 14px;
           font-weight: 600;
           color: #1d1d1f;
         }
 
         .status.online {
           color: #34c759;
-          font-size: 12px;
+          font-size: 11px;
           font-weight: 500;
           display: flex;
           align-items: center;
-          gap: 6px;
+          gap: 4px;
         }
 
         .status-dot {
-          width: 8px;
-          height: 8px;
+          width: 6px;
+          height: 6px;
           background: #34c759;
           border-radius: 50%;
           display: inline-block;
           animation: pulse 2s ease-in-out infinite;
-          box-shadow: 0 0 6px rgba(52, 199, 89, 0.6);
+          box-shadow: 0 0 4px rgba(52, 199, 89, 0.6);
         }
 
         .header-actions {
@@ -938,21 +955,23 @@ export default function AdminAssistant({
         }
 
         .quick-help-section {
-          padding: 16px;
+          padding: 10px 14px;
           border-bottom: 1px solid #e5e5e7;
           background: #f8f9fa;
+          flex-shrink: 0;
         }
 
         .quick-help-header {
           display: flex;
           justify-content: space-between;
           align-items: center;
-          margin-bottom: 8px;
+          margin-bottom: 6px;
+          cursor: pointer;
         }
 
         .quick-help-header h4 {
           margin: 0;
-          font-size: 14px;
+          font-size: 13px;
           font-weight: 600;
           color: #1d1d1f;
         }
@@ -973,21 +992,22 @@ export default function AdminAssistant({
         .quick-help-buttons {
           display: grid;
           grid-template-columns: 1fr 1fr;
-          gap: 8px;
-          margin-top: 8px;
+          gap: 6px;
+          margin-top: 6px;
         }
 
         .quick-help-btn {
           background: white;
           border: 1px solid #e9ecef;
-          padding: 8px 12px;
-          border-radius: 8px;
-          font-size: 13px;
+          padding: 6px 10px;
+          border-radius: 6px;
+          font-size: 12px;
           cursor: pointer;
           transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
           color: #1d1d1f;
           position: relative;
           overflow: hidden;
+          text-align: center;
         }
 
         .quick-help-btn::before {
@@ -1032,11 +1052,12 @@ export default function AdminAssistant({
 
         .chat-messages {
           flex: 1;
-          padding: 16px;
+          padding: 12px;
           overflow-y: auto;
+          overflow-x: hidden;
           scroll-behavior: smooth;
-          max-height: calc(100vh - 300px);
-          min-height: 200px;
+          max-height: calc(100vh - 320px);
+          min-height: 180px;
           display: flex;
           flex-direction: column;
         }
@@ -1062,8 +1083,8 @@ export default function AdminAssistant({
         .messages-container {
           display: flex;
           flex-direction: column;
-          gap: 16px;
-          padding-bottom: 16px;
+          gap: 12px;
+          padding-bottom: 12px;
         }
 
         .message {
@@ -1095,11 +1116,11 @@ export default function AdminAssistant({
 
         .assistant-message .message-content {
           background: #f8f9fa;
-          padding: 12px;
-          border-radius: 12px;
-          margin-bottom: 4px;
-          font-size: 14px;
-          line-height: 1.6;
+          padding: 10px 12px;
+          border-radius: 10px;
+          margin-bottom: 3px;
+          font-size: 13px;
+          line-height: 1.5;
           color: #1d1d1f;
           white-space: pre-wrap;
           word-wrap: break-word;
@@ -1110,20 +1131,21 @@ export default function AdminAssistant({
         }
 
         .assistant-message .message-content:hover {
-          box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
         }
 
         .copy-btn {
           background: transparent;
           border: none;
           cursor: pointer;
-          padding: 4px;
-          border-radius: 4px;
+          padding: 3px;
+          border-radius: 3px;
           opacity: 0;
           transition: all 0.2s ease;
           display: flex;
           align-items: center;
           justify-content: center;
+          flex-shrink: 0;
         }
 
         .copy-btn:hover {
@@ -1131,8 +1153,8 @@ export default function AdminAssistant({
         }
 
         .copy-icon {
-          width: 14px;
-          height: 14px;
+          width: 12px;
+          height: 12px;
           color: #8e8e93;
         }
 
@@ -1198,24 +1220,24 @@ export default function AdminAssistant({
         .user-message .message-content {
           background: linear-gradient(135deg, #007aff 0%, #0056d6 100%);
           color: white;
-          padding: 12px 16px;
-          border-radius: 18px 18px 4px 18px;
-          margin-bottom: 4px;
+          padding: 10px 14px;
+          border-radius: 16px 16px 4px 16px;
+          margin-bottom: 3px;
           margin-left: auto;
           max-width: 80%;
-          font-size: 14px;
-          line-height: 1.6;
+          font-size: 13px;
+          line-height: 1.5;
           display: inline-block;
-          box-shadow: 0 2px 8px rgba(0, 122, 255, 0.2);
+          box-shadow: 0 2px 6px rgba(0, 122, 255, 0.2);
           transition: box-shadow 0.2s ease;
         }
 
         .user-message .message-content:hover {
-          box-shadow: 0 4px 12px rgba(0, 122, 255, 0.3);
+          box-shadow: 0 3px 10px rgba(0, 122, 255, 0.25);
         }
 
         .message-time {
-          font-size: 11px;
+          font-size: 10px;
           color: #8e8e93;
           display: block;
         }
@@ -1255,33 +1277,36 @@ export default function AdminAssistant({
         }
 
         .chat-input {
-          padding: 16px;
+          padding: 12px 14px;
           border-top: 1px solid #e5e5e7;
           background: white;
           position: sticky;
           bottom: 0;
           z-index: 10;
+          flex-shrink: 0;
         }
 
         .input-container {
           display: flex;
-          gap: 8px;
-          align-items: end;
+          gap: 6px;
+          align-items: center;
         }
 
         .user-input {
           flex: 1;
           border: 1px solid #e9ecef;
-          border-radius: 20px;
-          padding: 8px 16px;
+          border-radius: 18px;
+          padding: 8px 14px;
           resize: none;
-          font-size: 14px;
+          font-size: 13px;
           font-family: inherit;
           outline: none;
-          max-height: 80px;
+          max-height: 60px;
+          height: 34px;
           transition: all 0.2s ease;
           background: white;
-          min-height: 36px;
+          line-height: 1.4;
+          overflow: hidden;
         }
 
         .user-input:focus {
@@ -1304,14 +1329,15 @@ export default function AdminAssistant({
           color: white;
           border: none;
           border-radius: 50%;
-          width: 36px;
-          height: 36px;
+          width: 34px;
+          height: 34px;
           display: flex;
           align-items: center;
           justify-content: center;
           cursor: pointer;
           transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-          box-shadow: 0 2px 8px rgba(0, 122, 255, 0.2);
+          box-shadow: 0 2px 6px rgba(0, 122, 255, 0.2);
+          flex-shrink: 0;
         }
 
         .send-btn:hover:not(:disabled) {
@@ -1330,30 +1356,30 @@ export default function AdminAssistant({
         }
 
         .send-icon {
-          width: 16px;
-          height: 16px;
+          width: 15px;
+          height: 15px;
           transition: transform 0.2s ease;
         }
 
         .send-btn:hover:not(:disabled) .send-icon {
-          transform: translateX(2px);
+          transform: translateX(1px);
         }
 
         .input-hint {
-          margin-top: 8px;
-          font-size: 11px;
+          margin-top: 6px;
+          font-size: 10px;
           color: #8e8e93;
           text-align: center;
-          opacity: 0.8;
+          opacity: 0.7;
         }
 
         .input-hint kbd {
           background: #f8f9fa;
           border: 1px solid #e5e5e7;
-          border-radius: 4px;
-          padding: 2px 6px;
+          border-radius: 3px;
+          padding: 1px 4px;
           font-family: monospace;
-          font-size: 10px;
+          font-size: 9px;
           box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
         }
 
