@@ -1,7 +1,17 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { HelpCircle, X, Send, Bot, ChevronDown, ChevronUp } from "lucide-react";
+import {
+  HelpCircle,
+  X,
+  Send,
+  Bot,
+  ChevronDown,
+  ChevronUp,
+  Minimize2,
+  Copy,
+  Check,
+} from "lucide-react";
 
 interface AdminMessage {
   id: string;
@@ -30,9 +40,13 @@ export default function AdminAssistant({
     Array<{ senderType: string; message: string }>
   >([]);
   const [isExpanded, setIsExpanded] = useState(false);
+  const [isMinimized, setIsMinimized] = useState(false);
+  const [copiedMessageId, setCopiedMessageId] = useState<string | null>(null);
+  const [unreadCount, setUnreadCount] = useState(0);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
+  const chatContainerRef = useRef<HTMLDivElement>(null);
 
   // Générer un ID de session unique
   useEffect(() => {
@@ -70,12 +84,42 @@ export default function AdminAssistant({
 
   // Focus sur l'input quand l'assistant s'ouvre
   useEffect(() => {
-    if (isOpen && inputRef.current) {
+    if (isOpen && inputRef.current && !isMinimized) {
       const timeoutId = setTimeout(() => {
         inputRef.current?.focus();
       }, 300);
       return () => clearTimeout(timeoutId);
     }
+  }, [isOpen, isMinimized]);
+
+  // Gérer les messages non lus
+  useEffect(() => {
+    if (!isOpen && messages.length > 0) {
+      const lastMessage = messages[messages.length - 1];
+      if (lastMessage.sender === "assistant") {
+        setUnreadCount((prev) => prev + 1);
+      }
+    } else {
+      setUnreadCount(0);
+    }
+  }, [messages, isOpen]);
+
+  // Raccourcis clavier
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Escape pour fermer
+      if (e.key === "Escape" && isOpen) {
+        setIsOpen(false);
+      }
+      // Ctrl/Cmd + K pour ouvrir/fermer
+      if ((e.ctrlKey || e.metaKey) && e.key === "k") {
+        e.preventDefault();
+        setIsOpen((prev) => !prev);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
   }, [isOpen]);
 
   // Gestion de la session timeout
@@ -249,22 +293,72 @@ export default function AdminAssistant({
     });
   };
 
+  // Fonction pour copier un message
+  const handleCopyMessage = async (messageId: string, content: string) => {
+    try {
+      await navigator.clipboard.writeText(content);
+      setCopiedMessageId(messageId);
+      setTimeout(() => setCopiedMessageId(null), 2000);
+    } catch (err) {
+      console.error("Erreur lors de la copie:", err);
+    }
+  };
+
+  // Fonction pour formater les liens dans les messages
+  const formatMessageContent = (content: string) => {
+    // Détection des URLs
+    const urlRegex = /(https?:\/\/[^\s]+)/g;
+    const parts = content.split(urlRegex);
+
+    return parts.map((part, index) => {
+      if (part.match(urlRegex)) {
+        return (
+          <a
+            key={index}
+            href={part}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="message-link"
+          >
+            {part}
+          </a>
+        );
+      }
+      return part;
+    });
+  };
+
+  // Fonction pour gérer l'ouverture/fermeture avec animation
+  const toggleAssistant = () => {
+    if (isMinimized) {
+      setIsMinimized(false);
+    } else {
+      setIsOpen(!isOpen);
+    }
+  };
+
   return (
     <div className="admin-assistant-widget">
       {/* Bouton flottant */}
       <button
         className="assistant-toggle"
-        onClick={() => setIsOpen(!isOpen)}
-        aria-label="Ouvrir l'assistant admin"
+        onClick={toggleAssistant}
+        aria-label={isOpen ? "Fermer l'assistant admin" : "Ouvrir l'assistant admin"}
+        title="Assistant Admin (Ctrl+K)"
       >
         <HelpCircle className="help-icon" />
         <span className="assistant-label">Assistant</span>
         <span className="status-indicator">24/7</span>
+        {unreadCount > 0 && !isOpen && (
+          <span className="unread-badge" aria-label={`${unreadCount} nouveau(x) message(s)`}>
+            {unreadCount}
+          </span>
+        )}
       </button>
 
       {/* Interface de l'assistant */}
       {isOpen && (
-        <div className="assistant-panel">
+        <div className={`assistant-panel ${isMinimized ? "minimized" : ""}`}>
           {/* Header */}
           <div className="assistant-header">
             <div className="assistant-info">
@@ -273,16 +367,34 @@ export default function AdminAssistant({
               </div>
               <div className="assistant-details">
                 <h3>Assistant KAIRO Admin</h3>
-                <span className="status online">24/7</span>
+                <span className="status online">
+                  <span className="status-dot"></span>
+                  En ligne 24/7
+                </span>
               </div>
             </div>
-            <button
-              className="close-assistant"
-              onClick={() => setIsOpen(false)}
-              aria-label="Fermer l'assistant"
-            >
-              <X className="close-icon" />
-            </button>
+            <div className="header-actions">
+              <button
+                className="minimize-assistant"
+                onClick={() => setIsMinimized(!isMinimized)}
+                aria-label={isMinimized ? "Agrandir" : "Réduire"}
+                title={isMinimized ? "Agrandir" : "Réduire"}
+              >
+                {isMinimized ? (
+                  <ChevronUp className="action-icon" />
+                ) : (
+                  <Minimize2 className="action-icon" />
+                )}
+              </button>
+              <button
+                className="close-assistant"
+                onClick={() => setIsOpen(false)}
+                aria-label="Fermer l'assistant"
+                title="Fermer (Esc)"
+              >
+                <X className="close-icon" />
+              </button>
+            </div>
           </div>
 
           {/* Section d'aide rapide */}
@@ -314,67 +426,97 @@ export default function AdminAssistant({
           </div>
 
           {/* Messages */}
-          <div className="chat-section">
-            <div className="chat-messages">
-              <div className="messages-container">
-                {messages.map((message) => (
-                  <div
-                    key={message.id}
-                    className={`message ${message.sender}-message`}
-                  >
-                    <div className="message-content">{message.message}</div>
-                    <span className="message-time">
-                      {formatTime(message.timestamp)}
-                    </span>
-                  </div>
-                ))}
+          {!isMinimized && (
+            <div className="chat-section">
+              <div className="chat-messages" ref={chatContainerRef}>
+                <div className="messages-container">
+                  {messages.map((message) => (
+                    <div
+                      key={message.id}
+                      className={`message ${message.sender}-message`}
+                    >
+                      <div className="message-wrapper">
+                        <div className="message-content">
+                          {formatMessageContent(message.message)}
+                        </div>
+                        {message.sender === "assistant" && (
+                          <button
+                            className="copy-btn"
+                            onClick={() =>
+                              handleCopyMessage(message.id, message.message)
+                            }
+                            aria-label="Copier le message"
+                            title="Copier"
+                          >
+                            {copiedMessageId === message.id ? (
+                              <Check className="copy-icon copied" />
+                            ) : (
+                              <Copy className="copy-icon" />
+                            )}
+                          </button>
+                        )}
+                      </div>
+                      <span className="message-time">
+                        {formatTime(message.timestamp)}
+                      </span>
+                    </div>
+                  ))}
 
-                {/* Indicateur de frappe */}
-                {isTyping && (
-                  <div className="message assistant-message">
-                    <div className="message-content typing">
-                      <div className="typing-indicator">
-                        <span></span>
-                        <span></span>
-                        <span></span>
+                  {/* Indicateur de frappe */}
+                  {isTyping && (
+                    <div className="message assistant-message">
+                      <div className="message-wrapper">
+                        <div className="message-content typing">
+                          <div className="typing-indicator">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                          </div>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                )}
+                  )}
 
-                <div ref={messagesEndRef} />
+                  <div ref={messagesEndRef} />
+                </div>
+              </div>
+
+              {/* Input */}
+              <div className="chat-input">
+                <div className="input-container">
+                  <textarea
+                    ref={inputRef}
+                    value={inputValue}
+                    onChange={(e) => setInputValue(e.target.value)}
+                    onKeyPress={handleKeyPress}
+                    placeholder="Posez votre question... (Entrée pour envoyer)"
+                    rows={1}
+                    disabled={isTyping}
+                    className="user-input"
+                    autoFocus={false}
+                    aria-label="Champ de saisie du message"
+                    style={{
+                      opacity: isTyping ? 0.7 : 1,
+                      pointerEvents: isTyping ? "none" : "auto",
+                    }}
+                  />
+                  <button
+                    onClick={() => handleSendMessage()}
+                    disabled={!inputValue.trim() || isTyping}
+                    className="send-btn"
+                    aria-label="Envoyer le message"
+                    title="Envoyer (Entrée)"
+                  >
+                    <Send className="send-icon" />
+                  </button>
+                </div>
+                <div className="input-hint">
+                  Astuce : Utilisez <kbd>Ctrl+K</kbd> pour ouvrir/fermer
+                  l'assistant
+                </div>
               </div>
             </div>
-
-            {/* Input */}
-            <div className="chat-input">
-              <div className="input-container">
-                <textarea
-                  ref={inputRef}
-                  value={inputValue}
-                  onChange={(e) => setInputValue(e.target.value)}
-                  onKeyPress={handleKeyPress}
-                  placeholder="Comment puis-je vous aider ?"
-                  rows={1}
-                  disabled={isTyping}
-                  className="user-input"
-                  autoFocus={false}
-                  style={{ 
-                    opacity: isTyping ? 0.7 : 1,
-                    pointerEvents: isTyping ? 'none' : 'auto'
-                  }}
-                />
-                <button
-                  onClick={() => handleSendMessage()}
-                  disabled={!inputValue.trim() || isTyping}
-                  className="send-btn"
-                  aria-label="Envoyer"
-                >
-                  <Send className="send-icon" />
-                </button>
-              </div>
-            </div>
-          </div>
+          )}
         </div>
       )}
 
@@ -390,7 +532,7 @@ export default function AdminAssistant({
         }
 
         .assistant-toggle {
-          background: #007aff;
+          background: linear-gradient(135deg, #007aff 0%, #0056d6 100%);
           color: white;
           border: none;
           padding: 12px 16px;
@@ -400,9 +542,31 @@ export default function AdminAssistant({
           align-items: center;
           gap: 8px;
           box-shadow: 0 4px 12px rgba(0, 122, 255, 0.3);
-          transition: all 0.3s ease;
+          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
           font-size: 14px;
           font-weight: 500;
+          position: relative;
+          overflow: hidden;
+        }
+
+        .assistant-toggle::before {
+          content: "";
+          position: absolute;
+          top: 0;
+          left: -100%;
+          width: 100%;
+          height: 100%;
+          background: linear-gradient(
+            90deg,
+            transparent,
+            rgba(255, 255, 255, 0.2),
+            transparent
+          );
+          transition: left 0.5s ease;
+        }
+
+        .assistant-toggle:hover::before {
+          left: 100%;
         }
 
         @media (max-width: 768px) {
@@ -455,6 +619,47 @@ export default function AdminAssistant({
           border-radius: 10px;
           font-size: 11px;
           font-weight: 600;
+          animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+          0%,
+          100% {
+            opacity: 1;
+          }
+          50% {
+            opacity: 0.7;
+          }
+        }
+
+        .unread-badge {
+          position: absolute;
+          top: -8px;
+          right: -8px;
+          background: #ff3b30;
+          color: white;
+          border-radius: 50%;
+          width: 20px;
+          height: 20px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 11px;
+          font-weight: 700;
+          box-shadow: 0 2px 8px rgba(255, 59, 48, 0.4);
+          animation: bounce 0.5s ease-out, pulse 2s ease-in-out infinite 0.5s;
+        }
+
+        @keyframes bounce {
+          0% {
+            transform: scale(0);
+          }
+          50% {
+            transform: scale(1.2);
+          }
+          100% {
+            transform: scale(1);
+          }
         }
 
         .assistant-panel {
@@ -472,6 +677,25 @@ export default function AdminAssistant({
           display: flex;
           flex-direction: column;
           overflow: hidden;
+          animation: slideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+          transform-origin: bottom right;
+        }
+
+        .assistant-panel.minimized {
+          height: auto;
+          max-height: 60px;
+          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes slideUp {
+          from {
+            opacity: 0;
+            transform: translateY(20px) scale(0.95);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+          }
         }
 
         @media (max-width: 768px) {
@@ -651,6 +875,47 @@ export default function AdminAssistant({
           color: #34c759;
           font-size: 12px;
           font-weight: 500;
+          display: flex;
+          align-items: center;
+          gap: 6px;
+        }
+
+        .status-dot {
+          width: 8px;
+          height: 8px;
+          background: #34c759;
+          border-radius: 50%;
+          display: inline-block;
+          animation: pulse 2s ease-in-out infinite;
+          box-shadow: 0 0 6px rgba(52, 199, 89, 0.6);
+        }
+
+        .header-actions {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+        }
+
+        .minimize-assistant {
+          background: none;
+          border: none;
+          cursor: pointer;
+          padding: 4px;
+          border-radius: 50%;
+          transition: background-color 0.2s ease;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        .minimize-assistant:hover {
+          background: rgba(0, 0, 0, 0.1);
+        }
+
+        .action-icon {
+          width: 16px;
+          height: 16px;
+          color: #8e8e93;
         }
 
         .close-assistant {
@@ -719,13 +984,39 @@ export default function AdminAssistant({
           border-radius: 8px;
           font-size: 13px;
           cursor: pointer;
-          transition: all 0.2s ease;
+          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
           color: #1d1d1f;
+          position: relative;
+          overflow: hidden;
+        }
+
+        .quick-help-btn::before {
+          content: "";
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          width: 0;
+          height: 0;
+          border-radius: 50%;
+          background: rgba(0, 122, 255, 0.1);
+          transform: translate(-50%, -50%);
+          transition: width 0.4s ease, height 0.4s ease;
+        }
+
+        .quick-help-btn:hover:not(:disabled)::before {
+          width: 200%;
+          height: 200%;
         }
 
         .quick-help-btn:hover:not(:disabled) {
-          background: #e9ecef;
           border-color: #007aff;
+          color: #007aff;
+          transform: translateY(-2px);
+          box-shadow: 0 4px 8px rgba(0, 122, 255, 0.15);
+        }
+
+        .quick-help-btn:active:not(:disabled) {
+          transform: translateY(0);
         }
 
         .quick-help-btn:disabled {
@@ -777,6 +1068,29 @@ export default function AdminAssistant({
 
         .message {
           margin-bottom: 0;
+          animation: messageSlideIn 0.3s ease-out;
+        }
+
+        @keyframes messageSlideIn {
+          from {
+            opacity: 0;
+            transform: translateY(10px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        .message-wrapper {
+          display: flex;
+          align-items: flex-start;
+          gap: 8px;
+          position: relative;
+        }
+
+        .assistant-message .message-wrapper:hover .copy-btn {
+          opacity: 1;
         }
 
         .assistant-message .message-content {
@@ -785,11 +1099,58 @@ export default function AdminAssistant({
           border-radius: 12px;
           margin-bottom: 4px;
           font-size: 14px;
-          line-height: 1.4;
+          line-height: 1.6;
           color: #1d1d1f;
           white-space: pre-wrap;
           word-wrap: break-word;
           overflow-wrap: break-word;
+          flex: 1;
+          box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+          transition: box-shadow 0.2s ease;
+        }
+
+        .assistant-message .message-content:hover {
+          box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .copy-btn {
+          background: transparent;
+          border: none;
+          cursor: pointer;
+          padding: 4px;
+          border-radius: 4px;
+          opacity: 0;
+          transition: all 0.2s ease;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        .copy-btn:hover {
+          background: rgba(0, 122, 255, 0.1);
+        }
+
+        .copy-icon {
+          width: 14px;
+          height: 14px;
+          color: #8e8e93;
+        }
+
+        .copy-icon.copied {
+          color: #34c759;
+        }
+
+        .message-link {
+          color: #007aff;
+          text-decoration: none;
+          border-bottom: 1px solid rgba(0, 122, 255, 0.3);
+          transition: all 0.2s ease;
+          font-weight: 500;
+        }
+
+        .message-link:hover {
+          border-bottom-color: #007aff;
+          background: rgba(0, 122, 255, 0.05);
         }
 
         @media (max-width: 768px) {
@@ -830,17 +1191,27 @@ export default function AdminAssistant({
           text-align: right;
         }
 
+        .user-message .message-wrapper {
+          justify-content: flex-end;
+        }
+
         .user-message .message-content {
-          background: #007aff;
+          background: linear-gradient(135deg, #007aff 0%, #0056d6 100%);
           color: white;
-          padding: 12px;
-          border-radius: 12px;
+          padding: 12px 16px;
+          border-radius: 18px 18px 4px 18px;
           margin-bottom: 4px;
           margin-left: auto;
           max-width: 80%;
           font-size: 14px;
-          line-height: 1.4;
+          line-height: 1.6;
           display: inline-block;
+          box-shadow: 0 2px 8px rgba(0, 122, 255, 0.2);
+          transition: box-shadow 0.2s ease;
+        }
+
+        .user-message .message-content:hover {
+          box-shadow: 0 4px 12px rgba(0, 122, 255, 0.3);
         }
 
         .message-time {
@@ -929,7 +1300,7 @@ export default function AdminAssistant({
         }
 
         .send-btn {
-          background: #007aff;
+          background: linear-gradient(135deg, #007aff 0%, #0056d6 100%);
           color: white;
           border: none;
           border-radius: 50%;
@@ -939,21 +1310,51 @@ export default function AdminAssistant({
           align-items: center;
           justify-content: center;
           cursor: pointer;
-          transition: all 0.2s ease;
+          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+          box-shadow: 0 2px 8px rgba(0, 122, 255, 0.2);
         }
 
         .send-btn:hover:not(:disabled) {
-          background: #0056d6;
+          transform: scale(1.1) rotate(5deg);
+          box-shadow: 0 4px 12px rgba(0, 122, 255, 0.3);
+        }
+
+        .send-btn:active:not(:disabled) {
+          transform: scale(0.95);
         }
 
         .send-btn:disabled {
           opacity: 0.5;
           cursor: not-allowed;
+          background: #c7c7cc;
         }
 
         .send-icon {
           width: 16px;
           height: 16px;
+          transition: transform 0.2s ease;
+        }
+
+        .send-btn:hover:not(:disabled) .send-icon {
+          transform: translateX(2px);
+        }
+
+        .input-hint {
+          margin-top: 8px;
+          font-size: 11px;
+          color: #8e8e93;
+          text-align: center;
+          opacity: 0.8;
+        }
+
+        .input-hint kbd {
+          background: #f8f9fa;
+          border: 1px solid #e5e5e7;
+          border-radius: 4px;
+          padding: 2px 6px;
+          font-family: monospace;
+          font-size: 10px;
+          box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
         }
 
         /* Responsive */
