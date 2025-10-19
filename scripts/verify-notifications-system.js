@@ -5,88 +5,116 @@
  * À lancer avant de démarrer Next.js
  */
 
-const { PrismaClient } = require('@prisma/client');
-const fs = require('fs');
-const path = require('path');
+const { PrismaClient } = require("@prisma/client");
+const fs = require("fs");
+const path = require("path");
 
 const prisma = new PrismaClient();
 
 async function verify() {
-  console.log('\n🔍 VÉRIFICATION DU SYSTÈME DE NOTIFICATIONS\n');
-  console.log('='.repeat(50));
+  console.log("\n🔍 VÉRIFICATION DU SYSTÈME DE NOTIFICATIONS\n");
+  console.log("=".repeat(50));
 
   const checks = [];
   let hasErrors = false;
 
   try {
     // Check 1: Connexion Prisma
-    console.log('\n📊 1. Connexion Prisma...');
+    console.log("\n📊 1. Connexion Prisma...");
     try {
       await prisma.$connect();
-      console.log('   ✅ Connexion réussie');
-      checks.push({ name: 'Connexion Prisma', status: 'OK' });
+      console.log("   ✅ Connexion réussie");
+      checks.push({ name: "Connexion Prisma", status: "OK" });
     } catch (error) {
-      console.error('   ❌ Échec:', error.message);
-      checks.push({ name: 'Connexion Prisma', status: 'ÉCHEC', error: error.message });
+      console.error("   ❌ Échec:", error.message);
+      checks.push({
+        name: "Connexion Prisma",
+        status: "ÉCHEC",
+        error: error.message,
+      });
       hasErrors = true;
     }
 
     // Check 2: Modèle Notification
-    console.log('\n📊 2. Modèle Notification...');
+    console.log("\n📊 2. Modèle Notification...");
     try {
       if (prisma.notification) {
         const count = await prisma.notification.count();
         console.log(`   ✅ Modèle existe (${count} notifications)`);
-        checks.push({ name: 'Modèle Notification', status: 'OK', count });
+        checks.push({ name: "Modèle Notification", status: "OK", count });
       } else {
-        throw new Error('prisma.notification est undefined');
+        throw new Error("prisma.notification est undefined");
       }
     } catch (error) {
-      console.error('   ❌ Échec:', error.message);
-      checks.push({ name: 'Modèle Notification', status: 'ÉCHEC', error: error.message });
+      console.error("   ❌ Échec:", error.message);
+      checks.push({
+        name: "Modèle Notification",
+        status: "ÉCHEC",
+        error: error.message,
+      });
       hasErrors = true;
     }
 
     // Check 3: Modèle NotificationPreference
-    console.log('\n📊 3. Modèle NotificationPreference...');
+    console.log("\n📊 3. Modèle NotificationPreference...");
     try {
       if (prisma.notificationPreference) {
         const count = await prisma.notificationPreference.count();
         console.log(`   ✅ Modèle existe (${count} préférences)`);
-        checks.push({ name: 'Modèle NotificationPreference', status: 'OK', count });
+        checks.push({
+          name: "Modèle NotificationPreference",
+          status: "OK",
+          count,
+        });
       } else {
-        throw new Error('prisma.notificationPreference est undefined');
+        throw new Error("prisma.notificationPreference est undefined");
       }
     } catch (error) {
-      console.error('   ❌ Échec:', error.message);
-      checks.push({ name: 'Modèle NotificationPreference', status: 'ÉCHEC', error: error.message });
+      console.error("   ❌ Échec:", error.message);
+      checks.push({
+        name: "Modèle NotificationPreference",
+        status: "ÉCHEC",
+        error: error.message,
+      });
       hasErrors = true;
     }
 
     // Check 4: AdminUser
-    console.log('\n📊 4. Utilisateurs Admin...');
+    console.log("\n📊 4. Utilisateurs Admin...");
     try {
       const users = await prisma.adminUser.findMany();
       if (users.length > 0) {
         console.log(`   ✅ ${users.length} utilisateur(s) trouvé(s)`);
-        checks.push({ name: 'Utilisateurs Admin', status: 'OK', count: users.length });
+        checks.push({
+          name: "Utilisateurs Admin",
+          status: "OK",
+          count: users.length,
+        });
       } else {
-        console.log('   ⚠️  Aucun utilisateur admin');
-        checks.push({ name: 'Utilisateurs Admin', status: 'ATTENTION', message: 'Aucun utilisateur' });
+        console.log("   ⚠️  Aucun utilisateur admin");
+        checks.push({
+          name: "Utilisateurs Admin",
+          status: "ATTENTION",
+          message: "Aucun utilisateur",
+        });
       }
     } catch (error) {
-      console.error('   ❌ Échec:', error.message);
-      checks.push({ name: 'Utilisateurs Admin', status: 'ÉCHEC', error: error.message });
+      console.error("   ❌ Échec:", error.message);
+      checks.push({
+        name: "Utilisateurs Admin",
+        status: "ÉCHEC",
+        error: error.message,
+      });
       hasErrors = true;
     }
 
     // Check 5: Fichiers requis
-    console.log('\n📊 5. Fichiers requis...');
+    console.log("\n📊 5. Fichiers requis...");
     const requiredFiles = [
-      'src/lib/notification-service.ts',
-      'src/app/api/notifications/route.ts',
-      'src/components/admin/NotificationBell.tsx',
-      'src/hooks/use-notifications.ts',
+      "src/lib/notification-service.ts",
+      "src/app/api/notifications/route.ts",
+      "src/components/admin/NotificationBell.tsx",
+      "src/hooks/use-notifications.ts",
     ];
 
     let missingFiles = 0;
@@ -102,24 +130,28 @@ async function verify() {
     }
 
     if (missingFiles === 0) {
-      checks.push({ name: 'Fichiers requis', status: 'OK' });
+      checks.push({ name: "Fichiers requis", status: "OK" });
     } else {
-      checks.push({ name: 'Fichiers requis', status: 'ÉCHEC', missing: missingFiles });
+      checks.push({
+        name: "Fichiers requis",
+        status: "ÉCHEC",
+        missing: missingFiles,
+      });
     }
 
     // Check 6: Test création notification
-    console.log('\n📊 6. Test fonctionnel...');
+    console.log("\n📊 6. Test fonctionnel...");
     try {
       const users = await prisma.adminUser.findFirst();
       if (users) {
         const testNotif = await prisma.notification.create({
           data: {
             userId: users.id,
-            type: 'INFO',
-            category: 'SYSTEM',
-            title: 'Test automatique',
-            message: 'Vérification du système',
-            priority: 'LOW',
+            type: "INFO",
+            category: "SYSTEM",
+            title: "Test automatique",
+            message: "Vérification du système",
+            priority: "LOW",
           },
         });
 
@@ -127,26 +159,35 @@ async function verify() {
           where: { id: testNotif.id },
         });
 
-        console.log('   ✅ Création/suppression fonctionnelle');
-        checks.push({ name: 'Test fonctionnel', status: 'OK' });
+        console.log("   ✅ Création/suppression fonctionnelle");
+        checks.push({ name: "Test fonctionnel", status: "OK" });
       } else {
-        console.log('   ⚠️  Pas d\'utilisateur pour tester');
-        checks.push({ name: 'Test fonctionnel', status: 'IGNORÉ' });
+        console.log("   ⚠️  Pas d'utilisateur pour tester");
+        checks.push({ name: "Test fonctionnel", status: "IGNORÉ" });
       }
     } catch (error) {
-      console.error('   ❌ Échec:', error.message);
-      checks.push({ name: 'Test fonctionnel', status: 'ÉCHEC', error: error.message });
+      console.error("   ❌ Échec:", error.message);
+      checks.push({
+        name: "Test fonctionnel",
+        status: "ÉCHEC",
+        error: error.message,
+      });
       hasErrors = true;
     }
 
     // Résumé
-    console.log('\n' + '='.repeat(50));
-    console.log('\n📋 RÉSUMÉ DES VÉRIFICATIONS\n');
+    console.log("\n" + "=".repeat(50));
+    console.log("\n📋 RÉSUMÉ DES VÉRIFICATIONS\n");
 
     checks.forEach((check, index) => {
-      const status = check.status === 'OK' ? '✅' :
-                    check.status === 'ATTENTION' ? '⚠️' :
-                    check.status === 'IGNORÉ' ? '⏭️' : '❌';
+      const status =
+        check.status === "OK"
+          ? "✅"
+          : check.status === "ATTENTION"
+          ? "⚠️"
+          : check.status === "IGNORÉ"
+          ? "⏭️"
+          : "❌";
       console.log(`${index + 1}. ${status} ${check.name}`);
       if (check.error) {
         console.log(`   └─ Erreur: ${check.error}`);
@@ -159,26 +200,27 @@ async function verify() {
       }
     });
 
-    console.log('\n' + '='.repeat(50));
+    console.log("\n" + "=".repeat(50));
 
     if (hasErrors) {
-      console.log('\n❌ DES ERREURS ONT ÉTÉ DÉTECTÉES');
-      console.log('\n🔧 ACTIONS REQUISES:');
-      console.log('   1. npx prisma generate');
-      console.log('   2. npx prisma db push');
-      console.log('   3. Redémarrer Next.js (Ctrl+C puis npm run dev)');
-      console.log('\n📚 Documentation: docs/TROUBLESHOOTING-NOTIFICATIONS.md\n');
+      console.log("\n❌ DES ERREURS ONT ÉTÉ DÉTECTÉES");
+      console.log("\n🔧 ACTIONS REQUISES:");
+      console.log("   1. npx prisma generate");
+      console.log("   2. npx prisma db push");
+      console.log("   3. Redémarrer Next.js (Ctrl+C puis npm run dev)");
+      console.log(
+        "\n📚 Documentation: docs/TROUBLESHOOTING-NOTIFICATIONS.md\n"
+      );
       process.exit(1);
     } else {
-      console.log('\n✅ SYSTÈME DE NOTIFICATIONS OPÉRATIONNEL');
-      console.log('\n🚀 Vous pouvez démarrer Next.js:');
-      console.log('   npm run dev\n');
+      console.log("\n✅ SYSTÈME DE NOTIFICATIONS OPÉRATIONNEL");
+      console.log("\n🚀 Vous pouvez démarrer Next.js:");
+      console.log("   npm run dev\n");
       process.exit(0);
     }
-
   } catch (error) {
-    console.error('\n❌ ERREUR CRITIQUE:', error.message);
-    console.error('\n📋 Stack:', error.stack);
+    console.error("\n❌ ERREUR CRITIQUE:", error.message);
+    console.error("\n📋 Stack:", error.stack);
     process.exit(1);
   } finally {
     await prisma.$disconnect();
@@ -186,4 +228,3 @@ async function verify() {
 }
 
 verify();
-
