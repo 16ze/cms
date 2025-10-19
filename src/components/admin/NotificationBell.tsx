@@ -213,16 +213,27 @@ export default function NotificationBell() {
       // Empêcher le focus automatique sur la popup
       const handleFocus = (e: FocusEvent) => {
         const target = e.target as HTMLElement;
-        if (target.closest('[data-notification-panel]')) {
+        if (target.closest("[data-notification-panel]")) {
           e.preventDefault();
           target.blur();
         }
       };
-      
-      document.addEventListener('focusin', handleFocus);
-      
+
+      // Empêcher le focus sur le bouton cloche aussi
+      const handleButtonFocus = (e: FocusEvent) => {
+        const target = e.target as HTMLElement;
+        if (target.closest("[data-notification-bell]")) {
+          e.preventDefault();
+          target.blur();
+        }
+      };
+
+      document.addEventListener("focusin", handleFocus);
+      document.addEventListener("focusin", handleButtonFocus);
+
       return () => {
-        document.removeEventListener('focusin', handleFocus);
+        document.removeEventListener("focusin", handleFocus);
+        document.removeEventListener("focusin", handleButtonFocus);
       };
     }
   }, [isOpen]);
@@ -231,14 +242,19 @@ export default function NotificationBell() {
     <>
       {/* Bouton Cloche */}
       <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="relative p-2.5 text-gray-600 hover:text-gray-900 hover:bg-gradient-to-br hover:from-blue-50 hover:to-indigo-50 rounded-xl transition-all duration-300 transform hover:scale-105 active:scale-95"
+        onClick={(e) => {
+          setIsOpen(!isOpen);
+          // Supprimer le focus immédiatement après le clic
+          e.currentTarget.blur();
+        }}
+        className="relative p-2.5 text-gray-600 hover:text-gray-900 hover:bg-gradient-to-br hover:from-blue-50 hover:to-indigo-50 rounded-xl transition-all duration-300 transform hover:scale-105 active:scale-95 focus:outline-none"
         title={
           unreadCount > 0
             ? `${unreadCount} notification(s) non lue(s)`
             : "Notifications"
         }
         aria-label="Notifications"
+        data-notification-bell="true"
       >
         <Bell
           className={`w-5 h-5 transition-transform duration-300 ${
@@ -257,13 +273,13 @@ export default function NotificationBell() {
         typeof window !== "undefined" &&
         createPortal(
           <>
-             {/* Overlay */}
-             <div
-               className="fixed inset-0 bg-black/20 backdrop-blur-[2px] z-[99999999] animate-fadeIn"
-               onClick={() => setIsOpen(false)}
-               style={{ zIndex: 99999999 }}
-               tabIndex={-1}
-             />
+            {/* Overlay */}
+            <div
+              className="fixed inset-0 bg-black/20 backdrop-blur-[2px] z-[99999999] animate-fadeIn"
+              onClick={() => setIsOpen(false)}
+              style={{ zIndex: 99999999 }}
+              tabIndex={-1}
+            />
 
             {/* Panel de notifications */}
             <div
@@ -389,12 +405,12 @@ export default function NotificationBell() {
                 </div>
               </div>
 
-               {/* Liste des notifications */}
-               <div
-                 ref={notificationListRef}
-                 className="overflow-y-auto max-h-[450px] custom-scrollbar"
-                 tabIndex={-1}
-               >
+              {/* Liste des notifications */}
+              <div
+                ref={notificationListRef}
+                className="overflow-y-auto max-h-[450px] custom-scrollbar"
+                tabIndex={-1}
+              >
                 {loading ? (
                   <div className="flex flex-col items-center justify-center py-16">
                     <div className="animate-spin rounded-full h-10 w-10 border-4 border-blue-600 border-t-transparent mb-4"></div>
