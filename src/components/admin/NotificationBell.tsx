@@ -275,7 +275,7 @@ export default function NotificationBell() {
           <>
             {/* Overlay */}
             <div
-              className="fixed inset-0 bg-black/20 backdrop-blur-[2px] z-[99999999] animate-fadeIn"
+              className="fixed inset-0 z-[99999999] animate-fadeIn"
               onClick={() => setIsOpen(false)}
               style={{ zIndex: 99999999 }}
               tabIndex={-1}
