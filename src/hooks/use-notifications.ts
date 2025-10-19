@@ -45,7 +45,7 @@ interface UseNotificationsOptions {
 export function useNotifications(options: UseNotificationsOptions = {}) {
   const {
     autoRefresh = true,
-    refreshInterval = 30000, // 30 secondes
+    refreshInterval = 10000, // 10 secondes (plus rapide)
     category,
     onlyUnread = false,
   } = options;
@@ -126,6 +126,11 @@ export function useNotifications(options: UseNotificationsOptions = {}) {
 
       setUnreadCount((prev) => Math.max(0, prev - 1));
 
+      // Rafraîchir immédiatement pour synchroniser avec le serveur
+      setTimeout(() => {
+        fetchNotifications();
+      }, 100);
+
       return true;
     } catch (err: any) {
       console.error("❌ Erreur marquage notification:", err);
@@ -154,6 +159,11 @@ export function useNotifications(options: UseNotificationsOptions = {}) {
       );
 
       setUnreadCount(0);
+
+      // Rafraîchir immédiatement pour synchroniser avec le serveur
+      setTimeout(() => {
+        fetchNotifications();
+      }, 100);
 
       return true;
     } catch (err: any) {
