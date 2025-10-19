@@ -13,15 +13,18 @@ enum AdminRole {
 }
 
 model AdminUser {
-  id             String            @id @default(uuid())
-  name           String?
-  email          String            @unique
-  hashedPassword String
-  role           AdminRole         @default(ADMIN)
-  lastLogin      DateTime?
-  createdAt      DateTime          @default(now())
-  updatedAt      DateTime          @updatedAt
-  permissions    AdminPermission[]
+  id                     String                  @id @default(uuid())
+  name                   String?
+  email                  String                  @unique
+  hashedPassword         String
+  role                   AdminRole               @default(ADMIN)
+  lastLogin              DateTime?
+  createdAt              DateTime                @default(now())
+  updatedAt              DateTime                @updatedAt
+  permissions            AdminPermission[]
+  notifications          Notification[]
+  notificationPreference NotificationPreference?
+  pushSubscriptions      PushSubscription[]
 }
 
 model AdminPermission {
@@ -1173,4 +1176,110 @@ model CrmReportExport {
   @@index([reportId])
   @@index([exportedBy])
   @@index([exportedAt])
+}
+
+// ===== SYSTÈME DE NOTIFICATIONS =====
+
+model Notification {
+  id          String             @id @default(uuid())
+  userId      String
+  type        NotificationType
+  category    NotificationCategory
+  title       String
+  message     String
+  priority    NotificationPriority @default(MEDIUM)
+  read        Boolean            @default(false)
+  actionUrl   String?
+  actionLabel String?
+  metadata    Json?
+  expiresAt   DateTime?
+  createdAt   DateTime           @default(now())
+  readAt      DateTime?
+  user        AdminUser          @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([userId, read])
+  @@index([category])
+  @@index([priority])
+  @@index([createdAt])
+  @@index([expiresAt])
+}
+
+model NotificationPreference {
+  id               String   @id @default(uuid())
+  userId           String   @unique
+  emailEnabled     Boolean  @default(true)
+  pushEnabled      Boolean  @default(true)
+  soundEnabled     Boolean  @default(true)
+  reservations     Boolean  @default(true)
+  clients          Boolean  @default(true)
+  seo              Boolean  @default(true)
+  system           Boolean  @default(true)
+  content          Boolean  @default(true)
+  security         Boolean  @default(true)
+  quietHoursEnabled Boolean @default(false)
+  quietHoursStart  String?  // Format: "22:00"
+  quietHoursEnd    String?  // Format: "08:00"
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  user             AdminUser @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model NotificationHistory {
+  id               String   @id @default(uuid())
+  notificationId   String
+  userId           String
+  action           String   // 'sent', 'delivered', 'read', 'clicked', 'dismissed'
+  metadata         Json?
+  createdAt        DateTime @default(now())
+
+  @@index([notificationId])
+  @@index([userId])
+  @@index([action])
+  @@index([createdAt])
+}
+
+model PushSubscription {
+  id           String   @id @default(uuid())
+  userId       String
+  endpoint     String   @unique
+  p256dh       String
+  auth         String
+  userAgent    String?
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  lastUsed     DateTime @default(now())
+  user         AdminUser @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([isActive])
+}
+
+// ===== ENUMS POUR NOTIFICATIONS =====
+
+enum NotificationType {
+  INFO
+  SUCCESS
+  WARNING
+  ERROR
+}
+
+enum NotificationCategory {
+  RESERVATION
+  CLIENT
+  SEO
+  SYSTEM
+  CONTENT
+  SECURITY
+  USER
+}
+
+enum NotificationPriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
 }

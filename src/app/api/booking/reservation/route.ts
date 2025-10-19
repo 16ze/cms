@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { sendEmail } from "../../../../lib/email-service";
-import { notificationService } from "../../../../lib/websocket";
+import { notificationService as notificationServiceWS } from "../../../../lib/websocket";
+import { notificationService } from "@/lib/notification-service";
+import { prisma } from "@/lib/prisma";
 import {
   reservationsStoreInstance,
   type ReservationData,
@@ -239,13 +241,35 @@ export async function POST(request: Request) {
       );
     }
 
-    // Envoyer une notification admin en temps réel
+    // Envoyer une notification admin en temps réel (WebSocket)
     try {
-      notificationService.sendNewReservationNotification(newReservation);
-      console.log("🔔 Notification admin envoyée pour la nouvelle réservation");
+      notificationServiceWS.sendNewReservationNotification(newReservation);
+      console.log("🔔 Notification WebSocket admin envoyée pour la nouvelle réservation");
     } catch (notificationError) {
       console.error(
-        "❌ Erreur lors de l'envoi de la notification admin:",
+        "❌ Erreur lors de l'envoi de la notification WebSocket admin:",
+        notificationError
+      );
+    }
+
+    // Créer une notification persistante pour tous les admins
+    try {
+      const admins = await prisma.adminUser.findMany({
+        where: {
+          role: {
+            in: ["ADMIN", "SUPER_ADMIN"],
+          },
+        },
+      });
+
+      for (const admin of admins) {
+        await notificationService.notifyNewReservation(admin.id, newReservation);
+      }
+
+      console.log(`✅ Notifications persistantes créées pour ${admins.length} admins`);
+    } catch (notificationError) {
+      console.error(
+        "❌ Erreur lors de la création des notifications persistantes:",
         notificationError
       );
     }

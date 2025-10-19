@@ -4,6 +4,7 @@ import { useRouter, usePathname } from "next/navigation";
 import { useState } from "react";
 import AdminSidebar from "@/app/admin/components/AdminSidebar";
 import AdminAssistant from "@/components/admin/admin-assistant";
+import NotificationBell from "@/components/admin/NotificationBell";
 import adminContentData from "@/config/admin-content.json";
 import { useAdminSession } from "@/hooks/use-admin-session";
 import {
@@ -137,6 +138,9 @@ export default function AdminLayout({
 
               {/* Actions - Mobile et Desktop */}
               <div className="flex items-center space-x-3">
+                {/* Notifications */}
+                <NotificationBell />
+                
                 {/* Bouton de déconnexion */}
                 <button
                   onClick={async () => {
