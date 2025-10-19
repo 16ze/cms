@@ -3,6 +3,7 @@
 ## ✅ **CE QUI A ÉTÉ FAIT**
 
 J'ai redémarré Next.js pour vous :
+
 ```bash
 ✅ pkill -f "next dev"  # Arrêt
 ✅ npm run dev          # Relance en arrière-plan
@@ -17,11 +18,13 @@ Next.js prend généralement **20-30 secondes** pour démarrer complètement.
 ### **Comment vérifier qu'il est prêt ?**
 
 **Dans votre navigateur, essayez d'ouvrir :**
+
 ```
 http://localhost:3000
 ```
 
 **Si vous voyez:**
+
 - ✅ Votre site → Next.js est prêt
 - ⏳ "Connecting..." → Attendez encore
 - ❌ Erreur de connexion → Next.js n'a pas démarré
@@ -31,24 +34,29 @@ http://localhost:3000
 ## 🧪 **TESTS À FAIRE (dans 30 secondes)**
 
 ### **1. Vérifier que Next.js est prêt**
+
 ```
 http://localhost:3000
 ```
 
 ### **2. Aller sur l'admin**
+
 ```
 http://localhost:3000/admin/dashboard
 ```
 
 ### **3. Regarder en haut à droite**
+
 Vous devriez voir la cloche 🔔
 
 ### **4. Créer une notification de test**
+
 ```
 http://localhost:3000/api/notifications/test
 ```
 
 Vous devriez voir:
+
 ```json
 {
   "success": true,
@@ -57,9 +65,11 @@ Vous devriez voir:
 ```
 
 ### **5. Retour sur l'admin**
+
 La cloche devrait maintenant avoir un badge rouge avec "1"
 
 ### **6. Cliquer sur la cloche**
+
 Le panel s'ouvre avec la notification de test
 
 ---
@@ -69,11 +79,13 @@ Le panel s'ouvre avec la notification de test
 ### **Si Next.js ne démarre pas**
 
 **Vérifiez les processus :**
+
 ```bash
 ps aux | grep "next dev"
 ```
 
 **Si aucun processus, relancez manuellement :**
+
 ```bash
 cd "/Users/KAIRO Dgital projet/templateVITRINE/kairowebsite"
 npm run dev
@@ -136,4 +148,3 @@ Une fois Next.js prêt (30 secondes) :
 ---
 
 **Prochain message dans 1 minute avec les résultats des tests ! ⏰**
-
