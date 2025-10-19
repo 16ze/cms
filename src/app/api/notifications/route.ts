@@ -14,10 +14,13 @@ export async function GET(request: NextRequest) {
     // Vérifier l'authentification
     const authResult = await ensureAdmin(request);
     if (authResult instanceof NextResponse) {
+      console.log("📬 API: Authentification échouée");
       return authResult;
     }
 
     const user = authResult;
+    console.log("📬 API: Utilisateur authentifié:", user.id, user.email);
+
     const { searchParams } = new URL(request.url);
 
     // Récupérer les paramètres de filtrage
@@ -49,8 +52,15 @@ export async function GET(request: NextRequest) {
       filters.priority = priority;
     }
 
+    console.log("📬 API: Filtres:", filters);
+
+    console.log("📬 API: Appel getNotifications...");
     const notifications = await notificationService.getNotifications(filters);
+    console.log("📬 API: Notifications récupérées:", notifications.length);
+
+    console.log("📬 API: Appel getUnreadCount...");
     const unreadCount = await notificationService.getUnreadCount(user.id);
+    console.log("📬 API: Unread count:", unreadCount);
 
     return NextResponse.json({
       success: true,
@@ -62,8 +72,12 @@ export async function GET(request: NextRequest) {
     });
   } catch (error) {
     console.error("❌ Erreur récupération notifications:", error);
+    console.error("❌ Stack trace:", error instanceof Error ? error.stack : "N/A");
     return NextResponse.json(
-      { error: "Erreur lors de la récupération des notifications" },
+      {
+        error: "Erreur lors de la récupération des notifications",
+        details: error instanceof Error ? error.message : String(error),
+      },
       { status: 500 }
     );
   }
