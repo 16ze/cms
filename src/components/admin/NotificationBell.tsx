@@ -207,7 +207,7 @@ export default function NotificationBell() {
   }, [isOpen, notifications.length]);
 
   return (
-    <div className="relative" ref={panelRef}>
+    <div className="relative z-[100000]" ref={panelRef}>
       {/* Bouton Cloche */}
       <button
         onClick={() => setIsOpen(!isOpen)}
@@ -225,15 +225,23 @@ export default function NotificationBell() {
           } ${unreadCount > 0 ? "animate-wiggle" : ""}`}
         />
         {unreadCount > 0 && (
-          <span className="absolute -top-1 -right-1 flex items-center justify-center min-w-[20px] h-5 px-1.5 text-xs font-bold text-white bg-gradient-to-r from-red-500 to-red-600 rounded-full shadow-lg animate-bounce-subtle ring-2 ring-white">
-            {unreadCount > 99 ? "99+" : unreadCount}
+          <span className="absolute -top-1 -right-1 flex items-center justify-center w-5 h-5 text-[10px] font-bold text-white bg-gradient-to-r from-red-500 to-red-600 rounded-full shadow-lg animate-bounce-subtle ring-2 ring-white">
+            {unreadCount > 99 ? "99" : unreadCount}
           </span>
         )}
       </button>
 
+      {/* Overlay */}
+      {isOpen && (
+        <div 
+          className="fixed inset-0 bg-black/20 backdrop-blur-[2px] z-[99998] animate-fadeIn"
+          onClick={() => setIsOpen(false)}
+        />
+      )}
+
       {/* Panel de notifications */}
       {isOpen && (
-        <div className="absolute right-0 top-14 w-[420px] max-h-[650px] bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-hidden z-[9999] animate-slideDown">
+        <div className="fixed right-4 top-20 w-[420px] max-h-[calc(100vh-100px)] bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-hidden z-[99999] animate-slideDown">
           {/* Header */}
           <div className="bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-700 text-white p-5 relative overflow-hidden">
             {/* Background pattern */}
