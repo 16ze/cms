@@ -64,7 +64,10 @@ export default function NotificationBell() {
         key = "today";
       } else if (date.toDateString() === yesterday.toDateString()) {
         key = "yesterday";
-      } else if (date.getTime() > yesterday.getTime() - 5 * 24 * 60 * 60 * 1000) {
+      } else if (
+        date.getTime() >
+        yesterday.getTime() - 5 * 24 * 60 * 60 * 1000
+      ) {
         key = "week";
       }
 
@@ -134,10 +137,7 @@ export default function NotificationBell() {
     refresh();
   };
 
-  const handleDelete = async (
-    e: React.MouseEvent,
-    notificationId: string
-  ) => {
+  const handleDelete = async (e: React.MouseEvent, notificationId: string) => {
     e.stopPropagation();
     await deleteNotification(notificationId);
     refresh();
@@ -239,87 +239,89 @@ export default function NotificationBell() {
               </div>
             ) : (
               <>
-                {Object.entries(groupedNotifications).map(([group, notifs]: [string, any]) => (
-                  <div key={group}>
-                    <div className="px-4 py-2 bg-gray-50 border-y border-gray-100">
-                      <h4 className="text-xs font-semibold text-gray-600 uppercase">
-                        {group === "today"
-                          ? "Aujourd'hui"
-                          : group === "yesterday"
-                          ? "Hier"
-                          : group === "week"
-                          ? "Cette semaine"
-                          : "Plus ancien"}
-                      </h4>
-                    </div>
-                    {notifs.map((notification: any) => (
-                      <div
-                        key={notification.id}
-                        onClick={() => handleNotificationClick(notification)}
-                        className={`relative p-4 border-b border-gray-100 hover:bg-gray-50 cursor-pointer transition-colors ${
-                          !notification.read ? "bg-blue-50/50" : ""
-                        }`}
-                      >
-                        <div className="flex items-start gap-3">
-                          {/* Indicateur de priorité */}
-                          <div
-                            className={`w-2 h-2 mt-2 rounded-full flex-shrink-0 ${getPriorityDot(
-                              notification.priority
-                            )}`}
-                          />
-
-                          <div className="flex-1 min-w-0">
-                            {/* Titre et catégorie */}
-                            <div className="flex items-center gap-2 mb-1">
-                              <h5 className="font-semibold text-sm text-gray-900 truncate">
-                                {notification.title}
-                              </h5>
-                              <span
-                                className={`px-2 py-0.5 text-xs rounded-full ${getTypeStyles(
-                                  notification.type
-                                )}`}
-                              >
-                                {getCategoryLabel(notification.category)}
-                              </span>
-                            </div>
-
-                            {/* Message */}
-                            <p className="text-sm text-gray-600 line-clamp-2 mb-2">
-                              {notification.message}
-                            </p>
-
-                            {/* Footer */}
-                            <div className="flex items-center justify-between">
-                              <span className="text-xs text-gray-400">
-                                {new Date(
-                                  notification.createdAt
-                                ).toLocaleTimeString("fr-FR", {
-                                  hour: "2-digit",
-                                  minute: "2-digit",
-                                })}
-                              </span>
-
-                              {notification.actionLabel && (
-                                <span className="text-xs text-blue-600 font-medium">
-                                  {notification.actionLabel} →
-                                </span>
-                              )}
-                            </div>
-                          </div>
-
-                          {/* Bouton supprimer */}
-                          <button
-                            onClick={(e) => handleDelete(e, notification.id)}
-                            className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
-                            title="Supprimer"
-                          >
-                            <Trash2 className="w-3.5 h-3.5" />
-                          </button>
-                        </div>
+                {Object.entries(groupedNotifications).map(
+                  ([group, notifs]: [string, any]) => (
+                    <div key={group}>
+                      <div className="px-4 py-2 bg-gray-50 border-y border-gray-100">
+                        <h4 className="text-xs font-semibold text-gray-600 uppercase">
+                          {group === "today"
+                            ? "Aujourd'hui"
+                            : group === "yesterday"
+                            ? "Hier"
+                            : group === "week"
+                            ? "Cette semaine"
+                            : "Plus ancien"}
+                        </h4>
                       </div>
-                    ))}
-                  </div>
-                ))}
+                      {notifs.map((notification: any) => (
+                        <div
+                          key={notification.id}
+                          onClick={() => handleNotificationClick(notification)}
+                          className={`relative p-4 border-b border-gray-100 hover:bg-gray-50 cursor-pointer transition-colors ${
+                            !notification.read ? "bg-blue-50/50" : ""
+                          }`}
+                        >
+                          <div className="flex items-start gap-3">
+                            {/* Indicateur de priorité */}
+                            <div
+                              className={`w-2 h-2 mt-2 rounded-full flex-shrink-0 ${getPriorityDot(
+                                notification.priority
+                              )}`}
+                            />
+
+                            <div className="flex-1 min-w-0">
+                              {/* Titre et catégorie */}
+                              <div className="flex items-center gap-2 mb-1">
+                                <h5 className="font-semibold text-sm text-gray-900 truncate">
+                                  {notification.title}
+                                </h5>
+                                <span
+                                  className={`px-2 py-0.5 text-xs rounded-full ${getTypeStyles(
+                                    notification.type
+                                  )}`}
+                                >
+                                  {getCategoryLabel(notification.category)}
+                                </span>
+                              </div>
+
+                              {/* Message */}
+                              <p className="text-sm text-gray-600 line-clamp-2 mb-2">
+                                {notification.message}
+                              </p>
+
+                              {/* Footer */}
+                              <div className="flex items-center justify-between">
+                                <span className="text-xs text-gray-400">
+                                  {new Date(
+                                    notification.createdAt
+                                  ).toLocaleTimeString("fr-FR", {
+                                    hour: "2-digit",
+                                    minute: "2-digit",
+                                  })}
+                                </span>
+
+                                {notification.actionLabel && (
+                                  <span className="text-xs text-blue-600 font-medium">
+                                    {notification.actionLabel} →
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+
+                            {/* Bouton supprimer */}
+                            <button
+                              onClick={(e) => handleDelete(e, notification.id)}
+                              className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
+                              title="Supprimer"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )
+                )}
               </>
             )}
           </div>
@@ -377,4 +379,3 @@ export default function NotificationBell() {
     </div>
   );
 }
-

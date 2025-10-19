@@ -70,7 +70,7 @@ export default function AdminLayout({
 
   // Normaliser le rôle (SUPER_ADMIN -> super_admin)
   const normalizedRole = sessionUser.role.toLowerCase().replace(/-/g, "_");
-  
+
   const userInfo: UserInfo = {
     id: sessionUser.id,
     name: sessionUser.name,
@@ -140,7 +140,7 @@ export default function AdminLayout({
               <div className="flex items-center space-x-3">
                 {/* Notifications */}
                 <NotificationBell />
-                
+
                 {/* Bouton de déconnexion */}
                 <button
                   onClick={async () => {

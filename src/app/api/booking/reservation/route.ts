@@ -244,7 +244,9 @@ export async function POST(request: Request) {
     // Envoyer une notification admin en temps réel (WebSocket)
     try {
       notificationServiceWS.sendNewReservationNotification(newReservation);
-      console.log("🔔 Notification WebSocket admin envoyée pour la nouvelle réservation");
+      console.log(
+        "🔔 Notification WebSocket admin envoyée pour la nouvelle réservation"
+      );
     } catch (notificationError) {
       console.error(
         "❌ Erreur lors de l'envoi de la notification WebSocket admin:",
@@ -263,10 +265,15 @@ export async function POST(request: Request) {
       });
 
       for (const admin of admins) {
-        await notificationService.notifyNewReservation(admin.id, newReservation);
+        await notificationService.notifyNewReservation(
+          admin.id,
+          newReservation
+        );
       }
 
-      console.log(`✅ Notifications persistantes créées pour ${admins.length} admins`);
+      console.log(
+        `✅ Notifications persistantes créées pour ${admins.length} admins`
+      );
     } catch (notificationError) {
       console.error(
         "❌ Erreur lors de la création des notifications persistantes:",

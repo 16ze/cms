@@ -26,5 +26,19 @@
     "status": "CONFIRMED",
     "createdAt": "2025-10-10T21:18:40.819Z",
     "userId": "final-test-user-1760131120720"
+  },
+  {
+    "id": "res-1760870776501-84",
+    "clientName": "Bryan HILAIRE",
+    "clientEmail": "b.hilaire0673@gmail.com",
+    "clientPhone": "0673124302",
+    "projectDescription": "neijvbdibvdbvojdbvoijbdfbvbd",
+    "communicationMethod": "VISIO",
+    "reservationType": "DISCOVERY",
+    "startTime": "2025-10-20T12:00:00.000Z",
+    "endTime": "2025-10-20T13:00:00.000Z",
+    "status": "PENDING",
+    "createdAt": "2025-10-19T10:46:16.501Z",
+    "userId": "admin-user-id"
   }
 ]

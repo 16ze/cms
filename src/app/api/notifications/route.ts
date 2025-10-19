@@ -21,9 +21,13 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
 
     // Récupérer les paramètres de filtrage
-    const category = searchParams.get("category") as NotificationCategory | null;
+    const category = searchParams.get(
+      "category"
+    ) as NotificationCategory | null;
     const read = searchParams.get("read");
-    const priority = searchParams.get("priority") as NotificationPriority | null;
+    const priority = searchParams.get(
+      "priority"
+    ) as NotificationPriority | null;
     const limit = parseInt(searchParams.get("limit") || "50");
     const offset = parseInt(searchParams.get("offset") || "0");
 
@@ -149,4 +153,3 @@ export async function PUT(request: NextRequest) {
     );
   }
 }
-

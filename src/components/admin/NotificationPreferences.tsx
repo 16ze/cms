@@ -114,7 +114,10 @@ export default function NotificationPreferences() {
                     type="checkbox"
                     checked={formData.emailEnabled}
                     onChange={(e) =>
-                      setFormData({ ...formData, emailEnabled: e.target.checked })
+                      setFormData({
+                        ...formData,
+                        emailEnabled: e.target.checked,
+                      })
                     }
                     className="sr-only peer"
                   />
@@ -136,7 +139,10 @@ export default function NotificationPreferences() {
                     type="checkbox"
                     checked={formData.pushEnabled}
                     onChange={(e) =>
-                      setFormData({ ...formData, pushEnabled: e.target.checked })
+                      setFormData({
+                        ...formData,
+                        pushEnabled: e.target.checked,
+                      })
                     }
                     className="sr-only peer"
                   />
@@ -156,7 +162,10 @@ export default function NotificationPreferences() {
                     type="checkbox"
                     checked={formData.soundEnabled}
                     onChange={(e) =>
-                      setFormData({ ...formData, soundEnabled: e.target.checked })
+                      setFormData({
+                        ...formData,
+                        soundEnabled: e.target.checked,
+                      })
                     }
                     className="sr-only peer"
                   />
@@ -176,7 +185,8 @@ export default function NotificationPreferences() {
                 {
                   key: "reservations",
                   label: "Réservations",
-                  description: "Nouvelles réservations, modifications, annulations",
+                  description:
+                    "Nouvelles réservations, modifications, annulations",
                 },
                 {
                   key: "clients",
@@ -219,7 +229,11 @@ export default function NotificationPreferences() {
                   <label className="relative inline-flex items-center cursor-pointer ml-4">
                     <input
                       type="checkbox"
-                      checked={formData[category.key as keyof typeof formData] as boolean}
+                      checked={
+                        formData[
+                          category.key as keyof typeof formData
+                        ] as boolean
+                      }
                       onChange={(e) =>
                         setFormData({
                           ...formData,
@@ -335,4 +349,3 @@ export default function NotificationPreferences() {
     </div>
   );
 }
-

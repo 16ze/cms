@@ -386,7 +386,11 @@ export class NotificationService {
       type: NotificationType.INFO,
       category: NotificationCategory.RESERVATION,
       title: "Nouvelle réservation",
-      message: `${reservation.clientName} a réservé un créneau pour le ${new Date(reservation.startTime).toLocaleString("fr-FR")}`,
+      message: `${
+        reservation.clientName
+      } a réservé un créneau pour le ${new Date(
+        reservation.startTime
+      ).toLocaleString("fr-FR")}`,
       priority: NotificationPriority.HIGH,
       actionUrl: "/admin/reservations",
       actionLabel: "Voir la réservation",
@@ -513,4 +517,3 @@ export class NotificationService {
 
 // Export d'une instance singleton
 export const notificationService = new NotificationService();
-

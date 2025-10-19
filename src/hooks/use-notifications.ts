@@ -70,20 +70,30 @@ export function useNotifications(options: UseNotificationsOptions = {}) {
         params.append("read", "false");
       }
 
-      const response = await fetch(`/api/notifications?${params.toString()}`, {
+      const url = `/api/notifications?${params.toString()}`;
+      console.log("📬 Fetching notifications from:", url);
+
+      const response = await fetch(url, {
         credentials: "include",
       });
 
+      console.log("📬 Response status:", response.status);
+
       if (!response.ok) {
-        throw new Error("Erreur lors de la récupération des notifications");
+        const errorText = await response.text();
+        console.error("❌ Response error:", errorText);
+        throw new Error(`Erreur ${response.status}: ${errorText}`);
       }
 
       const data = await response.json();
+      console.log("📬 Response data:", data);
 
       if (data.success) {
         setNotifications(data.data.notifications);
         setUnreadCount(data.data.unreadCount);
         setError(null);
+      } else {
+        throw new Error(data.error || "Erreur inconnue");
       }
     } catch (err: any) {
       console.error("❌ Erreur récupération notifications:", err);
@@ -96,36 +106,33 @@ export function useNotifications(options: UseNotificationsOptions = {}) {
   /**
    * Marquer une notification comme lue
    */
-  const markAsRead = useCallback(
-    async (notificationId: string) => {
-      try {
-        const response = await fetch(`/api/notifications/${notificationId}`, {
-          method: "PUT",
-          credentials: "include",
-        });
+  const markAsRead = useCallback(async (notificationId: string) => {
+    try {
+      const response = await fetch(`/api/notifications/${notificationId}`, {
+        method: "PUT",
+        credentials: "include",
+      });
 
-        if (!response.ok) {
-          throw new Error("Erreur lors du marquage de la notification");
-        }
-
-        // Mettre à jour localement
-        setNotifications((prev) =>
-          prev.map((notif) =>
-            notif.id === notificationId ? { ...notif, read: true } : notif
-          )
-        );
-
-        setUnreadCount((prev) => Math.max(0, prev - 1));
-
-        return true;
-      } catch (err: any) {
-        console.error("❌ Erreur marquage notification:", err);
-        setError(err.message);
-        return false;
+      if (!response.ok) {
+        throw new Error("Erreur lors du marquage de la notification");
       }
-    },
-    []
-  );
+
+      // Mettre à jour localement
+      setNotifications((prev) =>
+        prev.map((notif) =>
+          notif.id === notificationId ? { ...notif, read: true } : notif
+        )
+      );
+
+      setUnreadCount((prev) => Math.max(0, prev - 1));
+
+      return true;
+    } catch (err: any) {
+      console.error("❌ Erreur marquage notification:", err);
+      setError(err.message);
+      return false;
+    }
+  }, []);
 
   /**
    * Marquer toutes les notifications comme lues
@@ -296,4 +303,3 @@ export function useNotificationPreferences() {
     refresh: fetchPreferences,
   };
 }
-
