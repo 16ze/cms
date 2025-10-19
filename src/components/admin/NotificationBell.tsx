@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import { createPortal } from "react-dom";
 import {
   Bell,
   X,
@@ -231,17 +232,21 @@ export default function NotificationBell() {
         )}
       </button>
 
-      {/* Overlay et Panel - Sortis du contexte du header pour être au premier plan */}
-      {isOpen && (
+      {/* Overlay et Panel - Portal pour garantir le premier plan */}
+      {isOpen && typeof window !== "undefined" && createPortal(
         <>
           {/* Overlay */}
           <div
-            className="fixed inset-0 bg-black/20 backdrop-blur-[2px] z-[9999999] animate-fadeIn"
+            className="fixed inset-0 bg-black/20 backdrop-blur-[2px] z-[99999999] animate-fadeIn"
             onClick={() => setIsOpen(false)}
+            style={{ zIndex: 99999999 }}
           />
           
           {/* Panel de notifications */}
-          <div className="fixed right-4 top-20 w-[420px] max-h-[calc(100vh-100px)] bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-hidden z-[9999999] animate-slideDown">
+          <div 
+            className="fixed right-4 top-20 w-[420px] max-h-[calc(100vh-100px)] bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-hidden animate-slideDown"
+            style={{ zIndex: 99999999 }}
+          >
           {/* Header */}
           <div className="bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-700 text-white p-5 relative overflow-hidden">
             {/* Background pattern */}
@@ -554,7 +559,6 @@ export default function NotificationBell() {
               </div>
             )}
         </div>
-      )}
 
       <style jsx>{`
         @keyframes slideDown {
@@ -646,7 +650,8 @@ export default function NotificationBell() {
           background: linear-gradient(to bottom, #64748b, #475569);
         }
       `}</style>
-        </>
+        </>,
+        document.body
       )}
     </>
   );

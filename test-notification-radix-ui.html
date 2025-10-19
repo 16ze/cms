@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Test Z-Index Notifications - Radix UI</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 20px;
+        background: #f5f5f5;
+      }
+
+      .test-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      }
+
+      .z-index-test {
+        position: relative;
+        background: #e3f2fd;
+        padding: 20px;
+        margin: 20px 0;
+        border-radius: 8px;
+        border: 2px solid #2196f3;
+      }
+
+      /* Simulation des composants Radix UI */
+      .radix-dialog-overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 50;
+        background: rgba(0, 0, 0, 0.8);
+        backdrop-filter: blur(4px);
+      }
+
+      .radix-dialog-content {
+        position: fixed;
+        left: 50%;
+        top: 50%;
+        z-index: 50;
+        transform: translate(-50%, -50%);
+        background: white;
+        border-radius: 8px;
+        padding: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        border: 1px solid #e0e0e0;
+      }
+
+      .radix-popover-content {
+        position: fixed;
+        z-index: 50;
+        background: white;
+        border-radius: 8px;
+        padding: 15px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        border: 1px solid #e0e0e0;
+      }
+
+      .radix-tooltip-content {
+        position: fixed;
+        z-index: 50;
+        background: white;
+        border-radius: 4px;
+        padding: 8px 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        border: 1px solid #e0e0e0;
+      }
+
+      /* Simulation des boutons et inputs avec focus */
+      .form-element {
+        position: relative;
+        z-index: 10;
+        background: #ffebee;
+        padding: 15px;
+        margin: 10px 0;
+        border-radius: 4px;
+        border: 2px solid #f44336;
+      }
+
+      .form-element:focus {
+        outline: none;
+        ring: 2px;
+        ring-color: #3b82f6;
+        ring-offset: 2px;
+        z-index: 20; /* Focus peut augmenter le z-index */
+      }
+
+      .notification-popup {
+        position: fixed;
+        top: 80px;
+        right: 20px;
+        width: 400px;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        border: 1px solid #e0e0e0;
+        z-index: 99999999;
+        padding: 20px;
+      }
+
+      .overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.2);
+        backdrop-filter: blur(2px);
+        z-index: 99999999;
+      }
+
+      .test-button {
+        background: #2196f3;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 4px;
+        cursor: pointer;
+        margin: 10px 5px;
+      }
+
+      .test-button:hover {
+        background: #1976d2;
+      }
+
+      .status {
+        padding: 10px;
+        margin: 10px 0;
+        border-radius: 4px;
+        font-weight: bold;
+      }
+
+      .success {
+        background: #e8f5e8;
+        color: #2e7d32;
+        border: 1px solid #4caf50;
+      }
+
+      .error {
+        background: #ffebee;
+        color: #c62828;
+        border: 1px solid #f44336;
+      }
+
+      .warning {
+        background: #fff3e0;
+        color: #f57c00;
+        border: 1px solid #ff9800;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="test-container">
+      <h1>🧪 Test Z-Index Notifications vs Radix UI</h1>
+
+      <div class="status warning">
+        ⚠️ Test avancé : Simulation des conflits avec Radix UI (z-index: 50)
+      </div>
+
+      <h2>Éléments avec z-index élevés (simulation Radix UI)</h2>
+
+      <div class="z-index-test">
+        <h3>Composants Radix UI (z-index: 50)</h3>
+        <p>
+          Ces éléments simulent les composants Radix UI utilisés dans l'admin.
+        </p>
+
+        <div class="radix-dialog-overlay" style="display: none" id="dialog-overlay"></div>
+        <div class="radix-dialog-content" style="display: none" id="dialog-content">
+          <h4>Dialog Radix UI</h4>
+          <p>Z-index: 50</p>
+          <button class="test-button" onclick="hideDialog()">Fermer</button>
+        </div>
+
+        <div class="radix-popover-content" style="display: none; top: 200px; left: 100px;" id="popover-content">
+          <h4>Popover Radix UI</h4>
+          <p>Z-index: 50</p>
+        </div>
+
+        <div class="radix-tooltip-content" style="display: none; top: 300px; left: 200px;" id="tooltip-content">
+          <h4>Tooltip Radix UI</h4>
+          <p>Z-index: 50</p>
+        </div>
+
+        <div class="form-element">
+          <strong>Input avec focus (z-index: 20)</strong><br />
+          <input type="text" placeholder="Tapez ici pour tester le focus..." style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;" />
+        </div>
+
+        <div class="form-element">
+          <strong>Bouton avec focus</strong><br />
+          <button class="test-button" onclick="showDialog()">Ouvrir Dialog Radix</button>
+          <button class="test-button" onclick="showPopover()">Ouvrir Popover</button>
+          <button class="test-button" onclick="showTooltip()">Ouvrir Tooltip</button>
+        </div>
+      </div>
+
+      <div class="test-buttons">
+        <button class="test-button" onclick="showNotification()">
+          🔔 Afficher Notification (z-index: 99999999)
+        </button>
+        <button class="test-button" onclick="hideNotification()">
+          ❌ Masquer Notification
+        </button>
+        <button class="test-button" onclick="testAll()">
+          🧪 Test Complet
+        </button>
+      </div>
+
+      <div id="status" class="status" style="display: none"></div>
+    </div>
+
+    <!-- Overlay et Notification (initialement cachés) -->
+    <div
+      id="overlay"
+      class="overlay"
+      style="display: none"
+      onclick="hideNotification()"
+    ></div>
+    <div id="notification" class="notification-popup" style="display: none">
+      <h3>🔔 Notifications</h3>
+      <p><strong>Z-index: 99999999</strong></p>
+      <p>
+        Cette popup devrait apparaître AU-DESSUS de tous les éléments Radix UI
+        (z-index: 50).
+      </p>
+      <p>
+        Si vous voyez cette popup au-dessus de tout, le test est réussi ! ✅
+      </p>
+      <button class="test-button" onclick="hideNotification()">Fermer</button>
+    </div>
+
+    <script>
+      function showNotification() {
+        document.getElementById("overlay").style.display = "block";
+        document.getElementById("notification").style.display = "block";
+        document.getElementById("status").style.display = "block";
+        document.getElementById("status").className = "status success";
+        document.getElementById("status").innerHTML =
+          "✅ Notification affichée avec z-index: 99999999";
+      }
+
+      function hideNotification() {
+        document.getElementById("overlay").style.display = "none";
+        document.getElementById("notification").style.display = "none";
+        document.getElementById("status").style.display = "none";
+      }
+
+      function showDialog() {
+        document.getElementById("dialog-overlay").style.display = "block";
+        document.getElementById("dialog-content").style.display = "block";
+      }
+
+      function hideDialog() {
+        document.getElementById("dialog-overlay").style.display = "none";
+        document.getElementById("dialog-content").style.display = "none";
+      }
+
+      function showPopover() {
+        document.getElementById("popover-content").style.display = "block";
+      }
+
+      function showTooltip() {
+        document.getElementById("tooltip-content").style.display = "block";
+      }
+
+      function testAll() {
+        // Afficher tous les éléments Radix UI
+        showDialog();
+        showPopover();
+        showTooltip();
+        
+        // Puis afficher la notification
+        setTimeout(() => {
+          showNotification();
+        }, 500);
+      }
+
+      // Test automatique au chargement
+      window.onload = function () {
+        setTimeout(() => {
+          testAll();
+          setTimeout(() => {
+            hideNotification();
+            hideDialog();
+            document.getElementById("popover-content").style.display = "none";
+            document.getElementById("tooltip-content").style.display = "none";
+          }, 5000);
+        }, 1000);
+      };
+    </script>
+  </body>
+</html>
