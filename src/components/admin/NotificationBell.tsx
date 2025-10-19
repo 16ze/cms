@@ -247,7 +247,7 @@ export default function NotificationBell() {
           // Supprimer le focus immédiatement après le clic
           e.currentTarget.blur();
         }}
-        className="relative p-2.5 text-gray-600 hover:text-gray-900 hover:bg-gradient-to-br hover:from-blue-50 hover:to-indigo-50 rounded-xl transition-all duration-300 transform hover:scale-105 active:scale-95 focus:outline-none"
+        className="relative p-2.5 text-gray-600 hover:text-gray-900 hover:bg-gradient-to-br hover:from-blue-50 hover:to-indigo-50 rounded-xl transition-all duration-300 transform hover:scale-105 active:scale-95 focus:outline-none overflow-visible"
         title={
           unreadCount > 0
             ? `${unreadCount} notification(s) non lue(s)`
@@ -262,7 +262,7 @@ export default function NotificationBell() {
           } ${unreadCount > 0 ? "animate-wiggle" : ""}`}
         />
         {unreadCount > 0 && (
-          <span className="absolute -top-1 -right-1 flex items-center justify-center w-5 h-5 text-[10px] font-bold text-white bg-gradient-to-r from-red-500 to-red-600 rounded-full shadow-lg animate-bounce-subtle ring-2 ring-white">
+          <span className="absolute -top-0.5 -right-0.5 flex items-center justify-center w-5 h-5 text-[10px] font-bold text-white bg-gradient-to-r from-red-500 to-red-600 rounded-full shadow-lg animate-bounce-subtle ring-2 ring-white z-10">
             {unreadCount > 99 ? "99" : unreadCount}
           </span>
         )}
