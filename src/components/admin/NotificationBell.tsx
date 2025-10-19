@@ -207,7 +207,7 @@ export default function NotificationBell() {
   }, [isOpen, notifications.length]);
 
   return (
-    <div className="relative z-[100000]" ref={panelRef}>
+    <>
       {/* Bouton Cloche */}
       <button
         onClick={() => setIsOpen(!isOpen)}
@@ -231,17 +231,17 @@ export default function NotificationBell() {
         )}
       </button>
 
-      {/* Overlay */}
+      {/* Overlay et Panel - Sortis du contexte du header pour être au premier plan */}
       {isOpen && (
-        <div 
-          className="fixed inset-0 bg-black/20 backdrop-blur-[2px] z-[99998] animate-fadeIn"
-          onClick={() => setIsOpen(false)}
-        />
-      )}
-
-      {/* Panel de notifications */}
-      {isOpen && (
-        <div className="fixed right-4 top-20 w-[420px] max-h-[calc(100vh-100px)] bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-hidden z-[99999] animate-slideDown">
+        <>
+          {/* Overlay */}
+          <div
+            className="fixed inset-0 bg-black/20 backdrop-blur-[2px] z-[9999999] animate-fadeIn"
+            onClick={() => setIsOpen(false)}
+          />
+          
+          {/* Panel de notifications */}
+          <div className="fixed right-4 top-20 w-[420px] max-h-[calc(100vh-100px)] bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-hidden z-[9999999] animate-slideDown">
           {/* Header */}
           <div className="bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-700 text-white p-5 relative overflow-hidden">
             {/* Background pattern */}
@@ -646,6 +646,8 @@ export default function NotificationBell() {
           background: linear-gradient(to bottom, #64748b, #475569);
         }
       `}</style>
-    </div>
+        </>
+      )}
+    </>
   );
 }
