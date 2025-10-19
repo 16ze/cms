@@ -1,15 +1,19 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { Bell, X, Check, Trash2, Settings } from "lucide-react";
+import { Bell, X, Check, Trash2, Settings, Clock, AlertCircle, CheckCircle, Info } from "lucide-react";
 import { useNotifications } from "@/hooks/use-notifications";
 import { NotificationCategory } from "@prisma/client";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 export default function NotificationBell() {
   const [isOpen, setIsOpen] = useState(false);
   const [filter, setFilter] = useState<NotificationCategory | "ALL">("ALL");
+  const [hoveredNotif, setHoveredNotif] = useState<string | null>(null);
+  const [deletingNotif, setDeletingNotif] = useState<string | null>(null);
   const panelRef = useRef<HTMLDivElement>(null);
+  const notificationListRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
 
   const {
@@ -133,27 +137,77 @@ export default function NotificationBell() {
   };
 
   const handleMarkAllRead = async () => {
-    await markAllAsRead();
-    refresh();
+    const success = await markAllAsRead();
+    if (success) {
+      toast.success("Toutes les notifications ont été marquées comme lues");
+      refresh();
+    }
   };
 
   const handleDelete = async (e: React.MouseEvent, notificationId: string) => {
     e.stopPropagation();
-    await deleteNotification(notificationId);
-    refresh();
+    setDeletingNotif(notificationId);
+    
+    setTimeout(async () => {
+      const success = await deleteNotification(notificationId);
+      if (success) {
+        toast.success("Notification supprimée");
+        refresh();
+      }
+      setDeletingNotif(null);
+    }, 300);
   };
+
+  const getCategoryIcon = (category: NotificationCategory) => {
+    switch (category) {
+      case "RESERVATION":
+        return Clock;
+      case "CLIENT":
+      case "USER":
+        return Info;
+      case "SEO":
+      case "CONTENT":
+        return CheckCircle;
+      case "SYSTEM":
+      case "SECURITY":
+        return AlertCircle;
+      default:
+        return Info;
+    }
+  };
+
+  const getTypeIcon = (type: string) => {
+    switch (type) {
+      case "SUCCESS":
+        return CheckCircle;
+      case "WARNING":
+        return AlertCircle;
+      case "ERROR":
+        return AlertCircle;
+      default:
+        return Info;
+    }
+  };
+
+  // Auto-scroll vers les nouvelles notifications
+  useEffect(() => {
+    if (isOpen && notificationListRef.current && notifications.length > 0) {
+      notificationListRef.current.scrollTop = 0;
+    }
+  }, [isOpen, notifications.length]);
 
   return (
     <div className="relative" ref={panelRef}>
       {/* Bouton Cloche */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="relative p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-all duration-200"
-        title="Notifications"
+        className="relative p-2.5 text-gray-600 hover:text-gray-900 hover:bg-gradient-to-br hover:from-blue-50 hover:to-indigo-50 rounded-xl transition-all duration-300 transform hover:scale-105 active:scale-95"
+        title={unreadCount > 0 ? `${unreadCount} notification(s) non lue(s)` : "Notifications"}
+        aria-label="Notifications"
       >
-        <Bell className="w-5 h-5" />
+        <Bell className={`w-5 h-5 transition-transform duration-300 ${isOpen ? 'rotate-12' : ''} ${unreadCount > 0 ? 'animate-wiggle' : ''}`} />
         {unreadCount > 0 && (
-          <span className="absolute top-0 right-0 flex items-center justify-center w-5 h-5 text-xs font-bold text-white bg-red-500 rounded-full animate-pulse">
+          <span className="absolute -top-1 -right-1 flex items-center justify-center min-w-[20px] h-5 px-1.5 text-xs font-bold text-white bg-gradient-to-r from-red-500 to-red-600 rounded-full shadow-lg animate-bounce-subtle ring-2 ring-white">
             {unreadCount > 99 ? "99+" : unreadCount}
           </span>
         )}
@@ -161,81 +215,119 @@ export default function NotificationBell() {
 
       {/* Panel de notifications */}
       {isOpen && (
-        <div className="absolute right-0 top-12 w-96 max-h-[600px] bg-white rounded-lg shadow-2xl border border-gray-200 overflow-hidden z-50 animate-slideDown">
+        <div className="absolute right-0 top-14 w-[420px] max-h-[650px] bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden z-50 animate-slideDown backdrop-blur-sm">
           {/* Header */}
-          <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-4">
-            <div className="flex items-center justify-between mb-3">
-              <div className="flex items-center gap-2">
-                <Bell className="w-5 h-5" />
-                <h3 className="font-semibold text-lg">Notifications</h3>
-                {unreadCount > 0 && (
-                  <span className="px-2 py-1 text-xs font-bold bg-white/20 rounded-full">
-                    {unreadCount}
-                  </span>
-                )}
-              </div>
-              <button
-                onClick={() => setIsOpen(false)}
-                className="hover:bg-white/10 p-1 rounded transition-colors"
-              >
-                <X className="w-4 h-4" />
-              </button>
+          <div className="bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-700 text-white p-5 relative overflow-hidden">
+            {/* Background pattern */}
+            <div className="absolute inset-0 opacity-10">
+              <div className="absolute inset-0" style={{
+                backgroundImage: 'radial-gradient(circle at 20% 50%, white 1px, transparent 1px)',
+                backgroundSize: '24px 24px'
+              }} />
             </div>
 
-            {/* Actions rapides */}
-            <div className="flex items-center gap-2">
-              <button
-                onClick={handleMarkAllRead}
-                disabled={unreadCount === 0}
-                className="flex items-center gap-1 px-3 py-1 text-xs bg-white/10 hover:bg-white/20 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <Check className="w-3 h-3" />
-                Tout lire
-              </button>
-              <button
-                onClick={() => {
-                  setIsOpen(false);
-                  router.push("/admin/settings?tab=notifications");
-                }}
-                className="flex items-center gap-1 px-3 py-1 text-xs bg-white/10 hover:bg-white/20 rounded transition-colors"
-              >
-                <Settings className="w-3 h-3" />
-                Paramètres
-              </button>
+            <div className="relative z-10">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
+                    <Bell className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-lg">Notifications</h3>
+                    <p className="text-xs text-blue-100">Centre de notifications</p>
+                  </div>
+                  {unreadCount > 0 && (
+                    <span className="px-2.5 py-1 text-xs font-bold bg-white/25 backdrop-blur-sm rounded-full ring-2 ring-white/30">
+                      {unreadCount} {unreadCount > 1 ? 'nouvelles' : 'nouvelle'}
+                    </span>
+                  )}
+                </div>
+                <button
+                  onClick={() => setIsOpen(false)}
+                  className="hover:bg-white/20 p-2 rounded-lg transition-all duration-200 active:scale-90"
+                  aria-label="Fermer"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+
+              {/* Actions rapides */}
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={handleMarkAllRead}
+                  disabled={unreadCount === 0}
+                  className="flex items-center gap-1.5 px-4 py-2 text-xs font-medium bg-white/15 hover:bg-white/25 backdrop-blur-sm rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed active:scale-95 border border-white/20"
+                >
+                  <Check className="w-3.5 h-3.5" />
+                  Tout marquer lu
+                </button>
+                <button
+                  onClick={() => {
+                    setIsOpen(false);
+                    router.push("/admin/settings?tab=notifications");
+                  }}
+                  className="flex items-center gap-1.5 px-4 py-2 text-xs font-medium bg-white/15 hover:bg-white/25 backdrop-blur-sm rounded-lg transition-all duration-200 active:scale-95 border border-white/20"
+                >
+                  <Settings className="w-3.5 h-3.5" />
+                  Paramètres
+                </button>
+              </div>
             </div>
           </div>
 
           {/* Filtres */}
-          <div className="p-3 bg-gray-50 border-b border-gray-200">
+          <div className="p-4 bg-gradient-to-b from-gray-50 to-white border-b border-gray-200">
             <div className="flex flex-wrap gap-2">
               {["ALL", "RESERVATION", "CLIENT", "SEO", "SYSTEM", "CONTENT"].map(
-                (cat) => (
-                  <button
-                    key={cat}
-                    onClick={() => setFilter(cat as any)}
-                    className={`px-3 py-1 text-xs rounded-full transition-all ${
-                      filter === cat
-                        ? "bg-blue-600 text-white shadow-sm"
-                        : "bg-white text-gray-600 hover:bg-gray-100"
-                    }`}
-                  >
-                    {cat === "ALL" ? "Toutes" : getCategoryLabel(cat as any)}
-                  </button>
-                )
+                (cat) => {
+                  const isActive = filter === cat;
+                  const catCount = cat === "ALL" 
+                    ? notifications.length 
+                    : notifications.filter(n => n.category === cat).length;
+                  
+                  return (
+                    <button
+                      key={cat}
+                      onClick={() => setFilter(cat as any)}
+                      className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-all duration-200 transform hover:scale-105 active:scale-95 ${
+                        isActive
+                          ? "bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md ring-2 ring-blue-200"
+                          : "bg-white text-gray-700 hover:bg-gray-100 border border-gray-200 hover:border-gray-300"
+                      }`}
+                    >
+                      <span>{cat === "ALL" ? "Toutes" : getCategoryLabel(cat as any)}</span>
+                      {catCount > 0 && (
+                        <span className={`ml-1.5 px-1.5 py-0.5 rounded-full text-xs ${
+                          isActive ? 'bg-white/25' : 'bg-blue-100 text-blue-700'
+                        }`}>
+                          {catCount}
+                        </span>
+                      )}
+                    </button>
+                  );
+                }
               )}
             </div>
           </div>
 
           {/* Liste des notifications */}
-          <div className="overflow-y-auto max-h-[400px] custom-scrollbar">
+          <div ref={notificationListRef} className="overflow-y-auto max-h-[450px] custom-scrollbar">
             {loading ? (
-              <div className="flex items-center justify-center py-12">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+              <div className="flex flex-col items-center justify-center py-16">
+                <div className="animate-spin rounded-full h-10 w-10 border-4 border-blue-600 border-t-transparent mb-4"></div>
+                <p className="text-sm text-gray-500 font-medium">Chargement...</p>
               </div>
             ) : filteredNotifications.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-12 text-gray-500">
-                <Bell className="w-12 h-12 mb-3 opacity-20" />
-                <p className="text-sm">Aucune notification</p>
+              <div className="flex flex-col items-center justify-center py-16 px-6 text-gray-500">
+                <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+                  <Bell className="w-10 h-10 text-gray-400" />
+                </div>
+                <p className="text-sm font-medium mb-1">Aucune notification</p>
+                <p className="text-xs text-gray-400 text-center">
+                  {filter === "ALL" 
+                    ? "Vous êtes à jour !" 
+                    : `Pas de notifications ${getCategoryLabel(filter as any).toLowerCase()}`}
+                </p>
               </div>
             ) : (
               <>
@@ -253,72 +345,108 @@ export default function NotificationBell() {
                             : "Plus ancien"}
                         </h4>
                       </div>
-                      {notifs.map((notification: any) => (
-                        <div
-                          key={notification.id}
-                          onClick={() => handleNotificationClick(notification)}
-                          className={`relative p-4 border-b border-gray-100 hover:bg-gray-50 cursor-pointer transition-colors ${
-                            !notification.read ? "bg-blue-50/50" : ""
-                          }`}
-                        >
-                          <div className="flex items-start gap-3">
-                            {/* Indicateur de priorité */}
-                            <div
-                              className={`w-2 h-2 mt-2 rounded-full flex-shrink-0 ${getPriorityDot(
-                                notification.priority
-                              )}`}
-                            />
+                      {notifs.map((notification: any, index: number) => {
+                        const TypeIcon = getTypeIcon(notification.type);
+                        const CategoryIcon = getCategoryIcon(notification.category);
+                        const isHovered = hoveredNotif === notification.id;
+                        const isDeleting = deletingNotif === notification.id;
+                        
+                        return (
+                          <div
+                            key={notification.id}
+                            onClick={() => handleNotificationClick(notification)}
+                            onMouseEnter={() => setHoveredNotif(notification.id)}
+                            onMouseLeave={() => setHoveredNotif(null)}
+                            style={{
+                              animationDelay: `${index * 0.05}s`
+                            }}
+                            className={`relative p-4 border-b border-gray-100 cursor-pointer transition-all duration-300 animate-fadeIn ${
+                              isDeleting 
+                                ? "opacity-0 translate-x-full" 
+                                : isHovered
+                                ? "bg-gradient-to-r from-blue-50 to-indigo-50 shadow-sm scale-[1.02]"
+                                : !notification.read 
+                                ? "bg-blue-50/50" 
+                                : "bg-white hover:bg-gray-50"
+                            }`}
+                          >
+                            {/* Indicateur non lu */}
+                            {!notification.read && (
+                              <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-blue-500 to-indigo-500" />
+                            )}
 
-                            <div className="flex-1 min-w-0">
-                              {/* Titre et catégorie */}
-                              <div className="flex items-center gap-2 mb-1">
-                                <h5 className="font-semibold text-sm text-gray-900 truncate">
-                                  {notification.title}
-                                </h5>
-                                <span
-                                  className={`px-2 py-0.5 text-xs rounded-full ${getTypeStyles(
-                                    notification.type
-                                  )}`}
-                                >
-                                  {getCategoryLabel(notification.category)}
-                                </span>
+                            <div className="flex items-start gap-3">
+                              {/* Icône de catégorie */}
+                              <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 transition-all duration-300 ${
+                                notification.type === 'SUCCESS' ? 'bg-green-100 text-green-600' :
+                                notification.type === 'WARNING' ? 'bg-yellow-100 text-yellow-600' :
+                                notification.type === 'ERROR' ? 'bg-red-100 text-red-600' :
+                                'bg-blue-100 text-blue-600'
+                              } ${isHovered ? 'scale-110' : ''}`}>
+                                <CategoryIcon className="w-5 h-5" />
                               </div>
 
-                              {/* Message */}
-                              <p className="text-sm text-gray-600 line-clamp-2 mb-2">
-                                {notification.message}
-                              </p>
+                              <div className="flex-1 min-w-0">
+                                {/* Titre et priorité */}
+                                <div className="flex items-center gap-2 mb-1.5">
+                                  <h5 className="font-semibold text-sm text-gray-900 flex-1 truncate">
+                                    {notification.title}
+                                  </h5>
+                                  {notification.priority === "URGENT" && (
+                                    <span className="flex items-center gap-1 px-2 py-0.5 text-xs font-bold bg-red-100 text-red-700 rounded-full animate-pulse">
+                                      <AlertCircle className="w-3 h-3" />
+                                      Urgent
+                                    </span>
+                                  )}
+                                </div>
 
-                              {/* Footer */}
-                              <div className="flex items-center justify-between">
-                                <span className="text-xs text-gray-400">
-                                  {new Date(
-                                    notification.createdAt
-                                  ).toLocaleTimeString("fr-FR", {
-                                    hour: "2-digit",
-                                    minute: "2-digit",
-                                  })}
-                                </span>
-
-                                {notification.actionLabel && (
-                                  <span className="text-xs text-blue-600 font-medium">
-                                    {notification.actionLabel} →
+                                {/* Catégorie badge */}
+                                <div className="mb-2">
+                                  <span className={`inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-md ${getTypeStyles(notification.type)}`}>
+                                    <TypeIcon className="w-3 h-3" />
+                                    {getCategoryLabel(notification.category)}
                                   </span>
-                                )}
-                              </div>
-                            </div>
+                                </div>
 
-                            {/* Bouton supprimer */}
-                            <button
-                              onClick={(e) => handleDelete(e, notification.id)}
-                              className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
-                              title="Supprimer"
-                            >
-                              <Trash2 className="w-3.5 h-3.5" />
-                            </button>
+                                {/* Message */}
+                                <p className="text-sm text-gray-700 line-clamp-2 mb-2 leading-relaxed">
+                                  {notification.message}
+                                </p>
+
+                                {/* Footer */}
+                                <div className="flex items-center justify-between">
+                                  <span className="text-xs text-gray-500 flex items-center gap-1">
+                                    <Clock className="w-3 h-3" />
+                                    {new Date(notification.createdAt).toLocaleTimeString("fr-FR", {
+                                      hour: "2-digit",
+                                      minute: "2-digit",
+                                    })}
+                                  </span>
+
+                                  {notification.actionLabel && (
+                                    <span className="text-xs text-blue-600 font-semibold flex items-center gap-1 hover:gap-2 transition-all">
+                                      {notification.actionLabel}
+                                      <span className="text-lg">→</span>
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
+
+                              {/* Bouton supprimer */}
+                              <button
+                                onClick={(e) => handleDelete(e, notification.id)}
+                                className={`p-2 text-gray-400 hover:text-red-600 hover:bg-red-100 rounded-lg transition-all duration-200 transform hover:scale-110 active:scale-90 ${
+                                  isHovered ? 'opacity-100' : 'opacity-0'
+                                }`}
+                                title="Supprimer"
+                                aria-label="Supprimer la notification"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            </div>
                           </div>
-                        </div>
-                      ))}
+                        );
+                      })}
                     </div>
                   )
                 )}
@@ -328,15 +456,30 @@ export default function NotificationBell() {
 
           {/* Footer */}
           {filteredNotifications.length > 0 && (
-            <div className="p-3 bg-gray-50 border-t border-gray-200 text-center">
+            <div className="p-4 bg-gradient-to-b from-white to-gray-50 border-t border-gray-200">
               <button
                 onClick={() => {
                   setIsOpen(false);
                   router.push("/admin/notifications");
                 }}
-                className="text-sm text-blue-600 hover:text-blue-700 font-medium"
+                className="w-full px-4 py-2.5 text-sm text-blue-600 hover:text-white font-semibold bg-blue-50 hover:bg-gradient-to-r hover:from-blue-600 hover:to-indigo-600 rounded-lg transition-all duration-300 transform hover:scale-[1.02] active:scale-95 hover:shadow-md"
               >
-                Voir toutes les notifications
+                Voir toutes les notifications ({notifications.length})
+              </button>
+            </div>
+          )}
+          
+          {/* Info message si vide */}
+          {!loading && filteredNotifications.length === 0 && notifications.length > 0 && filter !== "ALL" && (
+            <div className="p-4 bg-gray-50 border-t border-gray-200 text-center">
+              <p className="text-xs text-gray-500">
+                Aucune notification dans cette catégorie
+              </p>
+              <button
+                onClick={() => setFilter("ALL")}
+                className="mt-2 text-xs text-blue-600 hover:text-blue-700 font-medium"
+              >
+                Voir toutes les catégories
               </button>
             </div>
           )}
@@ -347,33 +490,88 @@ export default function NotificationBell() {
         @keyframes slideDown {
           from {
             opacity: 0;
-            transform: translateY(-10px);
+            transform: translateY(-20px) scale(0.95);
           }
           to {
             opacity: 1;
-            transform: translateY(0);
+            transform: translateY(0) scale(1);
+          }
+        }
+
+        @keyframes fadeIn {
+          from {
+            opacity: 0;
+            transform: translateX(-10px);
+          }
+          to {
+            opacity: 1;
+            transform: translateX(0);
+          }
+        }
+
+        @keyframes wiggle {
+          0%, 100% {
+            transform: rotate(0deg);
+          }
+          25% {
+            transform: rotate(-10deg);
+          }
+          75% {
+            transform: rotate(10deg);
+          }
+        }
+
+        @keyframes bounce-subtle {
+          0%, 100% {
+            transform: scale(1);
+          }
+          50% {
+            transform: scale(1.05);
           }
         }
 
         .animate-slideDown {
-          animation: slideDown 0.2s ease-out;
+          animation: slideDown 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .animate-fadeIn {
+          animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .animate-wiggle {
+          animation: wiggle 0.5s ease-in-out;
+        }
+
+        .animate-bounce-subtle {
+          animation: bounce-subtle 2s ease-in-out infinite;
+        }
+
+        .custom-scrollbar {
+          scrollbar-width: thin;
+          scrollbar-color: #cbd5e1 #f1f5f9;
         }
 
         .custom-scrollbar::-webkit-scrollbar {
-          width: 6px;
+          width: 8px;
         }
 
         .custom-scrollbar::-webkit-scrollbar-track {
-          background: #f1f1f1;
+          background: linear-gradient(to bottom, #f1f5f9, #e2e8f0);
+          border-radius: 4px;
         }
 
         .custom-scrollbar::-webkit-scrollbar-thumb {
-          background: #c1c1c1;
-          border-radius: 3px;
+          background: linear-gradient(to bottom, #cbd5e1, #94a3b8);
+          border-radius: 4px;
+          border: 2px solid #f1f5f9;
         }
 
         .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-          background: #a8a8a8;
+          background: linear-gradient(to bottom, #94a3b8, #64748b);
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb:active {
+          background: linear-gradient(to bottom, #64748b, #475569);
         }
       `}</style>
     </div>
