@@ -1,7 +1,17 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { Bell, X, Check, Trash2, Settings, Clock, AlertCircle, CheckCircle, Info } from "lucide-react";
+import {
+  Bell,
+  X,
+  Check,
+  Trash2,
+  Settings,
+  Clock,
+  AlertCircle,
+  CheckCircle,
+  Info,
+} from "lucide-react";
 import { useNotifications } from "@/hooks/use-notifications";
 import { NotificationCategory } from "@prisma/client";
 import { useRouter } from "next/navigation";
@@ -147,7 +157,7 @@ export default function NotificationBell() {
   const handleDelete = async (e: React.MouseEvent, notificationId: string) => {
     e.stopPropagation();
     setDeletingNotif(notificationId);
-    
+
     setTimeout(async () => {
       const success = await deleteNotification(notificationId);
       if (success) {
@@ -202,10 +212,18 @@ export default function NotificationBell() {
       <button
         onClick={() => setIsOpen(!isOpen)}
         className="relative p-2.5 text-gray-600 hover:text-gray-900 hover:bg-gradient-to-br hover:from-blue-50 hover:to-indigo-50 rounded-xl transition-all duration-300 transform hover:scale-105 active:scale-95"
-        title={unreadCount > 0 ? `${unreadCount} notification(s) non lue(s)` : "Notifications"}
+        title={
+          unreadCount > 0
+            ? `${unreadCount} notification(s) non lue(s)`
+            : "Notifications"
+        }
         aria-label="Notifications"
       >
-        <Bell className={`w-5 h-5 transition-transform duration-300 ${isOpen ? 'rotate-12' : ''} ${unreadCount > 0 ? 'animate-wiggle' : ''}`} />
+        <Bell
+          className={`w-5 h-5 transition-transform duration-300 ${
+            isOpen ? "rotate-12" : ""
+          } ${unreadCount > 0 ? "animate-wiggle" : ""}`}
+        />
         {unreadCount > 0 && (
           <span className="absolute -top-1 -right-1 flex items-center justify-center min-w-[20px] h-5 px-1.5 text-xs font-bold text-white bg-gradient-to-r from-red-500 to-red-600 rounded-full shadow-lg animate-bounce-subtle ring-2 ring-white">
             {unreadCount > 99 ? "99+" : unreadCount}
@@ -215,15 +233,19 @@ export default function NotificationBell() {
 
       {/* Panel de notifications */}
       {isOpen && (
-        <div className="absolute right-0 top-14 w-[420px] max-h-[650px] bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden z-50 animate-slideDown backdrop-blur-sm">
+        <div className="absolute right-0 top-14 w-[420px] max-h-[650px] bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-hidden z-[9999] animate-slideDown">
           {/* Header */}
           <div className="bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-700 text-white p-5 relative overflow-hidden">
             {/* Background pattern */}
             <div className="absolute inset-0 opacity-10">
-              <div className="absolute inset-0" style={{
-                backgroundImage: 'radial-gradient(circle at 20% 50%, white 1px, transparent 1px)',
-                backgroundSize: '24px 24px'
-              }} />
+              <div
+                className="absolute inset-0"
+                style={{
+                  backgroundImage:
+                    "radial-gradient(circle at 20% 50%, white 1px, transparent 1px)",
+                  backgroundSize: "24px 24px",
+                }}
+              />
             </div>
 
             <div className="relative z-10">
@@ -234,11 +256,13 @@ export default function NotificationBell() {
                   </div>
                   <div>
                     <h3 className="font-bold text-lg">Notifications</h3>
-                    <p className="text-xs text-blue-100">Centre de notifications</p>
+                    <p className="text-xs text-blue-100">
+                      Centre de notifications
+                    </p>
                   </div>
                   {unreadCount > 0 && (
                     <span className="px-2.5 py-1 text-xs font-bold bg-white/25 backdrop-blur-sm rounded-full ring-2 ring-white/30">
-                      {unreadCount} {unreadCount > 1 ? 'nouvelles' : 'nouvelle'}
+                      {unreadCount} {unreadCount > 1 ? "nouvelles" : "nouvelle"}
                     </span>
                   )}
                 </div>
@@ -256,7 +280,7 @@ export default function NotificationBell() {
                 <button
                   onClick={handleMarkAllRead}
                   disabled={unreadCount === 0}
-                  className="flex items-center gap-1.5 px-4 py-2 text-xs font-medium bg-white/15 hover:bg-white/25 backdrop-blur-sm rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed active:scale-95 border border-white/20"
+                  className="flex items-center gap-1.5 px-4 py-2 text-xs font-medium bg-white/20 hover:bg-white/30 rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed active:scale-95 border border-white/30 shadow-sm"
                 >
                   <Check className="w-3.5 h-3.5" />
                   Tout marquer lu
@@ -266,7 +290,7 @@ export default function NotificationBell() {
                     setIsOpen(false);
                     router.push("/admin/settings?tab=notifications");
                   }}
-                  className="flex items-center gap-1.5 px-4 py-2 text-xs font-medium bg-white/15 hover:bg-white/25 backdrop-blur-sm rounded-lg transition-all duration-200 active:scale-95 border border-white/20"
+                  className="flex items-center gap-1.5 px-4 py-2 text-xs font-medium bg-white/20 hover:bg-white/30 rounded-lg transition-all duration-200 active:scale-95 border border-white/30 shadow-sm"
                 >
                   <Settings className="w-3.5 h-3.5" />
                   Paramètres
@@ -281,10 +305,11 @@ export default function NotificationBell() {
               {["ALL", "RESERVATION", "CLIENT", "SEO", "SYSTEM", "CONTENT"].map(
                 (cat) => {
                   const isActive = filter === cat;
-                  const catCount = cat === "ALL" 
-                    ? notifications.length 
-                    : notifications.filter(n => n.category === cat).length;
-                  
+                  const catCount =
+                    cat === "ALL"
+                      ? notifications.length
+                      : notifications.filter((n) => n.category === cat).length;
+
                   return (
                     <button
                       key={cat}
@@ -295,11 +320,19 @@ export default function NotificationBell() {
                           : "bg-white text-gray-700 hover:bg-gray-100 border border-gray-200 hover:border-gray-300"
                       }`}
                     >
-                      <span>{cat === "ALL" ? "Toutes" : getCategoryLabel(cat as any)}</span>
+                      <span>
+                        {cat === "ALL"
+                          ? "Toutes"
+                          : getCategoryLabel(cat as any)}
+                      </span>
                       {catCount > 0 && (
-                        <span className={`ml-1.5 px-1.5 py-0.5 rounded-full text-xs ${
-                          isActive ? 'bg-white/25' : 'bg-blue-100 text-blue-700'
-                        }`}>
+                        <span
+                          className={`ml-1.5 px-1.5 py-0.5 rounded-full text-xs ${
+                            isActive
+                              ? "bg-white/25"
+                              : "bg-blue-100 text-blue-700"
+                          }`}
+                        >
                           {catCount}
                         </span>
                       )}
@@ -311,11 +344,16 @@ export default function NotificationBell() {
           </div>
 
           {/* Liste des notifications */}
-          <div ref={notificationListRef} className="overflow-y-auto max-h-[450px] custom-scrollbar">
+          <div
+            ref={notificationListRef}
+            className="overflow-y-auto max-h-[450px] custom-scrollbar"
+          >
             {loading ? (
               <div className="flex flex-col items-center justify-center py-16">
                 <div className="animate-spin rounded-full h-10 w-10 border-4 border-blue-600 border-t-transparent mb-4"></div>
-                <p className="text-sm text-gray-500 font-medium">Chargement...</p>
+                <p className="text-sm text-gray-500 font-medium">
+                  Chargement...
+                </p>
               </div>
             ) : filteredNotifications.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-16 px-6 text-gray-500">
@@ -324,9 +362,11 @@ export default function NotificationBell() {
                 </div>
                 <p className="text-sm font-medium mb-1">Aucune notification</p>
                 <p className="text-xs text-gray-400 text-center">
-                  {filter === "ALL" 
-                    ? "Vous êtes à jour !" 
-                    : `Pas de notifications ${getCategoryLabel(filter as any).toLowerCase()}`}
+                  {filter === "ALL"
+                    ? "Vous êtes à jour !"
+                    : `Pas de notifications ${getCategoryLabel(
+                        filter as any
+                      ).toLowerCase()}`}
                 </p>
               </div>
             ) : (
@@ -347,26 +387,32 @@ export default function NotificationBell() {
                       </div>
                       {notifs.map((notification: any, index: number) => {
                         const TypeIcon = getTypeIcon(notification.type);
-                        const CategoryIcon = getCategoryIcon(notification.category);
+                        const CategoryIcon = getCategoryIcon(
+                          notification.category
+                        );
                         const isHovered = hoveredNotif === notification.id;
                         const isDeleting = deletingNotif === notification.id;
-                        
+
                         return (
                           <div
                             key={notification.id}
-                            onClick={() => handleNotificationClick(notification)}
-                            onMouseEnter={() => setHoveredNotif(notification.id)}
+                            onClick={() =>
+                              handleNotificationClick(notification)
+                            }
+                            onMouseEnter={() =>
+                              setHoveredNotif(notification.id)
+                            }
                             onMouseLeave={() => setHoveredNotif(null)}
                             style={{
-                              animationDelay: `${index * 0.05}s`
+                              animationDelay: `${index * 0.05}s`,
                             }}
                             className={`relative p-4 border-b border-gray-100 cursor-pointer transition-all duration-300 animate-fadeIn ${
-                              isDeleting 
-                                ? "opacity-0 translate-x-full" 
+                              isDeleting
+                                ? "opacity-0 translate-x-full"
                                 : isHovered
-                                ? "bg-gradient-to-r from-blue-50 to-indigo-50 shadow-sm scale-[1.02]"
-                                : !notification.read 
-                                ? "bg-blue-50/50" 
+                                ? "bg-gradient-to-r from-blue-50 to-indigo-50 shadow-md scale-[1.02] -translate-x-1"
+                                : !notification.read
+                                ? "bg-blue-50"
                                 : "bg-white hover:bg-gray-50"
                             }`}
                           >
@@ -377,12 +423,17 @@ export default function NotificationBell() {
 
                             <div className="flex items-start gap-3">
                               {/* Icône de catégorie */}
-                              <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 transition-all duration-300 ${
-                                notification.type === 'SUCCESS' ? 'bg-green-100 text-green-600' :
-                                notification.type === 'WARNING' ? 'bg-yellow-100 text-yellow-600' :
-                                notification.type === 'ERROR' ? 'bg-red-100 text-red-600' :
-                                'bg-blue-100 text-blue-600'
-                              } ${isHovered ? 'scale-110' : ''}`}>
+                              <div
+                                className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 transition-all duration-300 ${
+                                  notification.type === "SUCCESS"
+                                    ? "bg-green-100 text-green-600"
+                                    : notification.type === "WARNING"
+                                    ? "bg-yellow-100 text-yellow-600"
+                                    : notification.type === "ERROR"
+                                    ? "bg-red-100 text-red-600"
+                                    : "bg-blue-100 text-blue-600"
+                                } ${isHovered ? "scale-110" : ""}`}
+                              >
                                 <CategoryIcon className="w-5 h-5" />
                               </div>
 
@@ -402,7 +453,11 @@ export default function NotificationBell() {
 
                                 {/* Catégorie badge */}
                                 <div className="mb-2">
-                                  <span className={`inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-md ${getTypeStyles(notification.type)}`}>
+                                  <span
+                                    className={`inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-md ${getTypeStyles(
+                                      notification.type
+                                    )}`}
+                                  >
                                     <TypeIcon className="w-3 h-3" />
                                     {getCategoryLabel(notification.category)}
                                   </span>
@@ -417,7 +472,9 @@ export default function NotificationBell() {
                                 <div className="flex items-center justify-between">
                                   <span className="text-xs text-gray-500 flex items-center gap-1">
                                     <Clock className="w-3 h-3" />
-                                    {new Date(notification.createdAt).toLocaleTimeString("fr-FR", {
+                                    {new Date(
+                                      notification.createdAt
+                                    ).toLocaleTimeString("fr-FR", {
                                       hour: "2-digit",
                                       minute: "2-digit",
                                     })}
@@ -434,9 +491,11 @@ export default function NotificationBell() {
 
                               {/* Bouton supprimer */}
                               <button
-                                onClick={(e) => handleDelete(e, notification.id)}
+                                onClick={(e) =>
+                                  handleDelete(e, notification.id)
+                                }
                                 className={`p-2 text-gray-400 hover:text-red-600 hover:bg-red-100 rounded-lg transition-all duration-200 transform hover:scale-110 active:scale-90 ${
-                                  isHovered ? 'opacity-100' : 'opacity-0'
+                                  isHovered ? "opacity-100" : "opacity-0"
                                 }`}
                                 title="Supprimer"
                                 aria-label="Supprimer la notification"
@@ -468,21 +527,24 @@ export default function NotificationBell() {
               </button>
             </div>
           )}
-          
+
           {/* Info message si vide */}
-          {!loading && filteredNotifications.length === 0 && notifications.length > 0 && filter !== "ALL" && (
-            <div className="p-4 bg-gray-50 border-t border-gray-200 text-center">
-              <p className="text-xs text-gray-500">
-                Aucune notification dans cette catégorie
-              </p>
-              <button
-                onClick={() => setFilter("ALL")}
-                className="mt-2 text-xs text-blue-600 hover:text-blue-700 font-medium"
-              >
-                Voir toutes les catégories
-              </button>
-            </div>
-          )}
+          {!loading &&
+            filteredNotifications.length === 0 &&
+            notifications.length > 0 &&
+            filter !== "ALL" && (
+              <div className="p-4 bg-gray-50 border-t border-gray-200 text-center">
+                <p className="text-xs text-gray-500">
+                  Aucune notification dans cette catégorie
+                </p>
+                <button
+                  onClick={() => setFilter("ALL")}
+                  className="mt-2 text-xs text-blue-600 hover:text-blue-700 font-medium"
+                >
+                  Voir toutes les catégories
+                </button>
+              </div>
+            )}
         </div>
       )}
 
@@ -510,7 +572,8 @@ export default function NotificationBell() {
         }
 
         @keyframes wiggle {
-          0%, 100% {
+          0%,
+          100% {
             transform: rotate(0deg);
           }
           25% {
@@ -522,7 +585,8 @@ export default function NotificationBell() {
         }
 
         @keyframes bounce-subtle {
-          0%, 100% {
+          0%,
+          100% {
             transform: scale(1);
           }
           50% {
