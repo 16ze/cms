@@ -3,16 +3,19 @@
 ## ✅ Installation et Configuration
 
 ### **1. Synchroniser la base de données**
+
 ```bash
 npx prisma db push
 ```
 
 ### **2. Générer le Prisma Client**
+
 ```bash
 npx prisma generate
 ```
 
 ### **3. Redémarrer le serveur Next.js**
+
 ```bash
 # Arrêter le serveur (Ctrl+C dans le terminal)
 # Puis relancer:
@@ -24,17 +27,21 @@ npm run dev
 ## 🧪 **Test Rapide**
 
 ### **1. Ouvrir l'admin**
+
 ```
 http://localhost:3000/admin/dashboard
 ```
 
 ### **2. Créer une notification de test**
+
 Dans votre navigateur, ouvrez:
+
 ```
 http://localhost:3000/api/notifications/test
 ```
 
 Vous devriez voir:
+
 ```json
 {
   "success": true,
@@ -43,6 +50,7 @@ Vous devriez voir:
 ```
 
 ### **3. Vérifier la cloche**
+
 - Retourner sur le dashboard
 - La cloche en haut à droite devrait afficher un badge rouge avec "1"
 - Cliquer dessus pour voir la notification
@@ -52,7 +60,9 @@ Vous devriez voir:
 ## 📊 **Vérification des Logs**
 
 ### **Console du navigateur (F12)**
+
 Vous devriez voir:
+
 ```
 📬 Fetching notifications from: /api/notifications
 📬 Response status: 200
@@ -60,7 +70,9 @@ Vous devriez voir:
 ```
 
 ### **Terminal du serveur**
+
 Vous devriez voir:
+
 ```
 📬 API: Récupération des notifications
 📬 API: Utilisateur authentifié: user-id email@example.com
@@ -73,6 +85,7 @@ Vous devriez voir:
 ## ❌ **Si ça ne fonctionne pas**
 
 ### **Erreur 500**
+
 ```bash
 # 1. Vérifier que Prisma est bien généré
 npx prisma generate
@@ -88,12 +101,14 @@ npm run dev
 ```
 
 ### **Erreur 401**
+
 ```
 Vous n'êtes pas connecté. Allez sur:
 http://localhost:3000/admin/login
 ```
 
 ### **Badge ne s'affiche pas**
+
 ```bash
 # Créer une notification de test
 curl http://localhost:3000/api/notifications/test
@@ -107,6 +122,7 @@ http://localhost:3000/api/notifications/test
 ## 🎯 **Utilisation**
 
 ### **Créer une notification (Code)**
+
 ```typescript
 import { notificationService } from "@/lib/notification-service";
 
@@ -119,11 +135,12 @@ await notificationService.create({
   message: "Message de la notification",
   priority: "MEDIUM",
   actionUrl: "/admin/dashboard",
-  actionLabel: "Voir"
+  actionLabel: "Voir",
 });
 ```
 
 ### **Créer une réservation → Notification auto**
+
 ```
 1. Aller sur la page de réservation publique
 2. Remplir le formulaire et réserver
@@ -155,9 +172,10 @@ await notificationService.create({
 
 ## 🎉 **C'est prêt !**
 
-Le système de notifications est maintenant opérationnel ! 
+Le système de notifications est maintenant opérationnel !
 
 **Prochaines étapes:**
+
 1. Tester avec une vraie réservation
 2. Configurer vos préférences
 3. Intégrer avec d'autres événements
@@ -168,4 +186,3 @@ Le système de notifications est maintenant opérationnel !
 
 **Version:** 1.0.2  
 **Dernière mise à jour:** 19 Octobre 2025
-

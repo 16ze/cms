@@ -72,7 +72,10 @@ export async function GET(request: NextRequest) {
     });
   } catch (error) {
     console.error("❌ Erreur récupération notifications:", error);
-    console.error("❌ Stack trace:", error instanceof Error ? error.stack : "N/A");
+    console.error(
+      "❌ Stack trace:",
+      error instanceof Error ? error.stack : "N/A"
+    );
     return NextResponse.json(
       {
         error: "Erreur lors de la récupération des notifications",

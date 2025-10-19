@@ -37,7 +37,8 @@ export async function GET(request: NextRequest) {
       type: "INFO",
       category: "SYSTEM",
       title: "🧪 Notification de test",
-      message: "Ceci est une notification de test pour vérifier que le système fonctionne correctement.",
+      message:
+        "Ceci est une notification de test pour vérifier que le système fonctionne correctement.",
       priority: "MEDIUM",
       actionUrl: "/admin/dashboard",
       actionLabel: "Voir le dashboard",
@@ -67,4 +68,3 @@ export async function GET(request: NextRequest) {
     );
   }
 }
-
