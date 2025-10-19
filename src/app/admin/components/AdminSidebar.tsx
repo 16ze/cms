@@ -22,6 +22,7 @@ import {
 import { hasPageAccess, UserRole } from "@/lib/permissions";
 import adminContent from "@/config/admin-content.json";
 import { useAdminPermissions } from "@/hooks/use-admin-permissions";
+import { useNotifications } from "@/hooks/use-notifications";
 import AccordionMenu from "@/components/admin/AccordionMenu";
 
 interface AdminUser {
@@ -49,6 +50,20 @@ export default function AdminSidebar({
   const { hasPageAccess: hasPermission, loading: permissionsLoading } =
     useAdminPermissions();
 
+  // Récupérer les notifications pour les badges
+  const { notifications, unreadCount } = useNotifications();
+
+  // Calculer les compteurs de notifications par catégorie
+  const getNotificationCount = (category: string) => {
+    return notifications.filter(n => n.category === category && !n.read).length;
+  };
+
+  const reservationCount = getNotificationCount('RESERVATION');
+  const clientCount = getNotificationCount('CLIENT');
+  const seoCount = getNotificationCount('SEO');
+  const systemCount = getNotificationCount('SYSTEM');
+  const contentCount = getNotificationCount('CONTENT');
+
   // Obtenir le rôle de l'utilisateur actuel et le normaliser
   // La base de données retourne "SUPER_ADMIN" mais le système utilise "super_admin"
   const normalizeRole = (role: string): UserRole => {
@@ -57,6 +72,16 @@ export default function AdminSidebar({
   };
 
   const userRole = user?.role ? normalizeRole(user.role) : "admin";
+
+  // Composant Badge pour les notifications
+  const NotificationBadge = ({ count }: { count: number }) => {
+    if (count === 0) return null;
+    return (
+      <span className="absolute -top-1 -right-1 flex items-center justify-center min-w-[18px] h-[18px] px-1 text-[10px] font-bold text-white bg-gradient-to-r from-red-500 to-red-600 rounded-full shadow-lg ring-2 ring-white">
+        {count > 99 ? "99+" : count}
+      </span>
+    );
+  };
 
   // Import des labels de navigation depuis admin-content.json
   const nav = adminContent.navigation.main;
@@ -279,36 +304,62 @@ export default function AdminSidebar({
                       <div className="mb-2">
                         <Link
                           href={item.href}
-                          className={`flex items-center p-3 rounded-xl transition-all duration-200 ${
+                          className={`flex items-center justify-between p-3 rounded-xl transition-all duration-200 ${
                             activePage === item.id
                               ? "text-blue-600 bg-blue-50 font-semibold shadow-sm"
                               : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
                           }`}
                           onClick={handleNavLinkClick}
                         >
-                          <item.icon className="w-5 h-5 mr-3" />
-                          {item.label}
+                          <div className="flex items-center">
+                            <item.icon className="w-5 h-5 mr-3" />
+                            {item.label}
+                          </div>
+                          <NotificationBadge count={systemCount} />
                         </Link>
                       </div>
                     </div>
                   );
                 }
 
-                // Pour les autres éléments, rendu normal
+                // Pour les autres éléments, rendu normal avec badges
                 const IconComponent = item.icon;
+                
+                // Déterminer le compteur de notifications pour cet élément
+                let notificationCount = 0;
+                switch (item.id) {
+                  case 'reservations':
+                    notificationCount = reservationCount;
+                    break;
+                  case 'clients':
+                    notificationCount = clientCount;
+                    break;
+                  case 'content-advanced':
+                    notificationCount = contentCount;
+                    break;
+                  case 'site':
+                    notificationCount = seoCount;
+                    break;
+                  default:
+                    notificationCount = 0;
+                }
+
                 return (
                   <div key={item.id} className="mb-2">
                     <Link
                       href={item.href}
-                      className={`flex items-center p-3 rounded-xl transition-all duration-200 ${
+                      className={`flex items-center justify-between p-3 rounded-xl transition-all duration-200 ${
                         activePage === item.id
                           ? "text-blue-600 bg-blue-50 font-semibold shadow-sm"
                           : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
                       }`}
                       onClick={handleNavLinkClick}
                     >
-                      <IconComponent className="w-5 h-5 mr-3" />
-                      {item.label}
+                      <div className="flex items-center">
+                        <IconComponent className="w-5 h-5 mr-3" />
+                        {item.label}
+                      </div>
+                      <NotificationBadge count={notificationCount} />
                     </Link>
                   </div>
                 );
