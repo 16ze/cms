@@ -5,6 +5,7 @@
 L'utilisateur a signalé que **"LA POP UP NE PASSE PAS AU DESSUR DES BOUTON ET DES INPUT"**.
 
 ### **Symptômes observés :**
+
 - ❌ Popup de notification visible mais **sous** les boutons
 - ❌ Popup de notification visible mais **sous** les inputs
 - ❌ Conflit avec les composants Radix UI (Dialog, Popover, Tooltip)
@@ -16,11 +17,13 @@ L'utilisateur a signalé que **"LA POP UP NE PASSE PAS AU DESSUR DES BOUTON ET D
 ### **1. Investigation des z-index existants :**
 
 **Composants Radix UI (`src/components/ui/`) :**
+
 - Dialog : `z-50` (overlay et content)
 - Popover : `z-50` (content)
 - Tooltip : `z-50` (content)
 
 **Variables CSS (`src/styles/css-variables.css`) :**
+
 ```css
 --z-modal: 9999; /* Modal/Overlay */
 --z-modal-content: 10000; /* Contenu modal */
@@ -28,8 +31,11 @@ L'utilisateur a signalé que **"LA POP UP NE PASSE PAS AU DESSUR DES BOUTON ET D
 ```
 
 **Focus states (`src/styles/micro-interactions.css`) :**
+
 ```css
-input:focus, textarea:focus, select:focus {
+input:focus,
+textarea:focus,
+select:focus {
   ring: 2px;
   ring-color: #3b82f6;
   ring-offset: 2px;
@@ -39,6 +45,7 @@ input:focus, textarea:focus, select:focus {
 ### **2. Diagnostic du problème :**
 
 Le problème venait de **plusieurs facteurs combinés** :
+
 - **Radix UI** crée des **contextes de stacking** avec `z-50`
 - Les **focus states** des inputs peuvent créer des z-index élevés
 - Notre popup était dans le **contexte du header** au lieu du contexte racine
@@ -51,6 +58,7 @@ Le problème venait de **plusieurs facteurs combinés** :
 ### **1. Portal React pour contexte racine :**
 
 **AVANT :**
+
 ```tsx
 return (
   <>
@@ -66,17 +74,20 @@ return (
 ```
 
 **APRÈS :**
+
 ```tsx
 return (
   <>
     {/* Bouton */}
-    {isOpen && typeof window !== "undefined" && createPortal(
-      <>
-        {/* Overlay */}
-        {/* Panel */}
-      </>,
-      document.body  // ← Portal dans le contexte racine
-    )}
+    {isOpen &&
+      typeof window !== "undefined" &&
+      createPortal(
+        <>
+          {/* Overlay */}
+          {/* Panel */}
+        </>,
+        document.body // ← Portal dans le contexte racine
+      )}
   </>
 );
 ```
@@ -84,10 +95,12 @@ return (
 ### **2. Z-index ultra élevé avec double protection :**
 
 **AVANT :**
+
 - Overlay : `z-[9999999]` (9,999,999)
 - Panel : `z-[9999999]` (9,999,999)
 
 **APRÈS :**
+
 - Overlay : `z-[99999999]` + `style={{ zIndex: 99999999 }}`
 - Panel : `z-[99999999]` + `style={{ zIndex: 99999999 }}`
 
@@ -102,6 +115,7 @@ import { createPortal } from "react-dom";
 ## 🧪 **VALIDATION AVANCÉE**
 
 ### **Test créé :**
+
 - Fichier : `test-notification-radix-ui.html`
 - Simule **tous** les composants Radix UI (Dialog, Popover, Tooltip)
 - Teste les **conflits** avec `z-index: 50`
@@ -109,6 +123,7 @@ import { createPortal } from "react-dom";
 - Test **complet** avec tous les éléments
 
 ### **Hiérarchie z-index finale :**
+
 ```
 Focus states inputs : ~20
 Radix UI (Dialog, Popover, Tooltip) : 50
@@ -122,6 +137,7 @@ Popup notifications : 99,999,999 ✅
 ## 📊 **RÉSULTATS GARANTIS**
 
 ### **✅ Fonctionnalités restaurées :**
+
 - Popup notifications au **PREMIER PLAN ABSOLU**
 - Au-dessus de **tous** les boutons et inputs
 - Au-dessus de **tous** les composants Radix UI
@@ -129,6 +145,7 @@ Popup notifications : 99,999,999 ✅
 - **Portal** garantit le contexte racine du DOM
 
 ### **✅ Protection maximale :**
+
 - **Double z-index** : className + style inline
 - **Portal React** : contexte racine garanti
 - **Z-index ultra élevé** : 99,999,999
@@ -139,6 +156,7 @@ Popup notifications : 99,999,999 ✅
 ## 🔧 **FICHIERS MODIFIÉS**
 
 1. **`src/components/admin/NotificationBell.tsx`**
+
    - Import `createPortal` de React
    - Portal vers `document.body`
    - Z-index augmenté à 99,999,999
@@ -166,6 +184,7 @@ Popup notifications : 99,999,999 ✅
 **La popup de notifications passe maintenant AU-DESSUS DE TOUT ! 🎉**
 
 ### **Garanties techniques :**
+
 - ✅ **Portal React** : Contexte racine du DOM
 - ✅ **Z-index 99,999,999** : Au-dessus de tous les composants
 - ✅ **Style inline** : Priorité maximale
@@ -174,7 +193,7 @@ Popup notifications : 99,999,999 ✅
 
 ---
 
-*Solution appliquée le : $(date)*
-*Développeur : Assistant IA Senior*
-*Méthode : Analyse méthodique approfondie*
-*Résultat : Popup au premier plan absolu ✅*
+_Solution appliquée le : $(date)_
+_Développeur : Assistant IA Senior_
+_Méthode : Analyse méthodique approfondie_
+_Résultat : Popup au premier plan absolu ✅_

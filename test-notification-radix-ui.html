@@ -168,33 +168,64 @@
           Ces éléments simulent les composants Radix UI utilisés dans l'admin.
         </p>
 
-        <div class="radix-dialog-overlay" style="display: none" id="dialog-overlay"></div>
-        <div class="radix-dialog-content" style="display: none" id="dialog-content">
+        <div
+          class="radix-dialog-overlay"
+          style="display: none"
+          id="dialog-overlay"
+        ></div>
+        <div
+          class="radix-dialog-content"
+          style="display: none"
+          id="dialog-content"
+        >
           <h4>Dialog Radix UI</h4>
           <p>Z-index: 50</p>
           <button class="test-button" onclick="hideDialog()">Fermer</button>
         </div>
 
-        <div class="radix-popover-content" style="display: none; top: 200px; left: 100px;" id="popover-content">
+        <div
+          class="radix-popover-content"
+          style="display: none; top: 200px; left: 100px"
+          id="popover-content"
+        >
           <h4>Popover Radix UI</h4>
           <p>Z-index: 50</p>
         </div>
 
-        <div class="radix-tooltip-content" style="display: none; top: 300px; left: 200px;" id="tooltip-content">
+        <div
+          class="radix-tooltip-content"
+          style="display: none; top: 300px; left: 200px"
+          id="tooltip-content"
+        >
           <h4>Tooltip Radix UI</h4>
           <p>Z-index: 50</p>
         </div>
 
         <div class="form-element">
           <strong>Input avec focus (z-index: 20)</strong><br />
-          <input type="text" placeholder="Tapez ici pour tester le focus..." style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;" />
+          <input
+            type="text"
+            placeholder="Tapez ici pour tester le focus..."
+            style="
+              width: 100%;
+              padding: 8px;
+              border: 1px solid #ccc;
+              border-radius: 4px;
+            "
+          />
         </div>
 
         <div class="form-element">
           <strong>Bouton avec focus</strong><br />
-          <button class="test-button" onclick="showDialog()">Ouvrir Dialog Radix</button>
-          <button class="test-button" onclick="showPopover()">Ouvrir Popover</button>
-          <button class="test-button" onclick="showTooltip()">Ouvrir Tooltip</button>
+          <button class="test-button" onclick="showDialog()">
+            Ouvrir Dialog Radix
+          </button>
+          <button class="test-button" onclick="showPopover()">
+            Ouvrir Popover
+          </button>
+          <button class="test-button" onclick="showTooltip()">
+            Ouvrir Tooltip
+          </button>
         </div>
       </div>
 
@@ -205,9 +236,7 @@
         <button class="test-button" onclick="hideNotification()">
           ❌ Masquer Notification
         </button>
-        <button class="test-button" onclick="testAll()">
-          🧪 Test Complet
-        </button>
+        <button class="test-button" onclick="testAll()">🧪 Test Complet</button>
       </div>
 
       <div id="status" class="status" style="display: none"></div>
@@ -272,7 +301,7 @@
         showDialog();
         showPopover();
         showTooltip();
-        
+
         // Puis afficher la notification
         setTimeout(() => {
           showNotification();
