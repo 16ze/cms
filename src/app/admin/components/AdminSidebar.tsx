@@ -23,6 +23,7 @@ import { hasPageAccess, UserRole } from "@/lib/permissions";
 import adminContent from "@/config/admin-content.json";
 import { useAdminPermissions } from "@/hooks/use-admin-permissions";
 import { useNotifications } from "@/hooks/use-notifications";
+import { useTemplate } from "@/hooks/use-template";
 import AccordionMenu from "@/components/admin/AccordionMenu";
 
 interface AdminUser {
@@ -53,6 +54,26 @@ export default function AdminSidebar({
   // Récupérer les notifications pour les badges
   const { notifications, unreadCount } = useNotifications();
 
+  // Récupérer le template actif (non-bloquant)
+  const { currentTemplate } = useTemplate();
+  const [templateSidebarElements, setTemplateSidebarElements] = useState<any[]>([]);
+
+  useEffect(() => {
+    if (currentTemplate?.id) {
+      fetch(`/api/admin/sidebar/${currentTemplate.id}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.success && Array.isArray(data.data)) {
+            setTemplateSidebarElements(data.data);
+          }
+        })
+        .catch(err => {
+          console.warn('Template sidebar not loaded:', err);
+          // Fallback : continuer avec sidebar par défaut
+        });
+    }
+  }, [currentTemplate]);
+
   // Calculer les compteurs de notifications par catégorie
   const getNotificationCount = (category: string) => {
     return notifications.filter((n) => n.category === category && !n.read)
@@ -64,6 +85,16 @@ export default function AdminSidebar({
   const seoCount = getNotificationCount("SEO");
   const systemCount = getNotificationCount("SYSTEM");
   const contentCount = getNotificationCount("CONTENT");
+
+  // Helper pour icônes template
+  const getIconComponent = (iconName: string) => {
+    const iconMap: Record<string, any> = {
+      BarChart3, CalendarRange, UserPlus, Cog, Globe2, Users, Settings,
+      FileText, MessageSquare, Layers, Search, TrendingUp, Zap,
+      Package, ShoppingCart, FolderOpen, Image, Calendar
+    };
+    return iconMap[iconName] || Cog;
+  };
 
   // Obtenir le rôle de l'utilisateur actuel et le normaliser
   // La base de données retourne "SUPER_ADMIN" mais le système utilise "super_admin"
@@ -89,8 +120,8 @@ export default function AdminSidebar({
   const sidebarContent = adminContent.layout.sidebar;
   const rolesContent = adminContent.permissions.roles;
 
-  // Définition des éléments de navigation avec leurs permissions
-  const navigationItems = [
+  // FUSION SÉCURISÉE : base + template + universal
+  const baseNavigationItems = [
     {
       id: "dashboard",
       href: "/admin/dashboard",
@@ -126,6 +157,16 @@ export default function AdminSidebar({
       icon: Globe2,
       requiredRoles: ["super_admin"] as UserRole[],
     },
+  ];
+
+  const universalEndItems = [
+    {
+      id: "templates",
+      href: "/admin/templates",
+      label: "Templates",
+      icon: Layers,
+      requiredRoles: ["super_admin"] as UserRole[],
+    },
     {
       id: "users",
       href: "/admin/users",
@@ -141,6 +182,34 @@ export default function AdminSidebar({
       requiredRoles: ["super_admin"] as UserRole[],
     },
   ];
+
+  // Convertir éléments template
+  const templateItems = templateSidebarElements.map(item => ({
+    ...item,
+    icon: getIconComponent(item.icon),
+    requiredRoles: item.requiredRoles || ["super_admin"] as UserRole[]
+  }));
+
+  // FUSION FINALE
+  const navigationItems = [
+    ...baseNavigationItems,
+    ...templateItems,
+    ...universalEndItems
+  ];
+
+  // Mapping notifications dynamique
+  const notificationCategoryMap: Record<string, string> = {
+    'reservations': 'RESERVATION',
+    'clients': 'CLIENT',
+    'content-advanced': 'CONTENT',
+    'site': 'SEO',
+    ...templateSidebarElements.reduce((acc, item) => {
+      if (item.category) {
+        acc[item.id] = item.category;
+      }
+      return acc;
+    }, {} as Record<string, string>)
+  };
 
   // Filtrer les éléments accessibles selon les permissions réelles
   const accessibleItems = permissionsLoading
@@ -328,21 +397,9 @@ export default function AdminSidebar({
 
                 // Déterminer le compteur de notifications pour cet élément
                 let notificationCount = 0;
-                switch (item.id) {
-                  case "reservations":
-                    notificationCount = reservationCount;
-                    break;
-                  case "clients":
-                    notificationCount = clientCount;
-                    break;
-                  case "content-advanced":
-                    notificationCount = contentCount;
-                    break;
-                  case "site":
-                    notificationCount = seoCount;
-                    break;
-                  default:
-                    notificationCount = 0;
+                const categoryKey = notificationCategoryMap[item.id];
+                if (categoryKey) {
+                  notificationCount = getNotificationCount(categoryKey);
                 }
 
                 return (

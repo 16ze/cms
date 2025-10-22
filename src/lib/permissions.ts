@@ -46,6 +46,11 @@ export const PERMISSIONS: Permission[] = [
     roles: ["super_admin"],
     description: "Paramètres - Configuration générale du site",
   },
+  {
+    page: "templates",
+    roles: ["super_admin"],
+    description: "Gestion des templates - Sélection et personnalisation"
+  },
 ];
 
 // Vérifier si un utilisateur a accès à une page
