@@ -325,6 +325,28 @@ model SiteSettings {
   @@index([category])
 }
 
+// Paramètres SEO par tenant (isolés)
+model TenantSeoSettings {
+  id                String   @id @default(uuid())
+  tenantId          String
+  googleAnalyticsId String?
+  googleTagManagerId String?
+  metaTitle         String?
+  metaDescription   String?
+  keywords          String?  // JSON array
+  ogImage           String?
+  twitterCard       String?
+  sitemapEnabled    Boolean  @default(true)
+  robotsTxt         String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  tenant            Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  
+  @@unique([tenantId])
+  @@index([tenantId])
+}
+
 model ButtonStyles {
   id          String   @id @default(uuid())
   name        String   @unique
@@ -1434,6 +1456,7 @@ model Tenant {
   template                  Template @relation(fields: [templateId], references: [id])
   users                     TenantUser[]
   siteTemplate              SiteTemplate?
+  seoSettings               TenantSeoSettings?
   
   // Relations vers données
   clients                   Client[]
