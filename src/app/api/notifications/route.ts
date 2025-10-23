@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { notificationService } from "@/lib/notification-service";
-import { ensureAdmin } from "@/lib/require-admin";
+import { ensureAuthenticated } from "@/lib/tenant-auth";
 import { NotificationCategory, NotificationPriority } from "@prisma/client";
 
 /**
@@ -11,15 +11,15 @@ export async function GET(request: NextRequest) {
   try {
     console.log("📬 API: Récupération des notifications");
 
-    // Vérifier l'authentification
-    const authResult = await ensureAdmin(request);
+    // Vérifier l'authentification (multi-tenant)
+    const authResult = await ensureAuthenticated(request);
     if (authResult instanceof NextResponse) {
       console.log("📬 API: Authentification échouée");
       return authResult;
     }
 
     const user = authResult;
-    console.log("📬 API: Utilisateur authentifié:", user.id, user.email);
+    console.log("📬 API: Utilisateur authentifié:", user.id, user.email, user.type);
 
     const { searchParams } = new URL(request.url);
 
@@ -94,8 +94,8 @@ export async function POST(request: NextRequest) {
   try {
     console.log("📬 API: Création d'une notification");
 
-    // Vérifier l'authentification
-    const authResult = await ensureAdmin(request);
+    // Vérifier l'authentification (multi-tenant)
+    const authResult = await ensureAuthenticated(request);
     if (authResult instanceof NextResponse) {
       return authResult;
     }

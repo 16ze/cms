@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { ensureAdmin } from "@/lib/require-admin";
+import { ensureAuthenticated } from "@/lib/tenant-auth";
 import { adminPermissionService } from "@/lib/admin-permission-service";
 
 /**
@@ -11,17 +11,17 @@ export async function GET(request: NextRequest) {
   try {
     console.log("🔐 API: Récupération des permissions de l'utilisateur connecté");
 
-    // Vérifier l'authentification
-    const authResult = await ensureAdmin(request);
+    // Vérifier l'authentification (multi-tenant)
+    const authResult = await ensureAuthenticated(request);
     if (authResult instanceof NextResponse) {
       return authResult;
     }
 
     const currentUser = authResult;
-    console.log("🔐 Récupération des permissions pour:", currentUser.email);
+    console.log("🔐 Récupération des permissions pour:", currentUser.email, currentUser.type);
 
     // Si super admin, retourner tous les accès
-    if (currentUser.role === "SUPER_ADMIN") {
+    if (currentUser.type === "SUPER_ADMIN") {
       const allPages = adminPermissionService.getAvailablePages();
       const fullPermissions = allPages.map((page) => ({
         page: page.id,
@@ -39,18 +39,25 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    // Pour les admins, récupérer leurs permissions depuis la base
-    const permissions = await adminPermissionService.getUserPermissions(
-      currentUser.id
-    );
+    // Pour les tenants users, retourner des permissions par défaut
+    // (Ou récupérer depuis la base si vous avez un système de permissions pour tenants)
+    const defaultPermissions = [
+      { page: "dashboard", canView: true, canEdit: true, canDelete: false },
+      { page: "reservations", canView: true, canEdit: true, canDelete: true },
+      { page: "clients", canView: true, canEdit: true, canDelete: true },
+      { page: "content", canView: true, canEdit: true, canDelete: false },
+      { page: "site", canView: true, canEdit: true, canDelete: false },
+      { page: "users", canView: false, canEdit: false, canDelete: false }, // Pas d'accès par défaut
+      { page: "settings", canView: true, canEdit: true, canDelete: false },
+    ];
 
-    console.log("✅ Permissions récupérées:", permissions.length);
+    console.log("✅ Permissions par défaut pour tenant");
 
     return NextResponse.json({
       success: true,
       data: {
-        permissions,
-        role: "ADMIN",
+        permissions: defaultPermissions,
+        role: currentUser.role || "ADMIN",
       },
     });
   } catch (error) {
