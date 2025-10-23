@@ -410,81 +410,7 @@ export default function AdminSidebar({
           <nav className="px-6 py-2 flex-1 overflow-y-auto">
             <div className="space-y-2">
               {accessibleItems.map((item) => {
-                // Si c'est l'élément "users", on insère le menu SEO avant
-                if (item.id === "users") {
-                  const hasSEOPermissions =
-                    hasPermission("keywords") || hasPermission("settings");
-
-                  return (
-                    <div key="seo-menu-container">
-                      {/* Menu accordéon SEO */}
-                      {hasSEOPermissions && (
-                        <div className="mb-2">
-                          <AccordionMenu
-                            title="SEO"
-                            icon={TrendingUp}
-                            items={[
-                              {
-                                id: "seo-keywords",
-                                label: "Analyse des mots-clés",
-                                href: "/admin/seo/keywords",
-                                icon: Search,
-                              },
-                              {
-                                id: "seo-analysis",
-                                label: "Analyse Technique",
-                                href: "/admin/seo/analysis",
-                                icon: BarChart3,
-                              },
-                              {
-                                id: "seo-performance",
-                                label: "Performance",
-                                href: "/admin/seo/performance",
-                                icon: Zap,
-                              },
-                              {
-                                id: "seo-settings",
-                                label: "Paramètres SEO",
-                                href: "/admin/seo/settings",
-                                icon: Settings,
-                              },
-                            ]}
-                            isActive={
-                              activePage.startsWith("seo") ||
-                              activePage === "keywords"
-                            }
-                            defaultOpen={
-                              activePage.startsWith("seo") ||
-                              activePage === "keywords"
-                            }
-                            className="mb-2"
-                          />
-                        </div>
-                      )}
-
-                      {/* Élément users normal */}
-                      <div className="mb-2">
-                        <Link
-                          href={item.href}
-                          className={`flex items-center justify-between p-3 rounded-xl transition-all duration-200 ${
-                            activePage === item.id
-                              ? "text-blue-600 bg-blue-50 font-semibold shadow-sm"
-                              : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
-                          }`}
-                          onClick={handleNavLinkClick}
-                        >
-                          <div className="flex items-center">
-                            <item.icon className="w-5 h-5 mr-3" />
-                            {item.label}
-                          </div>
-                          <NotificationBadge count={systemCount} />
-                        </Link>
-                      </div>
-                    </div>
-                  );
-                }
-
-                // Pour les autres éléments, rendu normal avec badges
+                // Pour tous les éléments, rendu normal avec badges
                 const IconComponent = item.icon;
 
                 // Déterminer le compteur de notifications pour cet élément
@@ -492,6 +418,11 @@ export default function AdminSidebar({
                 const categoryKey = notificationCategoryMap[item.id];
                 if (categoryKey) {
                   notificationCount = getNotificationCount(categoryKey);
+                }
+
+                // Si c'est "users", on affiche le badge système
+                if (item.id === "users") {
+                  notificationCount = systemCount;
                 }
 
                 return (
@@ -514,6 +445,54 @@ export default function AdminSidebar({
                   </div>
                 );
               })}
+              
+              {/* Menu accordéon SEO - Toujours visible pour ceux qui ont les permissions */}
+              {(hasPermission("keywords") || 
+                hasPermission("analysis") || 
+                hasPermission("performance") || 
+                hasPermission("seo-settings")) && (
+                <div className="mb-2">
+                  <AccordionMenu
+                    title="SEO"
+                    icon={TrendingUp}
+                    items={[
+                      {
+                        id: "seo-keywords",
+                        label: "Analyse des mots-clés",
+                        href: "/admin/seo/keywords",
+                        icon: Search,
+                      },
+                      {
+                        id: "seo-analysis",
+                        label: "Analyse Technique",
+                        href: "/admin/seo/analysis",
+                        icon: BarChart3,
+                      },
+                      {
+                        id: "seo-performance",
+                        label: "Performance",
+                        href: "/admin/seo/performance",
+                        icon: Zap,
+                      },
+                      {
+                        id: "seo-settings",
+                        label: "Paramètres SEO",
+                        href: "/admin/seo/settings",
+                        icon: Settings,
+                      },
+                    ]}
+                    isActive={
+                      activePage.startsWith("seo") ||
+                      activePage === "keywords"
+                    }
+                    defaultOpen={
+                      activePage.startsWith("seo") ||
+                      activePage === "keywords"
+                    }
+                    className="mb-2"
+                  />
+                </div>
+              )}
             </div>
           </nav>
 
