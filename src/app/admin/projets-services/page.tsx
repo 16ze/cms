@@ -1,7 +1,16 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Plus, Edit, Trash2, Search, Briefcase, TrendingUp, Clock, DollarSign } from "lucide-react";
+import {
+  Plus,
+  Edit,
+  Trash2,
+  Search,
+  Briefcase,
+  TrendingUp,
+  Clock,
+  DollarSign,
+} from "lucide-react";
 
 interface ServiceProject {
   id: string;
@@ -73,7 +82,9 @@ export default function ProjetsServicesPage() {
   const handleDelete = async (id: string) => {
     if (!confirm("Supprimer ce projet ?")) return;
     try {
-      const res = await fetch(`/api/admin/projets-services/${id}`, { method: "DELETE" });
+      const res = await fetch(`/api/admin/projets-services/${id}`, {
+        method: "DELETE",
+      });
       const data = await res.json();
       if (data.success) await fetchProjects();
     } catch (error) {
@@ -84,10 +95,15 @@ export default function ProjetsServicesPage() {
   const filteredProjects = projects.filter((project) => {
     const matchesSearch =
       project.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      project.client?.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      project.client?.lastName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      project.client?.firstName
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase()) ||
+      project.client?.lastName
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase()) ||
       project.client?.company?.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus = statusFilter === "ALL" || project.status === statusFilter;
+    const matchesStatus =
+      statusFilter === "ALL" || project.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
 
@@ -178,26 +194,41 @@ export default function ProjetsServicesPage() {
       ) : (
         <div className="space-y-4">
           {filteredProjects.map((project) => (
-            <div key={project.id} className="bg-white border rounded-lg p-5 hover:shadow-lg transition">
+            <div
+              key={project.id}
+              className="bg-white border rounded-lg p-5 hover:shadow-lg transition"
+            >
               <div className="flex items-start justify-between mb-4">
                 <div className="flex items-start gap-4 flex-1">
                   <Briefcase className="w-10 h-10 text-indigo-600" />
                   <div className="flex-1">
                     <h3 className="font-bold text-lg">{project.name}</h3>
                     <p className="text-sm text-gray-600">
-                      Client: {project.client?.firstName} {project.client?.lastName}
-                      {project.client?.company && ` - ${project.client.company}`}
+                      Client: {project.client?.firstName}{" "}
+                      {project.client?.lastName}
+                      {project.client?.company &&
+                        ` - ${project.client.company}`}
                     </p>
-                    {project.description && <p className="text-sm text-gray-500 mt-1 line-clamp-2">{project.description}</p>}
+                    {project.description && (
+                      <p className="text-sm text-gray-500 mt-1 line-clamp-2">
+                        {project.description}
+                      </p>
+                    )}
                     <div className="flex items-center gap-4 mt-2 text-xs text-gray-500">
                       {project.startDate && (
                         <span>
-                          Début: {new Date(project.startDate).toLocaleDateString("fr-FR")}
+                          Début:{" "}
+                          {new Date(project.startDate).toLocaleDateString(
+                            "fr-FR"
+                          )}
                         </span>
                       )}
                       {project.endDate && (
                         <span>
-                          Fin: {new Date(project.endDate).toLocaleDateString("fr-FR")}
+                          Fin:{" "}
+                          {new Date(project.endDate).toLocaleDateString(
+                            "fr-FR"
+                          )}
                         </span>
                       )}
                       {project.budget && <span>Budget: {project.budget}€</span>}
@@ -207,8 +238,12 @@ export default function ProjetsServicesPage() {
                 <div className="text-right">
                   <select
                     value={project.status}
-                    onChange={(e) => handleStatusChange(project.id, e.target.value)}
-                    className={`px-3 py-1 text-sm rounded-full border-0 ${statusColors[project.status]}`}
+                    onChange={(e) =>
+                      handleStatusChange(project.id, e.target.value)
+                    }
+                    className={`px-3 py-1 text-sm rounded-full border-0 ${
+                      statusColors[project.status]
+                    }`}
                   >
                     {Object.entries(statusLabels).map(([key, label]) => (
                       <option key={key} value={key}>
@@ -223,7 +258,9 @@ export default function ProjetsServicesPage() {
               <div className="mb-3">
                 <div className="flex items-center justify-between mb-1">
                   <span className="text-sm text-gray-600">Progression</span>
-                  <span className="text-sm font-bold text-indigo-600">{project.progress}%</span>
+                  <span className="text-sm font-bold text-indigo-600">
+                    {project.progress}%
+                  </span>
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-2">
                   <div
@@ -248,4 +285,3 @@ export default function ProjetsServicesPage() {
     </div>
   );
 }
-

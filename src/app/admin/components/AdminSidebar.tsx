@@ -18,6 +18,12 @@ import {
   Search,
   TrendingUp,
   Zap,
+  MessageSquare,
+  Package,
+  ShoppingCart,
+  FolderOpen,
+  Image,
+  Calendar,
 } from "lucide-react";
 import { hasPageAccess, UserRole } from "@/lib/permissions";
 import adminContent from "@/config/admin-content.json";
@@ -56,19 +62,21 @@ export default function AdminSidebar({
 
   // Récupérer le template actif (non-bloquant)
   const { currentTemplate } = useTemplate();
-  const [templateSidebarElements, setTemplateSidebarElements] = useState<any[]>([]);
+  const [templateSidebarElements, setTemplateSidebarElements] = useState<any[]>(
+    []
+  );
 
   useEffect(() => {
     if (currentTemplate?.id) {
       fetch(`/api/admin/sidebar/${currentTemplate.id}`)
-        .then(res => res.json())
-        .then(data => {
+        .then((res) => res.json())
+        .then((data) => {
           if (data.success && Array.isArray(data.data)) {
             setTemplateSidebarElements(data.data);
           }
         })
-        .catch(err => {
-          console.warn('Template sidebar not loaded:', err);
+        .catch((err) => {
+          console.warn("Template sidebar not loaded:", err);
           // Fallback : continuer avec sidebar par défaut
         });
     }
@@ -89,9 +97,24 @@ export default function AdminSidebar({
   // Helper pour icônes template
   const getIconComponent = (iconName: string) => {
     const iconMap: Record<string, any> = {
-      BarChart3, CalendarRange, UserPlus, Cog, Globe2, Users, Settings,
-      FileText, MessageSquare, Layers, Search, TrendingUp, Zap,
-      Package, ShoppingCart, FolderOpen, Image, Calendar
+      BarChart3,
+      CalendarRange,
+      UserPlus,
+      Cog,
+      Globe2,
+      Users,
+      Settings,
+      FileText,
+      MessageSquare,
+      Layers,
+      Search,
+      TrendingUp,
+      Zap,
+      Package,
+      ShoppingCart,
+      FolderOpen,
+      Image,
+      Calendar,
     };
     return iconMap[iconName] || Cog;
   };
@@ -121,6 +144,23 @@ export default function AdminSidebar({
   const rolesContent = adminContent.permissions.roles;
 
   // FUSION SÉCURISÉE : base + template + universal
+  // ============================================
+  // ÉLÉMENTS DE BASE (toujours en haut)
+  // ============================================
+
+  // Templates nécessitant la gestion des réservations
+  const templatesWithReservations = [
+    "RESTAURANT",
+    "WELLNESS",
+    "BEAUTY",
+    "CONSULTATION",
+  ];
+
+  // Vérifier si le template actuel nécessite les réservations
+  const needsReservations = currentTemplate
+    ? templatesWithReservations.includes(currentTemplate.category)
+    : true; // Par défaut, afficher les réservations si pas de template actif
+
   const baseNavigationItems = [
     {
       id: "dashboard",
@@ -129,13 +169,18 @@ export default function AdminSidebar({
       icon: BarChart3,
       requiredRoles: ["admin", "super_admin"] as UserRole[],
     },
-    {
-      id: "reservations",
-      href: "/admin/reservations",
-      label: nav.reservations,
-      icon: CalendarRange,
-      requiredRoles: ["admin", "super_admin"] as UserRole[],
-    },
+    // Réservations : uniquement pour certains templates
+    ...(needsReservations
+      ? [
+          {
+            id: "reservations",
+            href: "/admin/reservations",
+            label: nav.reservations,
+            icon: CalendarRange,
+            requiredRoles: ["admin", "super_admin"] as UserRole[],
+          },
+        ]
+      : []),
     {
       id: "clients",
       href: "/admin/clients",
@@ -143,22 +188,11 @@ export default function AdminSidebar({
       icon: UserPlus,
       requiredRoles: ["admin", "super_admin"] as UserRole[],
     },
-    {
-      id: "content-advanced",
-      href: "/admin/content/advanced",
-      label: nav.content,
-      icon: Cog,
-      requiredRoles: ["super_admin"] as UserRole[],
-    },
-    {
-      id: "site",
-      href: "/admin/site",
-      label: nav.site,
-      icon: Globe2,
-      requiredRoles: ["super_admin"] as UserRole[],
-    },
   ];
 
+  // ============================================
+  // ÉLÉMENTS UNIVERSAUX (toujours en bas)
+  // ============================================
   const universalEndItems = [
     {
       id: "templates",
@@ -175,6 +209,13 @@ export default function AdminSidebar({
       requiredRoles: ["super_admin"] as UserRole[],
     },
     {
+      id: "seo",
+      href: "/admin/seo",
+      label: "SEO",
+      icon: Search,
+      requiredRoles: ["super_admin"] as UserRole[],
+    },
+    {
       id: "settings",
       href: "/admin/settings",
       label: nav.settings,
@@ -183,32 +224,61 @@ export default function AdminSidebar({
     },
   ];
 
-  // Convertir éléments template
-  const templateItems = templateSidebarElements.map(item => ({
+  // Convertir éléments template avec normalisation des IDs
+  const templateItems = templateSidebarElements.map((item) => ({
     ...item,
+    id: item.elementId || item.id, // Normaliser l'ID
     icon: getIconComponent(item.icon),
-    requiredRoles: item.requiredRoles || ["super_admin"] as UserRole[]
+    requiredRoles: item.requiredRoles || (["super_admin"] as UserRole[]),
   }));
 
-  // FUSION FINALE
+  // FUSION FINALE SANS DOUBLONS
+  // 1. Créer un Set des IDs existants dans base et universal
+  const baseAndUniversalIds = new Set([
+    ...baseNavigationItems.map((item) => item.id),
+    ...universalEndItems.map((item) => item.id),
+  ]);
+
+  // 2. Filtrer les éléments template pour exclure les doublons
+  const uniqueTemplateItems = templateItems.filter(
+    (item) => !baseAndUniversalIds.has(item.id)
+  );
+
+  // 3. FUSION : base + template (sans doublons) + universal
   const navigationItems = [
     ...baseNavigationItems,
-    ...templateItems,
-    ...universalEndItems
+    ...uniqueTemplateItems,
+    ...universalEndItems,
   ];
 
-  // Mapping notifications dynamique
+  // ============================================
+  // MAPPING NOTIFICATIONS (base + template + universal)
+  // ============================================
+  const baseNotificationMap: Record<string, string> = {
+    // Éléments de base
+    dashboard: "SYSTEM",
+    reservations: "RESERVATION",
+    clients: "CLIENT",
+    // Éléments universaux
+    templates: "SYSTEM",
+    users: "SYSTEM",
+    seo: "SEO",
+    settings: "SYSTEM",
+  };
+
+  // Ajouter les catégories des éléments template (sans écraser les base)
+  const templateNotificationMap = uniqueTemplateItems.reduce((acc, item) => {
+    const itemId = item.id;
+    if (item.category && !baseNotificationMap[itemId]) {
+      acc[itemId] = item.category;
+    }
+    return acc;
+  }, {} as Record<string, string>);
+
+  // FUSION des mappings (base prioritaire)
   const notificationCategoryMap: Record<string, string> = {
-    'reservations': 'RESERVATION',
-    'clients': 'CLIENT',
-    'content-advanced': 'CONTENT',
-    'site': 'SEO',
-    ...templateSidebarElements.reduce((acc, item) => {
-      if (item.category) {
-        acc[item.id] = item.category;
-      }
-      return acc;
-    }, {} as Record<string, string>)
+    ...baseNotificationMap,
+    ...templateNotificationMap,
   };
 
   // Filtrer les éléments accessibles selon les permissions réelles

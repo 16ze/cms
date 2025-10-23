@@ -1,7 +1,16 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Plus, Edit, Trash2, Search, Calendar, Clock, User, Heart } from "lucide-react";
+import {
+  Plus,
+  Edit,
+  Trash2,
+  Search,
+  Calendar,
+  Clock,
+  User,
+  Heart,
+} from "lucide-react";
 
 interface Appointment {
   id: string;
@@ -57,7 +66,10 @@ export default function ConsultationsPage() {
     }
   };
 
-  const handleStatusChange = async (appointmentId: string, newStatus: string) => {
+  const handleStatusChange = async (
+    appointmentId: string,
+    newStatus: string
+  ) => {
     try {
       const res = await fetch(`/api/admin/consultations/${appointmentId}`, {
         method: "PUT",
@@ -74,7 +86,9 @@ export default function ConsultationsPage() {
   const handleDelete = async (id: string) => {
     if (!confirm("Supprimer cette consultation ?")) return;
     try {
-      const res = await fetch(`/api/admin/consultations/${id}`, { method: "DELETE" });
+      const res = await fetch(`/api/admin/consultations/${id}`, {
+        method: "DELETE",
+      });
       const data = await res.json();
       if (data.success) await fetchAppointments();
     } catch (error) {
@@ -84,12 +98,21 @@ export default function ConsultationsPage() {
 
   const filteredAppointments = appointments.filter((appointment) => {
     const matchesSearch =
-      appointment.patient?.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      appointment.patient?.lastName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      appointment.therapist?.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      appointment.therapist?.lastName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      appointment.patient?.firstName
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase()) ||
+      appointment.patient?.lastName
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase()) ||
+      appointment.therapist?.firstName
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase()) ||
+      appointment.therapist?.lastName
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase()) ||
       appointment.type.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus = statusFilter === "ALL" || appointment.status === statusFilter;
+    const matchesStatus =
+      statusFilter === "ALL" || appointment.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
 
@@ -105,7 +128,9 @@ export default function ConsultationsPage() {
       <div className="flex justify-between items-center mb-8">
         <div>
           <h1 className="text-3xl font-bold">Consultations Thérapie</h1>
-          <p className="text-gray-600 mt-2">Gérez les rendez-vous de consultation</p>
+          <p className="text-gray-600 mt-2">
+            Gérez les rendez-vous de consultation
+          </p>
         </div>
       </div>
 
@@ -172,32 +197,42 @@ export default function ConsultationsPage() {
       ) : (
         <div className="space-y-4">
           {filteredAppointments.map((appointment) => (
-            <div key={appointment.id} className="bg-white border rounded-lg p-5 hover:shadow-lg transition">
+            <div
+              key={appointment.id}
+              className="bg-white border rounded-lg p-5 hover:shadow-lg transition"
+            >
               <div className="flex items-start justify-between mb-4">
                 <div className="flex items-start gap-4">
                   <Heart className="w-10 h-10 text-teal-600" />
                   <div>
                     <h3 className="font-bold text-lg">{appointment.type}</h3>
                     <p className="text-sm text-gray-600">
-                      Patient: {appointment.patient?.firstName} {appointment.patient?.lastName}
+                      Patient: {appointment.patient?.firstName}{" "}
+                      {appointment.patient?.lastName}
                     </p>
                     <p className="text-sm text-gray-600">
-                      Thérapeute: {appointment.therapist?.firstName} {appointment.therapist?.lastName}
+                      Thérapeute: {appointment.therapist?.firstName}{" "}
+                      {appointment.therapist?.lastName}
                     </p>
                     <p className="text-xs text-gray-500 mt-1">
                       {new Date(appointment.date).toLocaleDateString("fr-FR", {
                         day: "2-digit",
                         month: "long",
                         year: "numeric",
-                      })} • {appointment.time} • {appointment.duration} min
+                      })}{" "}
+                      • {appointment.time} • {appointment.duration} min
                     </p>
                   </div>
                 </div>
                 <div className="text-right">
                   <select
                     value={appointment.status}
-                    onChange={(e) => handleStatusChange(appointment.id, e.target.value)}
-                    className={`px-3 py-1 text-sm rounded-full border-0 ${statusColors[appointment.status]}`}
+                    onChange={(e) =>
+                      handleStatusChange(appointment.id, e.target.value)
+                    }
+                    className={`px-3 py-1 text-sm rounded-full border-0 ${
+                      statusColors[appointment.status]
+                    }`}
                   >
                     {Object.entries(statusLabels).map(([key, label]) => (
                       <option key={key} value={key}>
@@ -229,4 +264,3 @@ export default function ConsultationsPage() {
     </div>
   );
 }
-

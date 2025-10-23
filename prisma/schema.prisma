@@ -1391,3 +1391,689 @@ enum TemplateCategory {
   CONSULTATION  // Consultation & Thérapie
   SERVICES      // Prestations Professionnelles
 }
+
+// ===== GESTION DES PROJETS =====
+
+model Project {
+  id          String   @id @default(uuid())
+  title       String
+  slug        String   @unique
+  description String
+  content     String? 
+  category    String?
+  client      String?
+  technologies String?  // JSON array of tech tags
+  imageUrl    String?
+  images      String?  // JSON array of image URLs
+  projectUrl  String?
+  status      CorporateProjectStatus @default(COMPLETED)
+  startDate   DateTime?
+  endDate     DateTime?
+  featured    Boolean  @default(false)
+  orderIndex  Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@index([status])
+  @@index([featured])
+  @@index([orderIndex])
+  @@index([createdAt])
+}
+
+enum CorporateProjectStatus {
+  IN_PROGRESS
+  COMPLETED
+  ARCHIVED
+}
+
+// ===== GESTION DE L'ÉQUIPE =====
+
+model TeamMember {
+  id          String   @id @default(uuid())
+  firstName   String
+  lastName    String
+  slug        String   @unique
+  position    String
+  department  String?
+  bio         String? 
+  photoUrl    String?
+  email       String?
+  phone       String?
+  linkedin    String?
+  twitter     String?
+  github      String?
+  website     String?
+  skills      String?  // JSON array of skills
+  isActive    Boolean  @default(true)
+  orderIndex  Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@index([isActive])
+  @@index([orderIndex])
+  @@index([department])
+}
+
+// ===== E-COMMERCE TEMPLATE =====
+
+model Product {
+  id            String   @id @default(uuid())
+  name          String
+  slug          String   @unique
+  description   String  
+  shortDesc     String?
+  price         Float
+  comparePrice  Float?
+  cost          Float?
+  sku           String?  @unique
+  barcode       String?
+  trackQuantity Boolean  @default(true)
+  quantity      Int      @default(0)
+  lowStockAlert Int?
+  category      String?
+  brand         String?
+  tags          String?  // JSON array
+  images        String?  // JSON array of image URLs
+  featured      Boolean  @default(false)
+  isActive      Boolean  @default(true)
+  weight        Float?
+  dimensions    String?  // JSON {length, width, height}
+  seoTitle      String?
+  seoDesc       String?
+  orderIndex    Int      @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  orderItems    OrderItem[]
+  
+  @@index([slug])
+  @@index([category])
+  @@index([brand])
+  @@index([isActive])
+  @@index([featured])
+  @@index([price])
+}
+
+model Order {
+  id              String      @id @default(uuid())
+  orderNumber     String      @unique
+  customerName    String
+  customerEmail   String
+  customerPhone   String?
+  customerAddress String?     // JSON
+  status          OrderStatus @default(PENDING)
+  paymentStatus   PaymentStatus @default(PENDING)
+  paymentMethod   String?
+  subtotal        Float
+  tax             Float       @default(0)
+  shipping        Float       @default(0)
+  discount        Float       @default(0)
+  total           Float
+  notes           String?    
+  trackingNumber  String?
+  shippedAt       DateTime?
+  deliveredAt     DateTime?
+  cancelledAt     DateTime?
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  
+  items           OrderItem[]
+  
+  @@index([orderNumber])
+  @@index([status])
+  @@index([paymentStatus])
+  @@index([customerEmail])
+  @@index([createdAt])
+}
+
+model OrderItem {
+  id          String   @id @default(uuid())
+  orderId     String
+  productId   String
+  productName String
+  quantity    Int
+  price       Float
+  total       Float
+  createdAt   DateTime @default(now())
+  
+  order       Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product     Product  @relation(fields: [productId], references: [id])
+  
+  @@index([orderId])
+  @@index([productId])
+}
+
+enum OrderStatus {
+  PENDING
+  PROCESSING
+  SHIPPED
+  DELIVERED
+  CANCELLED
+  REFUNDED
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  FAILED
+  REFUNDED
+}
+
+// ===== BLOG TEMPLATE =====
+
+model Article {
+  id            String        @id @default(uuid())
+  title         String
+  slug          String        @unique
+  excerpt       String?      
+  content       String       
+  coverImage    String?
+  authorId      String
+  categoryId    String?
+  tags          String?       // JSON array
+  status        ArticleStatus @default(DRAFT)
+  featured      Boolean       @default(false)
+  viewCount     Int           @default(0)
+  publishedAt   DateTime?
+  seoTitle      String?
+  seoDesc       String?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  
+  author        Author        @relation(fields: [authorId], references: [id])
+  category      ArticleCategory? @relation(fields: [categoryId], references: [id])
+  
+  @@index([slug])
+  @@index([authorId])
+  @@index([categoryId])
+  @@index([status])
+  @@index([featured])
+  @@index([publishedAt])
+}
+
+model ArticleCategory {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  slug        String   @unique
+  description String? 
+  color       String?
+  icon        String?
+  orderIndex  Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  articles    Article[]
+  
+  @@index([slug])
+  @@index([orderIndex])
+}
+
+model Author {
+  id          String   @id @default(uuid())
+  firstName   String
+  lastName    String
+  slug        String   @unique
+  bio         String? 
+  photoUrl    String?
+  email       String?
+  website     String?
+  twitter     String?
+  linkedin    String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  articles    Article[]
+  
+  @@index([slug])
+  @@index([isActive])
+}
+
+enum ArticleStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+// ===== RESTAURANT TEMPLATE =====
+
+model MenuItem {
+  id          String      @id @default(uuid())
+  name        String
+  slug        String      @unique
+  description String?    
+  category    MenuCategory
+  price       Float
+  imageUrl    String?
+  ingredients String?     // JSON array
+  allergens   String?     // JSON array
+  dietary     String?     // JSON array (vegetarian, vegan, etc.)
+  spicyLevel  Int?        // 0-5
+  isAvailable Boolean     @default(true)
+  isFeatured  Boolean     @default(false)
+  orderIndex  Int         @default(0)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  
+  @@index([slug])
+  @@index([category])
+  @@index([isAvailable])
+  @@index([isFeatured])
+}
+
+model RestaurantReservation {
+  id            String               @id @default(uuid())
+  customerName  String
+  customerEmail String
+  customerPhone String
+  date          DateTime
+  time          String
+  guests        Int
+  tableId       String?
+  status        RestaurantReservationStatus    @default(PENDING)
+  notes         String?             
+  confirmedAt   DateTime?
+  cancelledAt   DateTime?
+  createdAt     DateTime             @default(now())
+  updatedAt     DateTime             @updatedAt
+  
+  table         RestaurantTable?     @relation(fields: [tableId], references: [id])
+  
+  @@index([date])
+  @@index([status])
+  @@index([customerEmail])
+}
+
+model RestaurantTable {
+  id           String                  @id @default(uuid())
+  number       String                  @unique
+  capacity     Int
+  location     TableLocation
+  isAvailable  Boolean                 @default(true)
+  createdAt    DateTime                @default(now())
+  updatedAt    DateTime                @updatedAt
+  
+  reservations RestaurantReservation[]
+  
+  @@index([isAvailable])
+  @@index([location])
+}
+
+enum MenuCategory {
+  APPETIZER
+  MAIN_COURSE
+  DESSERT
+  BEVERAGE
+  WINE
+  SPECIAL
+}
+
+enum TableLocation {
+  TERRACE
+  INDOOR
+  BAR
+  PRIVATE_ROOM
+}
+
+enum RestaurantReservationStatus {
+  PENDING
+  CONFIRMED
+  SEATED
+  COMPLETED
+  CANCELLED
+  NO_SHOW
+}
+
+// ===== WELLNESS (BIEN-ÊTRE) TEMPLATE =====
+
+model WellnessCourse {
+  id          String   @id @default(uuid())
+  name        String
+  slug        String   @unique
+  description String? 
+  category    String
+  duration    Int      // minutes
+  capacity    Int
+  price       Float
+  imageUrl    String?
+  coachId     String
+  schedule    String?  // JSON {days, times}
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  coach       WellnessCoach @relation(fields: [coachId], references: [id])
+  bookings    WellnessBooking[]
+  
+  @@index([slug])
+  @@index([category])
+  @@index([coachId])
+  @@index([isActive])
+}
+
+model WellnessCoach {
+  id            String          @id @default(uuid())
+  firstName     String
+  lastName      String
+  slug          String          @unique
+  specialty     String
+  bio           String?        
+  photoUrl      String?
+  certifications String?        // JSON array
+  email         String?
+  phone         String?
+  isActive      Boolean         @default(true)
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  
+  courses       WellnessCourse[]
+  bookings      WellnessBooking[]
+  
+  @@index([slug])
+  @@index([isActive])
+}
+
+model WellnessBooking {
+  id            String   @id @default(uuid())
+  courseId      String
+  coachId       String
+  customerName  String
+  customerEmail String
+  customerPhone String
+  date          DateTime
+  time          String
+  status        BookingStatus @default(PENDING)
+  notes         String? 
+  confirmedAt   DateTime?
+  cancelledAt   DateTime?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  course        WellnessCourse @relation(fields: [courseId], references: [id])
+  coach         WellnessCoach  @relation(fields: [coachId], references: [id])
+  
+  @@index([courseId])
+  @@index([coachId])
+  @@index([date])
+  @@index([status])
+  @@index([customerEmail])
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  COMPLETED
+  CANCELLED
+  NO_SHOW
+}
+
+// ===== BEAUTY (BEAUTÉ) TEMPLATE =====
+
+model BeautyTreatment {
+  id          String   @id @default(uuid())
+  name        String
+  slug        String   @unique
+  description String? 
+  category    String
+  duration    Int      // minutes
+  price       Float
+  imageUrl    String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  appointments BeautyAppointment[]
+  
+  @@index([slug])
+  @@index([category])
+  @@index([isActive])
+}
+
+model BeautyAppointment {
+  id            String   @id @default(uuid())
+  treatmentId   String
+  customerName  String
+  customerEmail String
+  customerPhone String
+  date          DateTime
+  time          String
+  status        AppointmentStatus @default(PENDING)
+  notes         String? 
+  confirmedAt   DateTime?
+  cancelledAt   DateTime?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  treatment     BeautyTreatment @relation(fields: [treatmentId], references: [id])
+  
+  @@index([treatmentId])
+  @@index([date])
+  @@index([status])
+  @@index([customerEmail])
+}
+
+enum AppointmentStatus {
+  PENDING
+  CONFIRMED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+  NO_SHOW
+}
+
+// ===== CONSULTATION TEMPLATE =====
+
+model Patient {
+  id            String   @id @default(uuid())
+  firstName     String
+  lastName      String
+  email         String   @unique
+  phone         String
+  dateOfBirth   DateTime?
+  address       String?  // JSON
+  notes         String? 
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  appointments  ConsultationAppointment[]
+  
+  @@index([email])
+  @@index([isActive])
+}
+
+model Therapist {
+  id            String   @id @default(uuid())
+  firstName     String
+  lastName      String
+  slug          String   @unique
+  specialty     String
+  bio           String? 
+  photoUrl      String?
+  qualifications String? // JSON array
+  email         String?
+  phone         String?
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  appointments  ConsultationAppointment[]
+  
+  @@index([slug])
+  @@index([isActive])
+}
+
+model ConsultationAppointment {
+  id            String   @id @default(uuid())
+  patientId     String
+  therapistId   String
+  date          DateTime
+  time          String
+  duration      Int      // minutes
+  type          String   // initial, follow-up, etc.
+  status        ConsultationStatus @default(SCHEDULED)
+  notes         String? 
+  diagnosis     String? 
+  prescription  String? 
+  confirmedAt   DateTime?
+  completedAt   DateTime?
+  cancelledAt   DateTime?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  patient       Patient   @relation(fields: [patientId], references: [id])
+  therapist     Therapist @relation(fields: [therapistId], references: [id])
+  
+  @@index([patientId])
+  @@index([therapistId])
+  @@index([date])
+  @@index([status])
+}
+
+enum ConsultationStatus {
+  SCHEDULED
+  CONFIRMED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+  NO_SHOW
+  RESCHEDULED
+}
+
+// ===== SERVICES (PRESTATIONS PRO) TEMPLATE =====
+
+model ServiceClient {
+  id            String   @id @default(uuid())
+  companyName   String
+  contactName   String
+  email         String   @unique
+  phone         String?
+  address       String?  // JSON
+  website       String?
+  notes         String? 
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  projects      ServiceProject[]
+  quotes        Quote[]
+  invoices      Invoice[]
+  
+  @@index([email])
+  @@index([isActive])
+}
+
+model ServiceProject {
+  id          String        @id @default(uuid())
+  name        String
+  slug        String        @unique
+  description String?      
+  clientId    String
+  status      ProjectServiceStatus @default(IN_PROGRESS)
+  startDate   DateTime?
+  endDate     DateTime?
+  budget      Float?
+  spent       Float         @default(0)
+  progress    Int           @default(0) // 0-100
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  
+  client      ServiceClient @relation(fields: [clientId], references: [id])
+  
+  @@index([slug])
+  @@index([clientId])
+  @@index([status])
+}
+
+model Quote {
+  id          String      @id @default(uuid())
+  quoteNumber String      @unique
+  clientId    String
+  title       String
+  description String?    
+  items       String      // JSON array
+  subtotal    Float
+  tax         Float       @default(0)
+  total       Float
+  status      QuoteStatus @default(DRAFT)
+  validUntil  DateTime?
+  acceptedAt  DateTime?
+  rejectedAt  DateTime?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  
+  client      ServiceClient @relation(fields: [clientId], references: [id])
+  
+  @@index([quoteNumber])
+  @@index([clientId])
+  @@index([status])
+}
+
+model Invoice {
+  id            String        @id @default(uuid())
+  invoiceNumber String        @unique
+  clientId      String
+  title         String
+  description   String?      
+  items         String        // JSON array
+  subtotal      Float
+  tax           Float         @default(0)
+  total         Float
+  status        InvoiceStatus @default(DRAFT)
+  dueDate       DateTime?
+  paidAt        DateTime?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  
+  client        ServiceClient @relation(fields: [clientId], references: [id])
+  
+  @@index([invoiceNumber])
+  @@index([clientId])
+  @@index([status])
+  @@index([dueDate])
+}
+
+enum ProjectServiceStatus {
+  PENDING
+  IN_PROGRESS
+  ON_HOLD
+  COMPLETED
+  CANCELLED
+}
+
+enum QuoteStatus {
+  DRAFT
+  SENT
+  ACCEPTED
+  REJECTED
+  EXPIRED
+}
+
+enum InvoiceStatus {
+  DRAFT
+  SENT
+  PAID
+  OVERDUE
+  CANCELLED
+}
+
+// ===== PORTFOLIO TEMPLATE =====
+
+model GalleryItem {
+  id          String   @id @default(uuid())
+  title       String
+  slug        String   @unique
+  description String? 
+  imageUrl    String
+  category    String?
+  tags        String?  // JSON array
+  featured    Boolean  @default(false)
+  orderIndex  Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@index([slug])
+  @@index([category])
+  @@index([featured])
+  @@index([orderIndex])
+}
