@@ -48,6 +48,26 @@ function DashboardContent() {
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [statsLoading, setStatsLoading] = useState(true);
 
+  // Vérifier le type d'utilisateur et rediriger si nécessaire
+  useEffect(() => {
+    const checkUserType = async () => {
+      try {
+        const response = await fetch("/api/auth/me");
+        const data = await response.json();
+
+        if (data.success && data.user.type === "SUPER_ADMIN") {
+          // Rediriger les Super Admins vers leur dashboard
+          router.push("/super-admin/dashboard");
+          return;
+        }
+      } catch (error) {
+        console.error("Erreur vérification utilisateur:", error);
+      }
+    };
+
+    checkUserType();
+  }, [router]);
+
   // Vérifier les paramètres d'erreur et charger les stats
   useEffect(() => {
     // Vérifier s'il y a un message d'accès refusé

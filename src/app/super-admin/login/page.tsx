@@ -39,8 +39,8 @@ export default function SuperAdminLoginPage() {
         return;
       }
 
-      // Redirection vers le dashboard admin
-      router.push("/admin/dashboard");
+      // Redirection vers le dashboard Super Admin
+      router.push("/super-admin/dashboard");
     } catch (error) {
       console.error("Erreur login:", error);
       setError("Erreur de connexion. Veuillez réessayer.");
