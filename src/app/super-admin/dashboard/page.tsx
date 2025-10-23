@@ -110,8 +110,13 @@ export default function SuperAdminDashboard() {
             </div>
             <button
               onClick={async () => {
-                await fetch("/api/auth/logout", { method: "POST" });
-                router.push("/super-admin/login");
+                try {
+                  await fetch("/api/auth/logout", { method: "POST" });
+                  router.push("/super-admin/login");
+                } catch (error) {
+                  console.error("Erreur déconnexion:", error);
+                  router.push("/super-admin/login");
+                }
               }}
               className="px-6 py-3 bg-red-500/20 hover:bg-red-500/30 text-white rounded-lg border border-red-500/50 transition-all"
             >

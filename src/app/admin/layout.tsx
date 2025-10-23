@@ -144,8 +144,25 @@ export default function AdminLayout({
                 {/* Bouton de déconnexion */}
                 <button
                   onClick={async () => {
-                    await fetch("/api/auth/logout", { method: "POST" });
-                    router.push("/admin/login");
+                    try {
+                      // Récupérer le type d'utilisateur avant de se déconnecter
+                      const meResponse = await fetch("/api/auth/me");
+                      const meData = await meResponse.json();
+                      const userType = meData.success ? meData.user.type : null;
+
+                      // Déconnexion
+                      await fetch("/api/auth/logout", { method: "POST" });
+
+                      // Redirection selon le type
+                      if (userType === "SUPER_ADMIN") {
+                        router.push("/super-admin/login");
+                      } else {
+                        router.push("/login");
+                      }
+                    } catch (error) {
+                      console.error("Erreur déconnexion:", error);
+                      router.push("/login");
+                    }
                   }}
                   className="text-sm font-medium text-slate-500 hover:text-red-600 transition-colors duration-200"
                 >
