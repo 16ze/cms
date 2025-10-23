@@ -109,7 +109,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { name, email, slug, templateId, domain } = body;
+    const { name, email, slug, templateId, domain, userPassword } = body;
 
     // Validation
     if (!name || !email || !slug || !templateId) {
@@ -137,26 +137,80 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Créer le tenant
-    const newTenant = await prisma.tenant.create({
-      data: {
-        name,
-        email,
-        slug,
-        templateId,
-        domain: domain || null,
-        isActive: true,
-      },
-      include: {
-        template: true,
-      },
+    // Vérifier si le template existe
+    const template = await prisma.template.findUnique({
+      where: { id: templateId },
+    });
+
+    if (!template) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Template non trouvé",
+        },
+        { status: 404 }
+      );
+    }
+
+    // Créer le tenant avec le premier utilisateur en une transaction
+    const bcrypt = require("bcryptjs");
+    const password = userPassword || "demo2025";
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const result = await prisma.$transaction(async (tx) => {
+      // 1. Créer le tenant
+      const newTenant = await tx.tenant.create({
+        data: {
+          name,
+          email,
+          slug,
+          templateId,
+          domain: domain || null,
+          isActive: true,
+        },
+        include: {
+          template: true,
+        },
+      });
+
+      // 2. Créer le premier utilisateur admin
+      const firstName = name.split(" ")[0] || "Admin";
+      const lastName = name.split(" ").slice(1).join(" ") || name;
+
+      const tenantUser = await tx.tenantUser.create({
+        data: {
+          tenantId: newTenant.id,
+          email: email,
+          password: hashedPassword,
+          firstName,
+          lastName,
+          role: "OWNER", // Premier utilisateur = OWNER
+          isActive: true,
+        },
+      });
+
+      // 3. Activer le template pour ce tenant (créer SiteTemplate)
+      await tx.siteTemplate.create({
+        data: {
+          tenantId: newTenant.id,
+          templateId: templateId,
+          isActive: true,
+          activatedAt: new Date(),
+        },
+      });
+
+      return { tenant: newTenant, user: tenantUser };
     });
 
     return NextResponse.json(
       {
         success: true,
-        data: newTenant,
-        message: "Tenant créé avec succès",
+        data: result.tenant,
+        user: {
+          email: result.user.email,
+          password: password, // Retourner le mot de passe en clair (à communiquer au client)
+        },
+        message: `Tenant créé avec succès ! Login: ${result.user.email} / Password: ${password}`,
       },
       { status: 201 }
     );

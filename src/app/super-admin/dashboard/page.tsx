@@ -24,6 +24,10 @@ import {
   FileText,
   Sparkles,
   Mail,
+  Plus,
+  X,
+  Check,
+  AlertCircle,
 } from "lucide-react";
 
 interface Tenant {
@@ -66,6 +70,19 @@ export default function SuperAdminDashboard() {
   const [loading, setLoading] = useState(true);
   const [tenants, setTenants] = useState<Tenant[]>([]);
   const [user, setUser] = useState<any>(null);
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [templates, setTemplates] = useState<any[]>([]);
+  const [creating, setCreating] = useState(false);
+  
+  // Formulaire de création
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    slug: "",
+    templateId: "",
+    domain: "",
+    userPassword: "",
+  });
 
   useEffect(() => {
     checkAuth();
@@ -108,6 +125,95 @@ export default function SuperAdminDashboard() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const loadTemplates = async () => {
+    try {
+      const response = await fetch("/api/admin/templates");
+      const data = await response.json();
+
+      if (data.success) {
+        setTemplates(data.data);
+      }
+    } catch (error) {
+      console.error("Erreur chargement templates:", error);
+    }
+  };
+
+  const handleCreateTenant = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setCreating(true);
+
+    try {
+      // Validation
+      if (!formData.name || !formData.email || !formData.slug || !formData.templateId) {
+        alert("Veuillez remplir tous les champs obligatoires");
+        setCreating(false);
+        return;
+      }
+
+      // Créer le tenant
+      const response = await fetch("/api/super-admin/tenants", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          slug: formData.slug,
+          templateId: formData.templateId,
+          domain: formData.domain || null,
+          userPassword: formData.userPassword || "demo2025",
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        alert(`Erreur: ${data.error || "Impossible de créer le tenant"}`);
+        setCreating(false);
+        return;
+      }
+
+      // Succès - afficher les identifiants
+      const loginInfo = `✅ Client "${formData.name}" créé avec succès !
+
+📧 Email: ${data.user.email}
+🔑 Mot de passe: ${data.user.password}
+
+⚠️ Communiquez ces identifiants au client.
+Il pourra se connecter sur: ${window.location.origin}/login`;
+
+      alert(loginInfo);
+      
+      // Réinitialiser le formulaire
+      setFormData({
+        name: "",
+        email: "",
+        slug: "",
+        templateId: "",
+        domain: "",
+        userPassword: "",
+      });
+      
+      // Fermer la modal
+      setShowCreateModal(false);
+      
+      // Recharger la liste
+      await loadTenants();
+      
+    } catch (error) {
+      console.error("Erreur création tenant:", error);
+      alert("Erreur lors de la création du tenant");
+    } finally {
+      setCreating(false);
+    }
+  };
+
+  const handleOpenCreateModal = () => {
+    loadTemplates();
+    setShowCreateModal(true);
   };
 
   /**
@@ -253,13 +359,22 @@ export default function SuperAdminDashboard() {
       {/* Tenants List */}
       <div className="max-w-7xl mx-auto">
         <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl p-6 shadow-2xl">
-          <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-3">
-            <Building2 className="w-6 h-6 text-purple-400" />
-            Liste des Clients
-            <span className="ml-auto text-sm font-normal text-purple-300">
-              {tenants.length} client{tenants.length > 1 ? "s" : ""}
-            </span>
-          </h2>
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl font-bold text-white flex items-center gap-3">
+              <Building2 className="w-6 h-6 text-purple-400" />
+              Liste des Clients
+              <span className="text-sm font-normal text-purple-300">
+                {tenants.length} client{tenants.length > 1 ? "s" : ""}
+              </span>
+            </h2>
+            <button
+              onClick={handleOpenCreateModal}
+              className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white font-medium rounded-lg shadow-lg transition-all transform hover:scale-105"
+            >
+              <Plus className="w-5 h-5" />
+              Nouveau Client
+            </button>
+          </div>
 
           {tenants.length === 0 ? (
             <div className="text-center py-12">
@@ -377,6 +492,161 @@ export default function SuperAdminDashboard() {
           )}
         </div>
       </div>
+
+      {/* Modal de création de tenant */}
+      {showCreateModal && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 border border-white/20 rounded-2xl p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
+            {/* Header */}
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-3">
+                <div className="bg-gradient-to-br from-green-500 to-emerald-500 p-3 rounded-xl">
+                  <Plus className="w-6 h-6 text-white" />
+                </div>
+                <h3 className="text-2xl font-bold text-white">Nouveau Client</h3>
+              </div>
+              <button
+                onClick={() => setShowCreateModal(false)}
+                className="text-purple-200 hover:text-white transition-colors"
+              >
+                <X className="w-6 h-6" />
+              </button>
+            </div>
+
+            {/* Form */}
+            <form onSubmit={handleCreateTenant} className="space-y-6">
+              {/* Nom du client */}
+              <div>
+                <label className="block text-sm font-medium text-purple-200 mb-2">
+                  Nom du client <span className="text-red-400">*</span>
+                </label>
+                <input
+                  type="text"
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  placeholder="Ex: Salon Élégance"
+                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-purple-300/50 focus:border-purple-500 focus:outline-none transition-colors"
+                  required
+                />
+              </div>
+
+              {/* Email */}
+              <div>
+                <label className="block text-sm font-medium text-purple-200 mb-2">
+                  Email <span className="text-red-400">*</span>
+                </label>
+                <input
+                  type="email"
+                  value={formData.email}
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  placeholder="Ex: contact@salon-elegance.fr"
+                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-purple-300/50 focus:border-purple-500 focus:outline-none transition-colors"
+                  required
+                />
+              </div>
+
+              {/* Slug */}
+              <div>
+                <label className="block text-sm font-medium text-purple-200 mb-2">
+                  Slug (identifiant unique) <span className="text-red-400">*</span>
+                </label>
+                <input
+                  type="text"
+                  value={formData.slug}
+                  onChange={(e) => setFormData({ ...formData, slug: e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, "-") })}
+                  placeholder="Ex: salon-elegance"
+                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-purple-300/50 focus:border-purple-500 focus:outline-none transition-colors"
+                  pattern="[a-z0-9-]+"
+                  required
+                />
+                <p className="text-xs text-purple-300/70 mt-1">
+                  Lettres minuscules, chiffres et tirets uniquement
+                </p>
+              </div>
+
+              {/* Template */}
+              <div>
+                <label className="block text-sm font-medium text-purple-200 mb-2">
+                  Template <span className="text-red-400">*</span>
+                </label>
+                <select
+                  value={formData.templateId}
+                  onChange={(e) => setFormData({ ...formData, templateId: e.target.value })}
+                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:border-purple-500 focus:outline-none transition-colors"
+                  required
+                >
+                  <option value="" className="bg-slate-800">Sélectionner un template</option>
+                  {templates.map((template) => (
+                    <option key={template.id} value={template.id} className="bg-slate-800">
+                      {template.displayName} ({template.category})
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Domaine (optionnel) */}
+              <div>
+                <label className="block text-sm font-medium text-purple-200 mb-2">
+                  Domaine personnalisé (optionnel)
+                </label>
+                <input
+                  type="text"
+                  value={formData.domain}
+                  onChange={(e) => setFormData({ ...formData, domain: e.target.value })}
+                  placeholder="Ex: www.salon-elegance.fr"
+                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-purple-300/50 focus:border-purple-500 focus:outline-none transition-colors"
+                />
+              </div>
+
+              {/* Mot de passe premier utilisateur */}
+              <div>
+                <label className="block text-sm font-medium text-purple-200 mb-2">
+                  Mot de passe premier utilisateur
+                </label>
+                <input
+                  type="text"
+                  value={formData.userPassword}
+                  onChange={(e) => setFormData({ ...formData, userPassword: e.target.value })}
+                  placeholder="Par défaut: demo2025"
+                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-purple-300/50 focus:border-purple-500 focus:outline-none transition-colors"
+                />
+                <p className="text-xs text-purple-300/70 mt-1">
+                  Si vide, le mot de passe sera "demo2025"
+                </p>
+              </div>
+
+              {/* Actions */}
+              <div className="flex items-center gap-3 pt-4">
+                <button
+                  type="submit"
+                  disabled={creating}
+                  className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white font-medium rounded-lg shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {creating ? (
+                    <>
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                      Création en cours...
+                    </>
+                  ) : (
+                    <>
+                      <Check className="w-5 h-5" />
+                      Créer le client
+                    </>
+                  )}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowCreateModal(false)}
+                  disabled={creating}
+                  className="px-6 py-3 bg-white/5 hover:bg-white/10 text-purple-200 rounded-lg border border-white/10 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Annuler
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
