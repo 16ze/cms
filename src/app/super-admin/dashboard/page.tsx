@@ -23,6 +23,7 @@ import {
   ShoppingCart,
   FileText,
   Sparkles,
+  Mail,
 } from "lucide-react";
 
 interface Tenant {

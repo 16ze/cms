@@ -34,7 +34,7 @@ export async function getAuthenticatedUser(
   request: NextRequest
 ): Promise<AuthenticatedUser | null> {
   try {
-    const cookieStore = cookies();
+    const cookieStore = await cookies();
     const sessionToken = cookieStore.get("auth_session")?.value;
 
     if (!sessionToken) {

@@ -81,7 +81,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Sauvegarder la session Super Admin actuelle dans un cookie séparé
-    const cookieStore = cookies();
+    const cookieStore = await cookies();
     const currentSession = cookieStore.get("auth_session")?.value;
 
     if (currentSession) {
@@ -161,7 +161,7 @@ export async function POST(request: NextRequest) {
  */
 export async function DELETE(request: NextRequest) {
   try {
-    const cookieStore = cookies();
+    const cookieStore = await cookies();
 
     // Récupérer la session Super Admin sauvegardée
     const superAdminSession = cookieStore.get("super_admin_session_backup")?.value;
