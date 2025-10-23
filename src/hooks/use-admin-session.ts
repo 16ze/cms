@@ -21,27 +21,27 @@ export function useAdminSession() {
   useEffect(() => {
     async function checkSession() {
       try {
-        // Vérifier la session en appelant l'API de vérification
-        const response = await fetch("/api/auth/verify", {
+        // Vérifier la session en appelant l'API /api/auth/me
+        const response = await fetch("/api/auth/me", {
           method: "GET",
           credentials: "include", // Important pour inclure les cookies
         });
 
         if (response.ok) {
           const data = await response.json();
-          if (data.authenticated && data.user) {
+          if (data.success && data.user) {
             setUser({
               id: data.user.id,
-              name: data.user.name || data.user.email.split("@")[0],
+              name: data.user.email.split("@")[0],
               email: data.user.email,
-              role: data.user.role,
+              role: data.user.type === "SUPER_ADMIN" ? "SUPER_ADMIN" : "TENANT_ADMIN",
             });
           } else {
-            // Pas authentifié, rediriger vers login
+            // Pas authentifié, rediriger vers login approprié
             router.push("/login");
           }
         } else {
-          // Erreur ou non authentifié, rediriger vers login
+          // Erreur ou non authentifié, rediriger vers login approprié
           router.push("/login");
         }
       } catch (error) {
