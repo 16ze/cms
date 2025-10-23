@@ -1,17 +1,31 @@
+/**
+ * API: SOIN INDIVIDUEL (GET/PUT/DELETE)
+ * ======================================
+ * Multi-tenant ready ✅
+ */
+
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { ensureAdmin } from "@/lib/auth";
+import { ensureAuthenticated } from "@/lib/tenant-auth";
+import { getTenantFilter, verifyTenantAccess } from "@/middleware/tenant-context";
 
 export async function GET(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
-    const authResult = await ensureAdmin(request);
+    // 🔐 Authentification
+    const authResult = await ensureAuthenticated(request);
     if (authResult instanceof NextResponse) return authResult;
 
-    const treatment = await prisma.beautyTreatment.findUnique({
-      where: { id: params.id },
+    // 🔒 Isolation multi-tenant
+    const { tenantFilter } = await getTenantFilter(request);
+
+    const treatment = await prisma.beautyTreatment.findFirst({
+      where: {
+        id: params.id,
+        ...tenantFilter, // 🔒 ISOLATION
+      },
       include: {
         appointments: {
           orderBy: { date: "desc" },
@@ -29,7 +43,7 @@ export async function GET(
 
     return NextResponse.json({ success: true, data: treatment });
   } catch (error: any) {
-    console.error("Erreur GET soin:", error);
+    console.error("❌ GET /api/admin/soins/[id]:", error);
     return NextResponse.json(
       { success: false, error: error.message },
       { status: 500 }
@@ -42,8 +56,29 @@ export async function PUT(
   { params }: { params: { id: string } }
 ) {
   try {
-    const authResult = await ensureAdmin(request);
+    // 🔐 Authentification
+    const authResult = await ensureAuthenticated(request);
     if (authResult instanceof NextResponse) return authResult;
+
+    // 🔒 Vérifier que la ressource appartient au tenant
+    const existing = await prisma.beautyTreatment.findUnique({
+      where: { id: params.id },
+    });
+
+    if (!existing) {
+      return NextResponse.json(
+        { success: false, error: "Soin introuvable" },
+        { status: 404 }
+      );
+    }
+
+    const hasAccess = await verifyTenantAccess(request, existing.tenantId);
+    if (!hasAccess) {
+      return NextResponse.json(
+        { success: false, error: "Accès refusé" },
+        { status: 403 }
+      );
+    }
 
     const data = await request.json();
 
@@ -54,7 +89,7 @@ export async function PUT(
 
     return NextResponse.json({ success: true, data: treatment });
   } catch (error: any) {
-    console.error("Erreur PUT soin:", error);
+    console.error("❌ PUT /api/admin/soins/[id]:", error);
     return NextResponse.json(
       { success: false, error: error.message },
       { status: 500 }
@@ -67,12 +102,37 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
-    const authResult = await ensureAdmin(request);
+    // 🔐 Authentification
+    const authResult = await ensureAuthenticated(request);
     if (authResult instanceof NextResponse) return authResult;
 
+    // 🔒 Vérifier que la ressource appartient au tenant
+    const existing = await prisma.beautyTreatment.findUnique({
+      where: { id: params.id },
+    });
+
+    if (!existing) {
+      return NextResponse.json(
+        { success: false, error: "Soin introuvable" },
+        { status: 404 }
+      );
+    }
+
+    const hasAccess = await verifyTenantAccess(request, existing.tenantId);
+    if (!hasAccess) {
+      return NextResponse.json(
+        { success: false, error: "Accès refusé" },
+        { status: 403 }
+      );
+    }
+
     // Vérifier s'il y a des rendez-vous liés
+    const { tenantFilter } = await getTenantFilter(request);
     const appointmentsCount = await prisma.beautyAppointment.count({
-      where: { treatmentId: params.id },
+      where: {
+        treatmentId: params.id,
+        ...tenantFilter, // 🔒 ISOLATION
+      },
     });
 
     if (appointmentsCount > 0) {
@@ -94,7 +154,7 @@ export async function DELETE(
       message: "Soin supprimé",
     });
   } catch (error: any) {
-    console.error("Erreur DELETE soin:", error);
+    console.error("❌ DELETE /api/admin/soins/[id]:", error);
     return NextResponse.json(
       { success: false, error: error.message },
       { status: 500 }
