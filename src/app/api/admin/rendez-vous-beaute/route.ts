@@ -1,18 +1,29 @@
+/**
+ * API: RENDEZ-VOUS BEAUTÉ
+ * ========================
+ * Multi-tenant ready ✅
+ */
+
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { ensureAdmin } from "@/lib/auth";
+import { ensureAuthenticated } from "@/lib/tenant-auth";
+import { getTenantFilter, requireTenant } from "@/middleware/tenant-context";
 
 export async function GET(request: NextRequest) {
   try {
-    const authResult = await ensureAdmin(request);
+    // 🔐 Authentification
+    const authResult = await ensureAuthenticated(request);
     if (authResult instanceof NextResponse) return authResult;
+
+    // 🔒 Isolation multi-tenant
+    const { tenantFilter } = await getTenantFilter(request);
 
     const { searchParams } = new URL(request.url);
     const status = searchParams.get("status");
     const treatmentId = searchParams.get("treatmentId");
     const date = searchParams.get("date");
 
-    const where: any = {};
+    const where: any = { ...tenantFilter }; // 🔒 ISOLATION
     if (status) where.status = status;
     if (treatmentId) where.treatmentId = treatmentId;
     if (date) {
@@ -35,7 +46,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ success: true, data: appointments });
   } catch (error: any) {
-    console.error("Erreur GET rendez-vous beauté:", error);
+    console.error("❌ GET /api/admin/rendez-vous-beaute:", error);
     return NextResponse.json(
       { success: false, error: error.message },
       { status: 500 }
@@ -45,8 +56,12 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const authResult = await ensureAdmin(request);
+    // 🔐 Authentification
+    const authResult = await ensureAuthenticated(request);
     if (authResult instanceof NextResponse) return authResult;
+
+    // 🔒 Récupérer le tenantId
+    const { tenantId } = await requireTenant(request);
 
     const data = await request.json();
 
@@ -72,10 +87,12 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // 🔒 Créer avec tenantId
     const appointment = await prisma.beautyAppointment.create({
       data: {
         ...data,
         date: new Date(data.date),
+        tenantId, // 🔒 ISOLATION
       },
       include: {
         treatment: true,
@@ -87,7 +104,7 @@ export async function POST(request: NextRequest) {
       { status: 201 }
     );
   } catch (error: any) {
-    console.error("Erreur POST rendez-vous beauté:", error);
+    console.error("❌ POST /api/admin/rendez-vous-beaute:", error);
     return NextResponse.json(
       { success: false, error: error.message },
       { status: 500 }

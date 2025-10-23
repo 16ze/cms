@@ -1,11 +1,24 @@
+/**
+ * API: FACTURATION
+ * ================
+ * Multi-tenant ready ✅
+ */
+
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { ensureAdmin } from "@/lib/auth";
+import { ensureAuthenticated } from "@/lib/tenant-auth";
+import { getTenantFilter, requireTenant, verifyTenantAccess } from "@/middleware/tenant-context";
 
 export async function GET(request: NextRequest) {
   try {
-    const authResult = await ensureAdmin(request);
+    const authResult = await ensureAuthenticated(request);
     if (authResult instanceof NextResponse) return authResult;
+
+    // 🔒 Récupérer le tenantId
+    const { tenantId } = await requireTenant(request);
+
+    // 🔒 Isolation multi-tenant
+    const { tenantFilter } = await getTenantFilter(request);
     const invoices = await prisma.invoice.findMany({
       include: { client: true },
       orderBy: { createdAt: "desc" },
@@ -18,8 +31,14 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const authResult = await ensureAdmin(request);
+    const authResult = await ensureAuthenticated(request);
     if (authResult instanceof NextResponse) return authResult;
+
+    // 🔒 Récupérer le tenantId
+    const { tenantId } = await requireTenant(request);
+
+    // 🔒 Isolation multi-tenant
+    const { tenantFilter } = await getTenantFilter(request);
     const data = await request.json();
     data.invoiceNumber = `INV-${Date.now()}-${Math.floor(
       Math.random() * 1000

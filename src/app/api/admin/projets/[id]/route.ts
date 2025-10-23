@@ -1,6 +1,13 @@
+/**
+ * API: PROJET INDIVIDUEL
+ * ======================
+ * Multi-tenant ready ✅
+ */
+
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { ensureAdmin } from "@/lib/auth";
+import { ensureAuthenticated } from "@/lib/tenant-auth";
+import { getTenantFilter, requireTenant, verifyTenantAccess } from "@/middleware/tenant-context";
 
 // GET - Un projet spécifique
 export async function GET(
@@ -8,8 +15,31 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const authResult = await ensureAdmin(request);
+    const authResult = await ensureAuthenticated(request);
     if (authResult instanceof NextResponse) return authResult;
+
+    // 🔒 Vérifier l'accès au tenant
+    const existing = await prisma.MODELNAME.findUnique({
+      where: { id: params.id },
+    });
+
+    if (!existing) {
+      return NextResponse.json(
+        { success: false, error: "Ressource introuvable" },
+        { status: 404 }
+      );
+    }
+
+    const hasAccess = await verifyTenantAccess(request, existing.tenantId);
+    if (!hasAccess) {
+      return NextResponse.json(
+        { success: false, error: "Accès refusé" },
+        { status: 403 }
+      );
+    }
+
+    // 🔒 Isolation multi-tenant
+    const { tenantFilter } = await getTenantFilter(request);
 
     const { id } = await params;
     const project = await prisma.project.findUnique({
@@ -36,8 +66,31 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const authResult = await ensureAdmin(request);
+    const authResult = await ensureAuthenticated(request);
     if (authResult instanceof NextResponse) return authResult;
+
+    // 🔒 Vérifier l'accès au tenant
+    const existing = await prisma.MODELNAME.findUnique({
+      where: { id: params.id },
+    });
+
+    if (!existing) {
+      return NextResponse.json(
+        { success: false, error: "Ressource introuvable" },
+        { status: 404 }
+      );
+    }
+
+    const hasAccess = await verifyTenantAccess(request, existing.tenantId);
+    if (!hasAccess) {
+      return NextResponse.json(
+        { success: false, error: "Accès refusé" },
+        { status: 403 }
+      );
+    }
+
+    // 🔒 Isolation multi-tenant
+    const { tenantFilter } = await getTenantFilter(request);
 
     const { id } = await params;
     const data = await request.json();
@@ -79,8 +132,31 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const authResult = await ensureAdmin(request);
+    const authResult = await ensureAuthenticated(request);
     if (authResult instanceof NextResponse) return authResult;
+
+    // 🔒 Vérifier l'accès au tenant
+    const existing = await prisma.MODELNAME.findUnique({
+      where: { id: params.id },
+    });
+
+    if (!existing) {
+      return NextResponse.json(
+        { success: false, error: "Ressource introuvable" },
+        { status: 404 }
+      );
+    }
+
+    const hasAccess = await verifyTenantAccess(request, existing.tenantId);
+    if (!hasAccess) {
+      return NextResponse.json(
+        { success: false, error: "Accès refusé" },
+        { status: 403 }
+      );
+    }
+
+    // 🔒 Isolation multi-tenant
+    const { tenantFilter } = await getTenantFilter(request);
 
     const { id } = await params;
     await prisma.project.delete({

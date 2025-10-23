@@ -1,17 +1,34 @@
+/**
+ * API: RENDEZ-VOUS BEAUTÉ INDIVIDUEL
+ * ===================================
+ * Multi-tenant ready ✅
+ */
+
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { ensureAdmin } from "@/lib/auth";
+import { ensureAuthenticated } from "@/lib/tenant-auth";
+import {
+  getTenantFilter,
+  verifyTenantAccess,
+} from "@/middleware/tenant-context";
 
 export async function GET(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
-    const authResult = await ensureAdmin(request);
+    // 🔐 Authentification
+    const authResult = await ensureAuthenticated(request);
     if (authResult instanceof NextResponse) return authResult;
 
-    const appointment = await prisma.beautyAppointment.findUnique({
-      where: { id: params.id },
+    // 🔒 Isolation multi-tenant
+    const { tenantFilter } = await getTenantFilter(request);
+
+    const appointment = await prisma.beautyAppointment.findFirst({
+      where: {
+        id: params.id,
+        ...tenantFilter, // 🔒 ISOLATION
+      },
       include: {
         treatment: true,
       },
@@ -26,7 +43,7 @@ export async function GET(
 
     return NextResponse.json({ success: true, data: appointment });
   } catch (error: any) {
-    console.error("Erreur GET rendez-vous:", error);
+    console.error("❌ GET /api/admin/rendez-vous-beaute/[id]:", error);
     return NextResponse.json(
       { success: false, error: error.message },
       { status: 500 }
@@ -39,8 +56,29 @@ export async function PUT(
   { params }: { params: { id: string } }
 ) {
   try {
-    const authResult = await ensureAdmin(request);
+    // 🔐 Authentification
+    const authResult = await ensureAuthenticated(request);
     if (authResult instanceof NextResponse) return authResult;
+
+    // 🔒 Vérifier l'accès au tenant
+    const existing = await prisma.beautyAppointment.findUnique({
+      where: { id: params.id },
+    });
+
+    if (!existing) {
+      return NextResponse.json(
+        { success: false, error: "Rendez-vous introuvable" },
+        { status: 404 }
+      );
+    }
+
+    const hasAccess = await verifyTenantAccess(request, existing.tenantId);
+    if (!hasAccess) {
+      return NextResponse.json(
+        { success: false, error: "Accès refusé" },
+        { status: 403 }
+      );
+    }
 
     const data = await request.json();
 
@@ -67,7 +105,7 @@ export async function PUT(
 
     return NextResponse.json({ success: true, data: appointment });
   } catch (error: any) {
-    console.error("Erreur PUT rendez-vous:", error);
+    console.error("❌ PUT /api/admin/rendez-vous-beaute/[id]:", error);
     return NextResponse.json(
       { success: false, error: error.message },
       { status: 500 }
@@ -80,8 +118,29 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
-    const authResult = await ensureAdmin(request);
+    // 🔐 Authentification
+    const authResult = await ensureAuthenticated(request);
     if (authResult instanceof NextResponse) return authResult;
+
+    // 🔒 Vérifier l'accès au tenant
+    const existing = await prisma.beautyAppointment.findUnique({
+      where: { id: params.id },
+    });
+
+    if (!existing) {
+      return NextResponse.json(
+        { success: false, error: "Rendez-vous introuvable" },
+        { status: 404 }
+      );
+    }
+
+    const hasAccess = await verifyTenantAccess(request, existing.tenantId);
+    if (!hasAccess) {
+      return NextResponse.json(
+        { success: false, error: "Accès refusé" },
+        { status: 403 }
+      );
+    }
 
     await prisma.beautyAppointment.delete({
       where: { id: params.id },
@@ -92,7 +151,7 @@ export async function DELETE(
       message: "Rendez-vous supprimé",
     });
   } catch (error: any) {
-    console.error("Erreur DELETE rendez-vous:", error);
+    console.error("❌ DELETE /api/admin/rendez-vous-beaute/[id]:", error);
     return NextResponse.json(
       { success: false, error: error.message },
       { status: 500 }

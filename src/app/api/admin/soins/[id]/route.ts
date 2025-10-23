@@ -7,7 +7,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { ensureAuthenticated } from "@/lib/tenant-auth";
-import { getTenantFilter, verifyTenantAccess } from "@/middleware/tenant-context";
+import {
+  getTenantFilter,
+  verifyTenantAccess,
+} from "@/middleware/tenant-context";
 
 export async function GET(
   request: NextRequest,

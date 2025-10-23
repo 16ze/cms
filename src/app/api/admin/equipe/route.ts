@@ -1,18 +1,31 @@
+/**
+ * API: ÉQUIPE
+ * ===========
+ * Multi-tenant ready ✅
+ */
+
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { ensureAdmin } from "@/lib/auth";
+import { ensureAuthenticated } from "@/lib/tenant-auth";
+import { getTenantFilter, requireTenant, verifyTenantAccess } from "@/middleware/tenant-context";
 
 // GET - Liste des membres de l'équipe
 export async function GET(request: NextRequest) {
   try {
-    const authResult = await ensureAdmin(request);
+    const authResult = await ensureAuthenticated(request);
     if (authResult instanceof NextResponse) return authResult;
+
+    // 🔒 Récupérer le tenantId
+    const { tenantId } = await requireTenant(request);
+
+    // 🔒 Isolation multi-tenant
+    const { tenantFilter } = await getTenantFilter(request);
 
     const { searchParams } = new URL(request.url);
     const isActive = searchParams.get("isActive");
     const department = searchParams.get("department");
 
-    const where: any = {};
+    const where: any = { ...tenantFilter }; // 🔒 ISOLATION
     if (isActive !== null) where.isActive = isActive === "true";
     if (department) where.department = department;
 
@@ -34,8 +47,14 @@ export async function GET(request: NextRequest) {
 // POST - Créer un membre
 export async function POST(request: NextRequest) {
   try {
-    const authResult = await ensureAdmin(request);
+    const authResult = await ensureAuthenticated(request);
     if (authResult instanceof NextResponse) return authResult;
+
+    // 🔒 Récupérer le tenantId
+    const { tenantId } = await requireTenant(request);
+
+    // 🔒 Isolation multi-tenant
+    const { tenantFilter } = await getTenantFilter(request);
 
     const data = await request.json();
 
@@ -51,6 +70,7 @@ export async function POST(request: NextRequest) {
 
     const teamMember = await prisma.teamMember.create({
       data: {
+        ...( {
         firstName: data.firstName,
         lastName: data.lastName,
         slug: data.slug,
