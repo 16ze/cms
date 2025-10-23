@@ -38,16 +38,16 @@ export function useAdminSession() {
             });
           } else {
             // Pas authentifié, rediriger vers login
-            router.push("/admin/login");
+            router.push("/login");
           }
         } else {
           // Erreur ou non authentifié, rediriger vers login
-          router.push("/admin/login");
+          router.push("/login");
         }
       } catch (error) {
         console.error("❌ Erreur lors de la vérification de session:", error);
         // En cas d'erreur, rediriger vers login
-        router.push("/admin/login");
+        router.push("/login");
       } finally {
         setLoading(false);
       }

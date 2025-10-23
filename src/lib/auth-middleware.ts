@@ -25,7 +25,7 @@ export async function verifyAdminAccess(
       return {
         success: false,
         error: "Session invalide",
-        redirectTo: "/admin/login",
+        redirectTo: "/login",
       };
     }
 
@@ -59,7 +59,7 @@ export async function verifyAdminAccess(
     return {
       success: false,
       error: "Erreur interne",
-      redirectTo: "/admin/login",
+      redirectTo: "/login",
     };
   }
 }

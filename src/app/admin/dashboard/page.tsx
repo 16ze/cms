@@ -143,7 +143,7 @@ function DashboardContent() {
       });
 
       // Rediriger vers la page de connexion après déconnexion
-      router.push("/admin/login");
+      router.push("/login");
     } catch (error) {
       console.error(dashboardContent.messages.errorLogout, error);
     }

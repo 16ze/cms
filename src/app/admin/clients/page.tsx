@@ -264,7 +264,7 @@ function ClientsContent() {
   const handleLogout = async () => {
     try {
       await fetch("/api/auth/logout", { method: "POST" });
-      router.push("/admin/login");
+      router.push("/login");
     } catch (err) {
       console.error("Erreur lors de la déconnexion:", err);
     }

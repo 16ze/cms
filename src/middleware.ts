@@ -82,14 +82,14 @@ export async function middleware(request: NextRequest) {
   const secret = process.env.ADMIN_SESSION_SECRET ?? "";
   if (!secret || secret.length < 32) {
     console.error("ADMIN_SESSION_SECRET manquant ou trop court.");
-    const loginUrl = new URL("/admin/login", request.url);
+    const loginUrl = new URL("/login", request.url);
     loginUrl.searchParams.set("error", "config_error");
     return NextResponse.redirect(loginUrl);
   }
 
   const token = request.cookies.get(ADMIN_SESSION_COOKIE)?.value;
   if (!token) {
-    const loginUrl = new URL("/admin/login", request.url);
+    const loginUrl = new URL("/login", request.url);
     // Ajouter un paramètre pour le retour après connexion
     loginUrl.searchParams.set("from", request.nextUrl.pathname);
     return NextResponse.redirect(loginUrl);
@@ -97,7 +97,7 @@ export async function middleware(request: NextRequest) {
 
   const verification = await verifyAdminSessionOnEdge(token, secret);
   if (!verification.valid) {
-    const loginUrl = new URL("/admin/login", request.url);
+    const loginUrl = new URL("/login", request.url);
     const reason =
       "reason" in verification ? verification.reason : "INVALID_SESSION";
     loginUrl.searchParams.set("error", reason.toLowerCase());
@@ -147,6 +147,6 @@ export const config = {
     // Routes admin protégées
     "/admin/:path*",
     // Exclure la page de login admin et les routes API
-    "/((?!admin/login|api|_next/static|_next/image|favicon.ico).*)",
+    "/((?!login|api|_next/static|_next/image|favicon.ico).*)",
   ],
 };

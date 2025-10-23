@@ -47,7 +47,7 @@ export default function AdminLayout({
 
   // Page de login - pas besoin de sidebar
   // Forcer le mode clair pour la page de login aussi
-  if (pathname === "/admin/login") {
+  if (pathname === "/login") {
     return <div className="light">{children}</div>;
   }
 
@@ -86,7 +86,7 @@ export default function AdminLayout({
           activePage={pathname}
           onLogout={async () => {
             await fetch("/api/auth/logout", { method: "POST" });
-            router.push("/admin/login");
+            router.push("/login");
           }}
           user={userInfo}
         />

@@ -51,7 +51,7 @@ export default function EditUserPage() {
         const data = await response.json();
 
         if (!response.ok || !data.authenticated) {
-          router.push("/admin/login");
+          router.push("/login");
           return;
         }
 
@@ -61,7 +61,7 @@ export default function EditUserPage() {
           "Erreur lors de la vérification de l'authentification:",
           error
         );
-        router.push("/admin/login");
+        router.push("/login");
       }
     };
 
@@ -115,7 +115,7 @@ export default function EditUserPage() {
         },
       });
 
-      router.push("/admin/login");
+      router.push("/login");
     } catch (error) {
       console.error("Erreur lors de la déconnexion:", error);
     }

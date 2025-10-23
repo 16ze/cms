@@ -486,7 +486,7 @@ function ReservationsContent() {
         },
       });
 
-      router.push("/admin/login");
+      router.push("/login");
     } catch (error) {
       console.error("Erreur lors de la déconnexion:", error);
     }

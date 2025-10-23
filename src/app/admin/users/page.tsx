@@ -238,7 +238,7 @@ export default function AdminUsersPage() {
 
       if (!response.ok) {
         if (response.status === 401) {
-          router.push("/admin/login");
+          router.push("/login");
           return;
         }
         throw new Error(`Erreur ${response.status}`);
