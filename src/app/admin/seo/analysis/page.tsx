@@ -619,7 +619,7 @@ function AnalysisPageContent() {
 
 export default function AdminSEOAnalysisPage() {
   return (
-    <ProtectedAdminPage page="keywords">
+    <ProtectedAdminPage page="analysis">
       <AdminErrorBoundary>
         <AnalysisPageContent />
       </AdminErrorBoundary>

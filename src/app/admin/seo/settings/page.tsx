@@ -1180,7 +1180,7 @@ function SEOSettingsContent() {
 
 export default function AdminSEOSettingsPage() {
   return (
-    <ProtectedAdminPage requiredPermissions={["canView", "canEdit"]}>
+    <ProtectedAdminPage page="seo-settings">
       <AdminErrorBoundary>
         <TooltipProvider>
           <SEOSettingsContent />

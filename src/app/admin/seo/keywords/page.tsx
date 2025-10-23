@@ -932,7 +932,7 @@ function KeywordsContent() {
 
 export default function AdminKeywordsPage() {
   return (
-    <ProtectedAdminPage requiredPermissions={["canView", "canEdit"]}>
+    <ProtectedAdminPage page="keywords">
       <AdminErrorBoundary>
         <KeywordsContent />
       </AdminErrorBoundary>

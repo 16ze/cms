@@ -487,7 +487,7 @@ function PerformancePageContent() {
 
 export default function AdminSEOPerformancePage() {
   return (
-    <ProtectedAdminPage page="keywords">
+    <ProtectedAdminPage page="performance">
       <AdminErrorBoundary>
         <PerformancePageContent />
       </AdminErrorBoundary>
