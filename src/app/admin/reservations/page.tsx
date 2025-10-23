@@ -176,31 +176,35 @@ function ReservationsContent() {
     setLoading(false);
   }, []);
 
-  // Charger les réservations depuis l'API
+  // Charger les réservations depuis l'API (isolées par tenant)
   useEffect(() => {
     const loadReservations = async () => {
       try {
-        const response = await fetch("/api/booking/reservation");
+        // ✅ Utiliser la nouvelle API isolée par tenant
+        const response = await fetch("/api/admin/reservations", {
+          credentials: "include", // Important pour les cookies de session
+        });
         const data = await response.json();
 
         if (response.ok && data.success) {
-          // Mapper les données de l'API vers le format attendu par l'interface
-          const formattedReservations: Reservation[] = data.reservations.map(
+          // Les données sont déjà isolées par tenant ✅
+          const formattedReservations: Reservation[] = (data.data || []).map(
             (res: any) => ({
               id: res.id,
-              clientName: res.clientName,
-              clientEmail: res.clientEmail,
-              clientPhone: res.clientPhone,
-              startTime: res.startTime,
-              endTime: res.endTime,
-              reservationType: res.reservationType,
+              clientName: res.customerName, // Note: restaurantReservation utilise customerName
+              clientEmail: res.customerEmail,
+              clientPhone: res.customerPhone,
+              startTime: `${res.date}T${res.time}`, // Combiner date et time
+              endTime: `${res.date}T${res.time}`, // Pas de endTime dans restaurantReservation
+              reservationType: "CONSULTATION", // Mapping par défaut
               status: res.status,
-              projectDescription: res.projectDescription,
-              communicationMethod: res.communicationMethod,
+              projectDescription: res.notes || "",
+              communicationMethod: "PHONE", // Par défaut
               createdAt: res.createdAt,
             })
           );
 
+          console.log(`✅ ${formattedReservations.length} réservations chargées (isolées par tenant)`);
           setReservations(formattedReservations);
           setFilteredReservations(formattedReservations);
         } else {
