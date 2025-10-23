@@ -68,17 +68,23 @@ export default function AdminSidebar({
 
   useEffect(() => {
     if (currentTemplate?.id) {
+      console.log('📋 Loading sidebar for template:', currentTemplate.displayName, currentTemplate.id);
       fetch(`/api/admin/sidebar/${currentTemplate.id}`)
         .then((res) => res.json())
         .then((data) => {
           if (data.success && Array.isArray(data.data)) {
+            console.log('✅ Template sidebar loaded:', data.data.length, 'elements', data.data);
             setTemplateSidebarElements(data.data);
+          } else {
+            console.warn('⚠️ Template sidebar response not valid:', data);
           }
         })
         .catch((err) => {
-          console.warn("Template sidebar not loaded:", err);
+          console.warn("❌ Template sidebar not loaded:", err);
           // Fallback : continuer avec sidebar par défaut
         });
+    } else {
+      console.log('⚠️ No currentTemplate, sidebar will use defaults only');
     }
   }, [currentTemplate]);
 
@@ -229,7 +235,8 @@ export default function AdminSidebar({
     ...item,
     id: item.elementId || item.id, // Normaliser l'ID
     icon: getIconComponent(item.icon),
-    requiredRoles: item.requiredRoles || (["super_admin"] as UserRole[]),
+    // ✅ FIX: Autoriser admin et super_admin, pas seulement super_admin
+    requiredRoles: item.requiredRoles || (["admin", "super_admin"] as UserRole[]),
   }));
 
   // FUSION FINALE SANS DOUBLONS
@@ -284,7 +291,14 @@ export default function AdminSidebar({
   // Filtrer les éléments accessibles selon les permissions réelles
   const accessibleItems = permissionsLoading
     ? []
-    : navigationItems.filter((item) => hasPermission(item.id));
+    : navigationItems.filter((item) => {
+        const hasAccess = hasPermission(item.id);
+        // Log pour debug
+        if (templateSidebarElements.length > 0 && uniqueTemplateItems.some(t => t.id === item.id)) {
+          console.log(`🔍 Permission check - ${item.label} (${item.id}):`, hasAccess);
+        }
+        return hasAccess;
+      });
 
   // Détecter si la taille de l'écran est mobile
   useEffect(() => {

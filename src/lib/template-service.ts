@@ -69,12 +69,14 @@ export class TemplateService {
 
     return templateSpecific.map(item => ({
       id: item.elementId,
+      elementId: item.elementId, // Garder elementId pour compatibilité
       label: item.label,
       icon: item.icon,
       href: item.href,
       orderIndex: item.orderIndex,
       category: item.category,
-      requiredRoles: ["super_admin"] as const
+      // ✅ FIX: Autoriser tous les rôles, pas seulement super_admin
+      requiredRoles: ["admin", "super_admin"] as const
     }));
   }
 
