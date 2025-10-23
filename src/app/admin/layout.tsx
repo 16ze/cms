@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter, usePathname } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import AdminSidebar from "@/app/admin/components/AdminSidebar";
 import AdminAssistant from "@/components/admin/admin-assistant";
 import NotificationBell from "@/components/admin/NotificationBell";
@@ -18,6 +18,8 @@ import {
   User,
   Settings,
   LogOut,
+  Shield,
+  ArrowLeft,
 } from "lucide-react";
 import "@/styles/admin-buttons.css";
 import "@/styles/admin-mobile-responsive.css";
@@ -41,9 +43,54 @@ export default function AdminLayout({
   const rolesContent = adminContentData.permissions.roles;
   const pathname = usePathname();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isImpersonating, setIsImpersonating] = useState(false);
 
   // Récupérer l'utilisateur depuis la session
   const { user: sessionUser, loading: sessionLoading } = useAdminSession();
+
+  // Vérifier si on est en mode impersonation
+  useEffect(() => {
+    const checkImpersonation = () => {
+      // Vérifier si le cookie "impersonating" existe
+      const cookies = document.cookie.split(";");
+      const impersonatingCookie = cookies.find((c) =>
+        c.trim().startsWith("impersonating=")
+      );
+      setIsImpersonating(impersonatingCookie?.includes("true") || false);
+    };
+
+    checkImpersonation();
+    // Vérifier périodiquement au cas où
+    const interval = setInterval(checkImpersonation, 2000);
+    return () => clearInterval(interval);
+  }, []);
+
+  // Fonction pour quitter le mode impersonation
+  const handleExitImpersonation = async () => {
+    try {
+      const confirmation = confirm(
+        "Voulez-vous retourner au dashboard Super Admin ?"
+      );
+
+      if (!confirmation) return;
+
+      const response = await fetch("/api/super-admin/impersonate", {
+        method: "DELETE",
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        // Rediriger vers le dashboard Super Admin
+        router.push("/super-admin/dashboard");
+      } else {
+        alert(`Erreur: ${data.error}`);
+      }
+    } catch (error) {
+      console.error("Erreur sortie impersonation:", error);
+      alert("Erreur lors de la sortie du mode impersonation");
+    }
+  };
 
   // Page de login - pas besoin de sidebar
   // Forcer le mode clair pour la page de login aussi
@@ -94,6 +141,35 @@ export default function AdminLayout({
 
       {/* Contenu principal - Pleine largeur sur mobile */}
       <div className="flex-1 flex flex-col overflow-hidden w-full lg:w-auto">
+        {/* Bannière d'impersonation */}
+        {isImpersonating && (
+          <div className="bg-gradient-to-r from-purple-600 via-pink-600 to-purple-600 text-white px-4 py-3 shadow-lg relative overflow-hidden">
+            {/* Animation background */}
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent animate-shimmer"></div>
+            
+            <div className="relative flex items-center justify-between max-w-7xl mx-auto">
+              <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2">
+                  <Shield className="w-5 h-5 animate-pulse" />
+                  <span className="font-semibold">Mode Super Admin</span>
+                </div>
+                <div className="hidden sm:block w-px h-5 bg-white/30"></div>
+                <span className="hidden sm:inline text-sm opacity-90">
+                  Vous gérez l'espace de ce client
+                </span>
+              </div>
+              <button
+                onClick={handleExitImpersonation}
+                className="flex items-center gap-2 px-4 py-2 bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-lg border border-white/30 transition-all font-medium text-sm"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                <span className="hidden sm:inline">Retour Super Admin</span>
+                <span className="sm:hidden">Retour</span>
+              </button>
+            </div>
+          </div>
+        )}
+        
         {/* Header - Design épuré sans bordures marquées */}
         <header className="bg-white/80 backdrop-blur-sm shadow-sm">
           <div className="px-4 lg:px-8 py-4 lg:py-5">
