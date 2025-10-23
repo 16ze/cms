@@ -28,6 +28,7 @@ import {
   X,
   Check,
   AlertCircle,
+  Layout,
 } from "lucide-react";
 
 interface Tenant {
@@ -476,6 +477,13 @@ Il pourra se connecter sur: ${window.location.origin}/login`;
                       <LogIn className="w-5 h-5 group-hover/btn:scale-110 transition-transform" />
                       Gérer cet espace admin
                       <Sparkles className="w-4 h-4 opacity-50" />
+                    </button>
+                    <button
+                      className="px-4 py-3 bg-white/5 hover:bg-white/10 text-purple-200 rounded-lg border border-white/10 transition-all flex items-center gap-2 group/sidebar"
+                      onClick={() => router.push(`/super-admin/tenants/${tenant.id}/sidebar`)}
+                      title="Gérer la sidebar"
+                    >
+                      <Layout className="w-5 h-5 group-hover/sidebar:scale-110 transition-transform" />
                     </button>
                     <button
                       className="px-4 py-3 bg-white/5 hover:bg-white/10 text-purple-200 rounded-lg border border-white/10 transition-all flex items-center gap-2"

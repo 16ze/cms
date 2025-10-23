@@ -24,6 +24,14 @@ import {
   FolderOpen,
   Image,
   Calendar,
+  Briefcase,
+  Tag,
+  UserCheck,
+  Utensils,
+  Grid,
+  Dumbbell,
+  Sparkles,
+  CreditCard,
 } from "lucide-react";
 import { hasPageAccess, UserRole } from "@/lib/permissions";
 import adminContent from "@/config/admin-content.json";
@@ -121,6 +129,14 @@ export default function AdminSidebar({
       FolderOpen,
       Image,
       Calendar,
+      Briefcase,
+      Tag,
+      UserCheck,
+      Utensils,
+      Grid,
+      Dumbbell,
+      Sparkles,
+      CreditCard,
     };
     return iconMap[iconName] || Cog;
   };
@@ -153,19 +169,8 @@ export default function AdminSidebar({
   // ============================================
   // ÉLÉMENTS DE BASE (toujours en haut)
   // ============================================
-
-  // Templates nécessitant la gestion des réservations
-  const templatesWithReservations = [
-    "RESTAURANT",
-    "WELLNESS",
-    "BEAUTY",
-    "CONSULTATION",
-  ];
-
-  // Vérifier si le template actuel nécessite les réservations
-  const needsReservations = currentTemplate
-    ? templatesWithReservations.includes(currentTemplate.category)
-    : true; // Par défaut, afficher les réservations si pas de template actif
+  // ⚠️ IMPORTANT : "Réservations" a été retiré des éléments de base
+  // Chaque template gère maintenant ses propres rendez-vous via TemplateSidebarConfig
 
   const baseNavigationItems = [
     {
@@ -175,18 +180,6 @@ export default function AdminSidebar({
       icon: BarChart3,
       requiredRoles: ["admin", "super_admin"] as UserRole[],
     },
-    // Réservations : uniquement pour certains templates
-    ...(needsReservations
-      ? [
-          {
-            id: "reservations",
-            href: "/admin/reservations",
-            label: nav.reservations,
-            icon: CalendarRange,
-            requiredRoles: ["admin", "super_admin"] as UserRole[],
-          },
-        ]
-      : []),
     {
       id: "clients",
       href: "/admin/clients",
