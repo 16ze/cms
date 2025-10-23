@@ -341,9 +341,10 @@ model ButtonStyles {
 
 model Client {
   id           String              @id @default(uuid())
+  tenantId     String              // Multi-tenant isolation
   firstName    String
   lastName     String
-  email        String              @unique
+  email        String
   phone        String?
   company      String?
   address      String?
@@ -355,7 +356,10 @@ model Client {
   updatedAt    DateTime            @updatedAt
   interactions ClientInteraction[]
   projects     ClientProject[]
+  tenant       Tenant              @relation(fields: [tenantId], references: [id], onDelete: Cascade)
 
+  @@unique([tenantId, email]) // Email unique par tenant
+  @@index([tenantId])
   @@index([email])
   @@index([status])
   @@index([source])
@@ -1378,9 +1382,11 @@ model TemplateCustomization {
   updatedAt   DateTime @updatedAt
   
   template    Template @relation(fields: [templateId], references: [id], onDelete: Cascade)
+  tenant      Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   
   @@unique([templateId, tenantId])
   @@index([templateId])
+  @@index([tenantId])
 }
 
 enum TemplateCategory {
@@ -1430,6 +1436,7 @@ model Tenant {
   siteTemplate              SiteTemplate?
   
   // Relations vers données
+  clients                   Client[]
   beautyTreatments          BeautyTreatment[]
   beautyAppointments        BeautyAppointment[]
   wellnessCourses           WellnessCourse[]
@@ -1454,6 +1461,7 @@ model Tenant {
   quotes                    Quote[]
   invoices                  Invoice[]
   galleryItems              GalleryItem[]
+  templateCustomizations    TemplateCustomization[]
   
   @@index([slug])
   @@index([templateId])

@@ -201,32 +201,46 @@ export default function AdminSidebar({
   // ============================================
   const universalEndItems = [
     {
+      id: "content",
+      href: "/admin/content",
+      label: nav.content || "Contenu",
+      icon: FileText,
+      requiredRoles: ["admin", "super_admin"] as UserRole[], // ✅ Accessible aux tenants
+    },
+    {
+      id: "site",
+      href: "/admin/site",
+      label: nav.site || "Site",
+      icon: Globe2,
+      requiredRoles: ["admin", "super_admin"] as UserRole[], // ✅ Accessible aux tenants
+    },
+    {
       id: "templates",
       href: "/admin/templates",
       label: "Templates",
       icon: Layers,
-      requiredRoles: ["super_admin"] as UserRole[],
+      requiredRoles: ["super_admin"] as UserRole[], // Super Admin uniquement
     },
     {
       id: "users",
       href: "/admin/users",
       label: nav.users,
       icon: Users,
-      requiredRoles: ["super_admin"] as UserRole[],
+      requiredRoles: ["super_admin"] as UserRole[], // Super Admin uniquement
     },
     {
       id: "seo",
       href: "/admin/seo",
       label: "SEO",
       icon: Search,
-      requiredRoles: ["super_admin"] as UserRole[],
+      requiredRoles: ["admin", "super_admin"] as UserRole[], // ✅ Accessible aux tenants
     },
     {
       id: "settings",
       href: "/admin/settings",
       label: nav.settings,
       icon: Settings,
-      requiredRoles: ["super_admin"] as UserRole[],
+      requiredRoles: ["admin", "super_admin"] as UserRole[], // ✅ Accessible aux tenants
     },
   ];
 

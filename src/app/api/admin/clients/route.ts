@@ -2,20 +2,26 @@ import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { ClientStatus, ClientSource } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
-import { ensureAdmin } from "@/lib/require-admin";
+import { ensureAuthenticated } from "@/lib/tenant-auth";
+import { getTenantFilter, requireTenant } from "@/middleware/tenant-context";
 
 // GET /api/admin/clients - Récupérer tous les clients
 export async function GET(request: NextRequest) {
   try {
     console.log("📝 API: Traitement GET /api/admin/clients");
 
-    // Vérifier l'authentification
-    const authResult = await ensureAdmin(request);
+    // 🔐 Authentification multi-tenant
+    const authResult = await ensureAuthenticated(request);
     if (authResult instanceof NextResponse) {
       return authResult; // Erreur d'authentification
     }
 
-    const adminUser = authResult;
+    const user = authResult;
+    console.log(`✅ User authentifié: ${user.email} (type: ${user.type})`);
+
+    // 🔒 Isolation multi-tenant
+    const { tenantFilter, tenantId } = await getTenantFilter(request);
+    console.log(`🔒 Tenant filter:`, tenantFilter);
 
     // Paramètres de requête pour filtrage/pagination
     const { searchParams } = new URL(request.url);
@@ -25,8 +31,8 @@ export async function GET(request: NextRequest) {
     const page = parseInt(searchParams.get("page") || "1");
     const limit = parseInt(searchParams.get("limit") || "50");
 
-    // Construire les filtres WHERE pour Prisma
-    const where: any = {};
+    // Construire les filtres WHERE pour Prisma avec isolation tenant
+    const where: any = { ...tenantFilter }; // 🔒 ISOLATION
 
     // Filtrage par statut
     if (status && status !== "ALL") {
@@ -99,7 +105,7 @@ export async function GET(request: NextRequest) {
     };
 
     console.log(
-      `📝 ${clients.length} clients trouvés sur ${totalClients} total`
+      `📝 ${clients.length} clients trouvés sur ${totalClients} total (tenant: ${tenantId || 'super-admin'})`
     );
 
     return NextResponse.json({
@@ -127,13 +133,16 @@ export async function POST(request: NextRequest) {
   try {
     console.log("📝 API: Traitement POST /api/admin/clients");
 
-    // Vérifier l'authentification
-    const authResult = await ensureAdmin(request);
+    // 🔐 Authentification multi-tenant
+    const authResult = await ensureAuthenticated(request);
     if (authResult instanceof NextResponse) {
       return authResult; // Erreur d'authentification
     }
 
-    const adminUser = authResult;
+    const user = authResult;
+
+    // 🔒 Récupérer le tenantId
+    const { tenantId } = await requireTenant(request);
 
     // Récupérer les données de la requête
     const body = await request.json();
@@ -195,9 +204,10 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Source invalide" }, { status: 400 });
     }
 
-    // Créer le nouveau client avec Prisma
+    // Créer le nouveau client avec Prisma + tenantId
     const newClient = await prisma.client.create({
       data: {
+        tenantId, // 🔒 ISOLATION
         firstName: firstName.trim(),
         lastName: lastName.trim(),
         email: email.toLowerCase().trim(),
@@ -215,7 +225,7 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    console.log(`✅ Client créé avec l'ID: ${newClient.id}`);
+    console.log(`✅ Client créé avec l'ID: ${newClient.id} pour tenant ${tenantId}`);
 
     return NextResponse.json(
       {
@@ -239,13 +249,16 @@ export async function PUT(request: NextRequest) {
   try {
     console.log("📝 API: Traitement PUT /api/admin/clients");
 
-    // Vérifier l'authentification
-    const authResult = await ensureAdmin(request);
+    // 🔐 Authentification multi-tenant
+    const authResult = await ensureAuthenticated(request);
     if (authResult instanceof NextResponse) {
       return authResult; // Erreur d'authentification
     }
 
-    const adminUser = authResult;
+    const user = authResult;
+
+    // 🔒 Récupérer le tenantId
+    const { tenantId } = await requireTenant(request);
 
     const body = await request.json();
     const { operation, clientIds, data } = body;
@@ -256,10 +269,11 @@ export async function PUT(request: NextRequest) {
         return NextResponse.json({ error: "Statut invalide" }, { status: 400 });
       }
 
-      // Mise à jour en masse avec Prisma
+      // Mise à jour en masse avec Prisma + isolation tenant
       const result = await prisma.client.updateMany({
         where: {
           id: { in: clientIds },
+          tenantId, // 🔒 ISOLATION
         },
         data: {
           status: data.status,
@@ -292,13 +306,16 @@ export async function DELETE(request: NextRequest) {
   try {
     console.log("📝 API: Traitement DELETE /api/admin/clients");
 
-    // Vérifier l'authentification
-    const authResult = await ensureAdmin(request);
+    // 🔐 Authentification multi-tenant
+    const authResult = await ensureAuthenticated(request);
     if (authResult instanceof NextResponse) {
       return authResult; // Erreur d'authentification
     }
 
-    const adminUser = authResult;
+    const user = authResult;
+
+    // 🔒 Récupérer le tenantId
+    const { tenantId } = await requireTenant(request);
 
     const { searchParams } = new URL(request.url);
     const clientIds = searchParams.get("ids")?.split(",") || [];
@@ -310,10 +327,11 @@ export async function DELETE(request: NextRequest) {
       );
     }
 
-    // Suppression en masse avec Prisma (cascade sur projets et interactions)
+    // Suppression en masse avec Prisma (cascade sur projets et interactions) + isolation tenant
     const result = await prisma.client.deleteMany({
       where: {
         id: { in: clientIds },
+        tenantId, // 🔒 ISOLATION
       },
     });
 
