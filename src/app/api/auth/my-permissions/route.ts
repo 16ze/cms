@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { ensureAuthenticated } from "@/lib/tenant-auth";
 import { adminPermissionService } from "@/lib/admin-permission-service";
+import { prisma } from "@/lib/prisma";
 
 /**
  * GET /api/auth/my-permissions
@@ -39,24 +40,52 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    // Pour les tenants users, retourner des permissions par défaut
-    // (Ou récupérer depuis la base si vous avez un système de permissions pour tenants)
-    const defaultPermissions = [
+    // Pour les tenants users, charger les permissions dynamiquement
+    // Inclure les éléments du template
+    const basePermissions = [
       { page: "dashboard", canView: true, canEdit: true, canDelete: false },
       { page: "reservations", canView: true, canEdit: true, canDelete: true },
       { page: "clients", canView: true, canEdit: true, canDelete: true },
       { page: "content", canView: true, canEdit: true, canDelete: false },
       { page: "site", canView: true, canEdit: true, canDelete: false },
-      { page: "users", canView: false, canEdit: false, canDelete: false }, // Pas d'accès par défaut
+      { page: "seo", canView: true, canEdit: true, canDelete: false },
       { page: "settings", canView: true, canEdit: true, canDelete: false },
     ];
 
-    console.log("✅ Permissions par défaut pour tenant");
+    // Charger les éléments sidebar du template pour ajouter leurs permissions
+    let allPermissions = [...basePermissions];
+
+    if (currentUser.tenantId) {
+      const tenant = await prisma.tenant.findUnique({
+        where: { id: currentUser.tenantId },
+        include: {
+          template: {
+            include: {
+              sidebarConfigs: true
+            }
+          }
+        }
+      });
+
+      if (tenant && tenant.template && tenant.template.sidebarConfigs) {
+        const templatePermissions = tenant.template.sidebarConfigs.map((config) => ({
+          page: config.elementId,
+          canView: true,
+          canEdit: true,
+          canDelete: true,
+        }));
+        allPermissions = [...allPermissions, ...templatePermissions];
+        
+        console.log(`✅ ${templatePermissions.length} permissions template ajoutées pour ${tenant.template.displayName}`);
+      }
+    }
+
+    console.log(`✅ Total ${allPermissions.length} permissions pour tenant`);
 
     return NextResponse.json({
       success: true,
       data: {
-        permissions: defaultPermissions,
+        permissions: allPermissions,
         role: currentUser.role || "ADMIN",
       },
     });
