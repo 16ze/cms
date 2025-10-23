@@ -228,13 +228,7 @@ export default function AdminSidebar({
       icon: Users,
       requiredRoles: ["super_admin"] as UserRole[], // Super Admin uniquement
     },
-    {
-      id: "seo",
-      href: "/admin/seo",
-      label: "SEO",
-      icon: Search,
-      requiredRoles: ["admin", "super_admin"] as UserRole[], // ✅ Accessible aux tenants
-    },
+    // ⚠️ SEO supprimé car il existe déjà comme menu accordéon (lignes 419-461)
     {
       id: "settings",
       href: "/admin/settings",

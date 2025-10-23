@@ -48,7 +48,12 @@ export async function GET(request: NextRequest) {
       { page: "clients", canView: true, canEdit: true, canDelete: true },
       { page: "content", canView: true, canEdit: true, canDelete: false },
       { page: "site", canView: true, canEdit: true, canDelete: false },
-      { page: "seo", canView: true, canEdit: true, canDelete: false },
+      // Permissions SEO (menu accordéon)
+      { page: "keywords", canView: true, canEdit: true, canDelete: false },
+      { page: "analysis", canView: true, canEdit: true, canDelete: false },
+      { page: "performance", canView: true, canEdit: true, canDelete: false },
+      { page: "seo-settings", canView: true, canEdit: true, canDelete: false },
+      // Autres
       { page: "settings", canView: true, canEdit: true, canDelete: false },
     ];
 
