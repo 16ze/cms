@@ -1303,7 +1303,6 @@ model Template {
   sidebarConfigs   TemplateSidebarConfig[]
   customizations   TemplateCustomization[]
   siteTemplates    SiteTemplate[]
-  tenants          Tenant[]
   
   @@index([category])
   @@index([isActive])

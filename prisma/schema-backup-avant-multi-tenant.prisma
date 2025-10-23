@@ -1303,7 +1303,6 @@ model Template {
   sidebarConfigs   TemplateSidebarConfig[]
   customizations   TemplateCustomization[]
   siteTemplates    SiteTemplate[]
-  tenants          Tenant[]
   
   @@index([category])
   @@index([isActive])
@@ -1349,16 +1348,14 @@ model TemplateSidebarConfig {
 }
 
 model SiteTemplate {
-  // MODIFIED: Multi-tenant architecture
   id          String   @id @default(uuid())
-  tenantId    String   @unique
+  siteId      String   @default("main") @unique
   templateId  String
   isActive    Boolean  @default(true)
   activatedAt DateTime @default(now())
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   
-  tenant      Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   template    Template @relation(fields: [templateId], references: [id])
   
   @@index([templateId])
@@ -1367,7 +1364,7 @@ model SiteTemplate {
 model TemplateCustomization {
   id          String   @id @default(uuid())
   templateId  String
-  tenantId    String
+  siteId      String   @default("main")
   colors      Json?
   typography  Json?
   logo        String?
@@ -1379,7 +1376,7 @@ model TemplateCustomization {
   
   template    Template @relation(fields: [templateId], references: [id], onDelete: Cascade)
   
-  @@unique([templateId, tenantId])
+  @@unique([templateId, siteId])
   @@index([templateId])
 }
 
@@ -1395,109 +1392,10 @@ enum TemplateCategory {
   SERVICES      // Prestations Professionnelles
 }
 
-// ===== MULTI-TENANT SYSTEM =====
-
-// Super Admin (KAIRO Digital Developer)
-model SuperAdmin {
-  id          String   @id @default(uuid())
-  email       String   @unique
-  password    String   // Hash bcrypt
-  firstName   String
-  lastName    String
-  isActive    Boolean  @default(true)
-  lastLogin   DateTime?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  
-  @@index([email])
-  @@index([isActive])
-}
-
-// Tenant (Client)
-model Tenant {
-  id            String   @id @default(uuid())
-  name          String
-  slug          String   @unique
-  email         String   @unique
-  templateId    String
-  domain        String?
-  isActive      Boolean  @default(true)
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-  
-  template                  Template @relation(fields: [templateId], references: [id])
-  users                     TenantUser[]
-  siteTemplate              SiteTemplate?
-  
-  // Relations vers données
-  beautyTreatments          BeautyTreatment[]
-  beautyAppointments        BeautyAppointment[]
-  wellnessCourses           WellnessCourse[]
-  wellnessCoaches           WellnessCoach[]
-  wellnessBookings          WellnessBooking[]
-  products                  Product[]
-  orders                    Order[]
-  orderItems                OrderItem[]
-  articles                  Article[]
-  articleCategories         ArticleCategory[]
-  authors                   Author[]
-  menuItems                 MenuItem[]
-  restaurantReservations    RestaurantReservation[]
-  restaurantTables          RestaurantTable[]
-  projects                  Project[]
-  teamMembers               TeamMember[]
-  patients                  Patient[]
-  therapists                Therapist[]
-  consultationAppointments  ConsultationAppointment[]
-  serviceClients            ServiceClient[]
-  serviceProjects           ServiceProject[]
-  quotes                    Quote[]
-  invoices                  Invoice[]
-  galleryItems              GalleryItem[]
-  
-  @@index([slug])
-  @@index([templateId])
-  @@index([email])
-  @@index([isActive])
-}
-
-// Tenant User (User of a client)
-model TenantUser {
-  id          String         @id @default(uuid())
-  tenantId    String
-  email       String
-  password    String
-  firstName   String
-  lastName    String
-  role        TenantUserRole @default(ADMIN)
-  isActive    Boolean        @default(true)
-  lastLogin   DateTime?
-  createdAt   DateTime       @default(now())
-  updatedAt   DateTime       @updatedAt
-  
-  tenant      Tenant         @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  
-  @@unique([tenantId, email])
-  @@index([tenantId])
-  @@index([email])
-  @@index([isActive])
-}
-
-enum TenantUserRole {
-  OWNER
-  ADMIN
-  EDITOR
-  VIEWER
-}
-
-
-
-
 // ===== GESTION DES PROJETS =====
 
 model Project {
   id          String   @id @default(uuid())
-  tenantId    String
   title       String
   slug        String   @unique
   description String
@@ -1516,13 +1414,10 @@ model Project {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   
-  
-  tenant      Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   @@index([status])
   @@index([featured])
   @@index([orderIndex])
   @@index([createdAt])
-  @@index([tenantId])
 }
 
 enum CorporateProjectStatus {
@@ -1535,7 +1430,6 @@ enum CorporateProjectStatus {
 
 model TeamMember {
   id          String   @id @default(uuid())
-  tenantId    String
   firstName   String
   lastName    String
   slug        String   @unique
@@ -1555,19 +1449,15 @@ model TeamMember {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   
-  
-  tenant      Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   @@index([isActive])
   @@index([orderIndex])
   @@index([department])
-  @@index([tenantId])
 }
 
 // ===== E-COMMERCE TEMPLATE =====
 
 model Product {
   id            String   @id @default(uuid())
-  tenantId    String
   name          String
   slug          String   @unique
   description   String  
@@ -1596,20 +1486,16 @@ model Product {
   
   orderItems    OrderItem[]
   
-  
-  tenant      Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   @@index([slug])
   @@index([category])
   @@index([brand])
   @@index([isActive])
   @@index([featured])
   @@index([price])
-  @@index([tenantId])
 }
 
 model Order {
   id              String      @id @default(uuid())
-  tenantId    String
   orderNumber     String      @unique
   customerName    String
   customerEmail   String
@@ -1633,19 +1519,15 @@ model Order {
   
   items           OrderItem[]
   
-  
-  tenant      Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   @@index([orderNumber])
   @@index([status])
   @@index([paymentStatus])
   @@index([customerEmail])
   @@index([createdAt])
-  @@index([tenantId])
 }
 
 model OrderItem {
   id          String   @id @default(uuid())
-  tenantId    String
   orderId     String
   productId   String
   productName String
@@ -1657,11 +1539,8 @@ model OrderItem {
   order       Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
   product     Product  @relation(fields: [productId], references: [id])
   
-  
-  tenant      Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   @@index([orderId])
   @@index([productId])
-  @@index([tenantId])
 }
 
 enum OrderStatus {
@@ -1684,7 +1563,6 @@ enum PaymentStatus {
 
 model Article {
   id            String        @id @default(uuid())
-  tenantId    String
   title         String
   slug          String        @unique
   excerpt       String?      
@@ -1705,20 +1583,16 @@ model Article {
   author        Author        @relation(fields: [authorId], references: [id])
   category      ArticleCategory? @relation(fields: [categoryId], references: [id])
   
-  
-  tenant      Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   @@index([slug])
   @@index([authorId])
   @@index([categoryId])
   @@index([status])
   @@index([featured])
   @@index([publishedAt])
-  @@index([tenantId])
 }
 
 model ArticleCategory {
   id          String   @id @default(uuid())
-  tenantId    String
   name        String   @unique
   slug        String   @unique
   description String? 
@@ -1730,16 +1604,12 @@ model ArticleCategory {
   
   articles    Article[]
   
-  
-  tenant      Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   @@index([slug])
   @@index([orderIndex])
-  @@index([tenantId])
 }
 
 model Author {
   id          String   @id @default(uuid())
-  tenantId    String
   firstName   String
   lastName    String
   slug        String   @unique
@@ -1755,11 +1625,8 @@ model Author {
   
   articles    Article[]
   
-  
-  tenant      Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   @@index([slug])
   @@index([isActive])
-  @@index([tenantId])
 }
 
 enum ArticleStatus {
@@ -1772,7 +1639,6 @@ enum ArticleStatus {
 
 model MenuItem {
   id          String      @id @default(uuid())
-  tenantId    String
   name        String
   slug        String      @unique
   description String?    
@@ -1789,18 +1655,14 @@ model MenuItem {
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
   
-  
-  tenant      Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   @@index([slug])
   @@index([category])
   @@index([isAvailable])
   @@index([isFeatured])
-  @@index([tenantId])
 }
 
 model RestaurantReservation {
   id            String               @id @default(uuid())
-  tenantId    String
   customerName  String
   customerEmail String
   customerPhone String
@@ -1817,17 +1679,13 @@ model RestaurantReservation {
   
   table         RestaurantTable?     @relation(fields: [tableId], references: [id])
   
-  
-  tenant      Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   @@index([date])
   @@index([status])
   @@index([customerEmail])
-  @@index([tenantId])
 }
 
 model RestaurantTable {
   id           String                  @id @default(uuid())
-  tenantId    String
   number       String                  @unique
   capacity     Int
   location     TableLocation
@@ -1837,11 +1695,8 @@ model RestaurantTable {
   
   reservations RestaurantReservation[]
   
-  
-  tenant      Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   @@index([isAvailable])
   @@index([location])
-  @@index([tenantId])
 }
 
 enum MenuCategory {
@@ -1873,7 +1728,6 @@ enum RestaurantReservationStatus {
 
 model WellnessCourse {
   id          String   @id @default(uuid())
-  tenantId    String
   name        String
   slug        String   @unique
   description String? 
@@ -1891,18 +1745,14 @@ model WellnessCourse {
   coach       WellnessCoach @relation(fields: [coachId], references: [id])
   bookings    WellnessBooking[]
   
-  
-  tenant      Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   @@index([slug])
   @@index([category])
   @@index([coachId])
   @@index([isActive])
-  @@index([tenantId])
 }
 
 model WellnessCoach {
   id            String          @id @default(uuid())
-  tenantId    String
   firstName     String
   lastName      String
   slug          String          @unique
@@ -1919,16 +1769,12 @@ model WellnessCoach {
   courses       WellnessCourse[]
   bookings      WellnessBooking[]
   
-  
-  tenant      Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   @@index([slug])
   @@index([isActive])
-  @@index([tenantId])
 }
 
 model WellnessBooking {
   id            String   @id @default(uuid())
-  tenantId    String
   courseId      String
   coachId       String
   customerName  String
@@ -1946,14 +1792,11 @@ model WellnessBooking {
   course        WellnessCourse @relation(fields: [courseId], references: [id])
   coach         WellnessCoach  @relation(fields: [coachId], references: [id])
   
-  
-  tenant      Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   @@index([courseId])
   @@index([coachId])
   @@index([date])
   @@index([status])
   @@index([customerEmail])
-  @@index([tenantId])
 }
 
 enum BookingStatus {
@@ -1968,7 +1811,6 @@ enum BookingStatus {
 
 model BeautyTreatment {
   id          String   @id @default(uuid())
-  tenantId    String
   name        String
   slug        String   @unique
   description String? 
@@ -1982,17 +1824,13 @@ model BeautyTreatment {
   
   appointments BeautyAppointment[]
   
-  
-  tenant      Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   @@index([slug])
   @@index([category])
   @@index([isActive])
-  @@index([tenantId])
 }
 
 model BeautyAppointment {
   id            String   @id @default(uuid())
-  tenantId    String
   treatmentId   String
   customerName  String
   customerEmail String
@@ -2008,13 +1846,10 @@ model BeautyAppointment {
   
   treatment     BeautyTreatment @relation(fields: [treatmentId], references: [id])
   
-  
-  tenant      Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   @@index([treatmentId])
   @@index([date])
   @@index([status])
   @@index([customerEmail])
-  @@index([tenantId])
 }
 
 enum AppointmentStatus {
@@ -2030,7 +1865,6 @@ enum AppointmentStatus {
 
 model Patient {
   id            String   @id @default(uuid())
-  tenantId    String
   firstName     String
   lastName      String
   email         String   @unique
@@ -2044,16 +1878,12 @@ model Patient {
   
   appointments  ConsultationAppointment[]
   
-  
-  tenant      Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   @@index([email])
   @@index([isActive])
-  @@index([tenantId])
 }
 
 model Therapist {
   id            String   @id @default(uuid())
-  tenantId    String
   firstName     String
   lastName      String
   slug          String   @unique
@@ -2069,16 +1899,12 @@ model Therapist {
   
   appointments  ConsultationAppointment[]
   
-  
-  tenant      Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   @@index([slug])
   @@index([isActive])
-  @@index([tenantId])
 }
 
 model ConsultationAppointment {
   id            String   @id @default(uuid())
-  tenantId    String
   patientId     String
   therapistId   String
   date          DateTime
@@ -2098,13 +1924,10 @@ model ConsultationAppointment {
   patient       Patient   @relation(fields: [patientId], references: [id])
   therapist     Therapist @relation(fields: [therapistId], references: [id])
   
-  
-  tenant      Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   @@index([patientId])
   @@index([therapistId])
   @@index([date])
   @@index([status])
-  @@index([tenantId])
 }
 
 enum ConsultationStatus {
@@ -2121,7 +1944,6 @@ enum ConsultationStatus {
 
 model ServiceClient {
   id            String   @id @default(uuid())
-  tenantId    String
   companyName   String
   contactName   String
   email         String   @unique
@@ -2137,16 +1959,12 @@ model ServiceClient {
   quotes        Quote[]
   invoices      Invoice[]
   
-  
-  tenant      Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   @@index([email])
   @@index([isActive])
-  @@index([tenantId])
 }
 
 model ServiceProject {
   id          String        @id @default(uuid())
-  tenantId    String
   name        String
   slug        String        @unique
   description String?      
@@ -2162,17 +1980,13 @@ model ServiceProject {
   
   client      ServiceClient @relation(fields: [clientId], references: [id])
   
-  
-  tenant      Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   @@index([slug])
   @@index([clientId])
   @@index([status])
-  @@index([tenantId])
 }
 
 model Quote {
   id          String      @id @default(uuid())
-  tenantId    String
   quoteNumber String      @unique
   clientId    String
   title       String
@@ -2190,17 +2004,13 @@ model Quote {
   
   client      ServiceClient @relation(fields: [clientId], references: [id])
   
-  
-  tenant      Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   @@index([quoteNumber])
   @@index([clientId])
   @@index([status])
-  @@index([tenantId])
 }
 
 model Invoice {
   id            String        @id @default(uuid())
-  tenantId    String
   invoiceNumber String        @unique
   clientId      String
   title         String
@@ -2217,13 +2027,10 @@ model Invoice {
   
   client        ServiceClient @relation(fields: [clientId], references: [id])
   
-  
-  tenant      Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   @@index([invoiceNumber])
   @@index([clientId])
   @@index([status])
   @@index([dueDate])
-  @@index([tenantId])
 }
 
 enum ProjectServiceStatus {
@@ -2254,7 +2061,6 @@ enum InvoiceStatus {
 
 model GalleryItem {
   id          String   @id @default(uuid())
-  tenantId    String
   title       String
   slug        String   @unique
   description String? 
@@ -2266,11 +2072,8 @@ model GalleryItem {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   
-  
-  tenant      Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   @@index([slug])
   @@index([category])
   @@index([featured])
   @@index([orderIndex])
-  @@index([tenantId])
 }
