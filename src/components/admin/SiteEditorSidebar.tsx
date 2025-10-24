@@ -36,20 +36,20 @@ export default function SiteEditorSidebar({
   const initializeFields = (sectionId: string) => {
     console.log("📝 Initialisation des champs pour la section:", sectionId);
     console.log("📦 Contenu reçu:", content);
-    
+
     // Essayer plusieurs structures possibles
     let sectionContent = content?.[sectionId]?.text?.content || {};
-    
+
     // Si pas de données dans cette structure, essayer une autre
     if (Object.keys(sectionContent).length === 0) {
       sectionContent = content?.[sectionId]?.text || {};
     }
-    
+
     // Si toujours vide, essayer sans le nested content
     if (Object.keys(sectionContent).length === 0) {
       sectionContent = content?.[sectionId] || {};
     }
-    
+
     console.log("📄 Contenu de la section:", sectionContent);
 
     switch (sectionId) {

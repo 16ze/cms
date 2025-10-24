@@ -52,6 +52,9 @@ export default function AdminLayout({
 
   // Hook pour gérer le mode de la sidebar
   const { mode: sidebarMode } = useSidebarMode();
+  
+  console.log("🔍 [Layout] Sidebar mode:", sidebarMode);
+  console.log("🔍 [Layout] Pathname:", pathname);
 
   // Charger le contenu frontend si on est en mode éditeur
   const { content: frontendContent, reload: reloadContent } =
@@ -59,6 +62,8 @@ export default function AdminLayout({
       pageSlug: "accueil",
       autoSync: false, // ✅ Désactivé pour éviter le refresh permanent
     });
+  
+  console.log("🔍 [Layout] Frontend content:", frontendContent);
 
   // Fonction pour sauvegarder le contenu édité
   const handleEditorSave = async (section: string, data: any) => {
@@ -194,6 +199,14 @@ export default function AdminLayout({
           editorContent={frontendContent}
           onEditorSave={handleEditorSave}
           onEditorBack={handleEditorBack}
+        
+        {/* Debug logs */}
+        {console.log("🔍 [Layout] AdminSidebar props:", {
+          sidebarMode: sidebarMode === "default" ? "navigation" : sidebarMode,
+          hasEditorContent: !!frontendContent,
+          hasEditorSave: !!handleEditorSave,
+          hasEditorBack: !!handleEditorBack
+        })}
         />
       </div>
 
