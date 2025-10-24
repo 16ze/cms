@@ -34,7 +34,11 @@ export default function SiteEditorSidebar({
 
   // Initialiser les champs selon la section active
   const initializeFields = (sectionId: string) => {
+    console.log("📝 Initialisation des champs pour la section:", sectionId);
+    console.log("📦 Contenu reçu:", content);
+    
     const sectionContent = content?.[sectionId]?.text?.content || {};
+    console.log("📄 Contenu de la section:", sectionContent);
 
     switch (sectionId) {
       case "hero":
@@ -90,11 +94,17 @@ export default function SiteEditorSidebar({
   };
 
   const handleSave = async () => {
+    console.log("💾 Sauvegarde demandée:", { activeSection, fields });
     setSaving(true);
     try {
       await onSave(activeSection, fields);
+      console.log("✅ Sauvegarde réussie");
       alert("✅ Contenu sauvegardé avec succès !");
+      
+      // Déclencher l'événement de mise à jour pour recharger l'iframe
+      window.dispatchEvent(new CustomEvent("content-updated"));
     } catch (error) {
+      console.error("❌ Erreur lors de la sauvegarde:", error);
       alert("❌ Erreur lors de la sauvegarde");
     } finally {
       setSaving(false);

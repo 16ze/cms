@@ -62,8 +62,9 @@ export default function AdminLayout({
 
   // Fonction pour sauvegarder le contenu édité
   const handleEditorSave = async (section: string, data: any) => {
+    console.log("💾 [Layout] Sauvegarde demandée:", { section, data });
     try {
-      await fetch("/api/admin/frontend-content", {
+      const response = await fetch("/api/admin/frontend-content", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -74,13 +75,24 @@ export default function AdminLayout({
         }),
       });
 
+      console.log("📡 [Layout] Réponse API:", response.status, response.statusText);
+      
+      if (!response.ok) {
+        const errorData = await response.text();
+        console.error("❌ [Layout] Erreur API:", errorData);
+        throw new Error(`Erreur ${response.status}: ${errorData}`);
+      }
+
+      const result = await response.json();
+      console.log("✅ [Layout] Sauvegarde réussie:", result);
+
       // Recharger le contenu après sauvegarde
       await reloadContent();
 
       // Déclencher un événement pour recharger l'iframe
       window.dispatchEvent(new CustomEvent("content-updated"));
     } catch (error) {
-      console.error("Erreur sauvegarde:", error);
+      console.error("❌ [Layout] Erreur sauvegarde:", error);
       throw error;
     }
   };
