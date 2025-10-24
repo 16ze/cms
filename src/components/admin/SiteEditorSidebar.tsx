@@ -36,11 +36,11 @@ export default function SiteEditorSidebar({
   const initializeFields = (sectionId: string) => {
     console.log("📝 Initialisation des champs pour la section:", sectionId);
     console.log("📦 Contenu reçu:", content);
-    
+
     // Structure attendue: content.hero.text (données directes)
     // La structure est: { hero: { text: { title, subtitle, ... } } }
     const sectionContent = content?.[sectionId]?.text || {};
-    
+
     console.log("📄 Contenu de la section:", sectionContent);
 
     switch (sectionId) {

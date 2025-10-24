@@ -57,25 +57,33 @@ export default function AdminLayout({
   console.log("🔍 [Layout] Pathname:", pathname);
 
   // Charger le contenu frontend si on est en mode éditeur
-  const { content: frontendContent, reload: reloadContent } =
+  const { content: frontendContent, reload: reloadContent, loading: contentLoading } =
     useFrontendContent({
       pageSlug: "accueil",
       autoSync: false, // ✅ Désactivé pour éviter le refresh permanent
     });
+
+  // Charger le contenu manuellement au montage pour l'éditeur
+  useEffect(() => {
+    if (sidebarMode === "site-editor" && !contentLoading && Object.keys(frontendContent).length === 0) {
+      console.log("🔍 [Layout] Chargement manuel du contenu pour l'éditeur");
+      reloadContent();
+    }
+  }, [sidebarMode, frontendContent, contentLoading, reloadContent]);
 
   console.log("🔍 [Layout] Frontend content:", frontendContent);
 
   // Fonction pour sauvegarder le contenu édité
   const handleEditorSave = async (section: string, data: any) => {
     console.log("💾 [Layout] Sauvegarde demandée:", { section, data });
-    
+
     try {
       // La structure attendue par l'API:
       // - pageSlug: "accueil"
       // - sectionSlug: "hero", "services", etc.
       // - dataType: "text"
       // - content: { title, subtitle, ... } (données brutes)
-      
+
       const response = await fetch("/api/admin/frontend-content", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
