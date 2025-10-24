@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { NotificationCategory, NotificationPriority } from "@prisma/client";
 
 export interface Notification {
@@ -54,12 +54,29 @@ export function useNotifications(options: UseNotificationsOptions = {}) {
   const [unreadCount, setUnreadCount] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const isFetchingRef = useRef<boolean>(false);
+  const lastFetchRef = useRef<number>(0);
 
   /**
    * Récupérer les notifications
    */
   const fetchNotifications = useCallback(async () => {
+    // Éviter les requêtes multiples simultanées
+    if (isFetchingRef.current) {
+      console.log("⏭️ Requête déjà en cours, ignorée");
+      return;
+    }
+
+    // Cache de 5 secondes pour éviter trop de requêtes
+    const now = Date.now();
+    if (now - lastFetchRef.current < 5000 && !loading) {
+      console.log("⏭️ Cache encore valide, requête ignorée");
+      return;
+    }
+
     try {
+      isFetchingRef.current = true;
+      lastFetchRef.current = now;
       const params = new URLSearchParams();
 
       if (category) {
@@ -99,18 +116,21 @@ export function useNotifications(options: UseNotificationsOptions = {}) {
       }
     } catch (err: any) {
       console.error("❌ Erreur récupération notifications:", err);
-      
+
       // Si c'est une erreur de timeout ou de réseau, ne pas interrompre l'application
-      if (err.name === 'TimeoutError' || err.name === 'TypeError') {
-        console.warn("⚠️ Connexion interrompue, utilisation de l'état existant");
+      if (err.name === "TimeoutError" || err.name === "TypeError") {
+        console.warn(
+          "⚠️ Connexion interrompue, utilisation de l'état existant"
+        );
         setError(null); // Ne pas afficher d'erreur pour les problèmes réseau temporaires
       } else {
         setError(err.message);
       }
     } finally {
       setLoading(false);
+      isFetchingRef.current = false;
     }
-  }, [category, onlyUnread]);
+  }, [category, onlyUnread, loading]);
 
   /**
    * Marquer une notification comme lue

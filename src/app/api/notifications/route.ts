@@ -20,7 +20,12 @@ export async function GET(request: NextRequest) {
     }
 
     const user = authResult;
-    console.log("📬 API: Utilisateur authentifié:", user.id, user.email, user.type);
+    console.log(
+      "📬 API: Utilisateur authentifié:",
+      user.id,
+      user.email,
+      user.type
+    );
 
     const { searchParams } = new URL(request.url);
 
