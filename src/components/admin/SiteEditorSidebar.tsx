@@ -37,7 +37,19 @@ export default function SiteEditorSidebar({
     console.log("📝 Initialisation des champs pour la section:", sectionId);
     console.log("📦 Contenu reçu:", content);
     
-    const sectionContent = content?.[sectionId]?.text?.content || {};
+    // Essayer plusieurs structures possibles
+    let sectionContent = content?.[sectionId]?.text?.content || {};
+    
+    // Si pas de données dans cette structure, essayer une autre
+    if (Object.keys(sectionContent).length === 0) {
+      sectionContent = content?.[sectionId]?.text || {};
+    }
+    
+    // Si toujours vide, essayer sans le nested content
+    if (Object.keys(sectionContent).length === 0) {
+      sectionContent = content?.[sectionId] || {};
+    }
+    
     console.log("📄 Contenu de la section:", sectionContent);
 
     switch (sectionId) {
@@ -100,7 +112,7 @@ export default function SiteEditorSidebar({
       await onSave(activeSection, fields);
       console.log("✅ Sauvegarde réussie");
       alert("✅ Contenu sauvegardé avec succès !");
-      
+
       // Déclencher l'événement de mise à jour pour recharger l'iframe
       window.dispatchEvent(new CustomEvent("content-updated"));
     } catch (error) {
