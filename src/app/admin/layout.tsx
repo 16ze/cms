@@ -57,19 +57,27 @@ export default function AdminLayout({
   console.log("🔍 [Layout] Pathname:", pathname);
 
   // Charger le contenu frontend si on est en mode éditeur
-  const { content: frontendContent, reload: reloadContent, loading: contentLoading } =
-    useFrontendContent({
-      pageSlug: "accueil",
-      autoSync: false, // ✅ Désactivé pour éviter le refresh permanent
-    });
+  const {
+    content: frontendContent,
+    reload: reloadContent,
+    loading: contentLoading,
+  } = useFrontendContent({
+    pageSlug: "accueil",
+    autoSync: false, // ✅ Désactivé pour éviter le refresh permanent
+  });
 
   // Charger le contenu manuellement au montage pour l'éditeur
   useEffect(() => {
-    if (sidebarMode === "site-editor" && !contentLoading && Object.keys(frontendContent).length === 0) {
+    if (
+      sidebarMode === "site-editor" &&
+      !contentLoading &&
+      Object.keys(frontendContent).length === 0
+    ) {
       console.log("🔍 [Layout] Chargement manuel du contenu pour l'éditeur");
       reloadContent();
     }
-  }, [sidebarMode, frontendContent, contentLoading, reloadContent]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sidebarMode]);
 
   console.log("🔍 [Layout] Frontend content:", frontendContent);
 
