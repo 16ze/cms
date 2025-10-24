@@ -184,6 +184,14 @@ export default function AdminLayout({
     role: normalizedRole,
   };
 
+  // Debug logs pour AdminSidebar props
+  console.log("🔍 [Layout] AdminSidebar props:", {
+    sidebarMode: sidebarMode === "default" ? "navigation" : sidebarMode,
+    hasEditorContent: !!frontendContent,
+    hasEditorSave: !!handleEditorSave,
+    hasEditorBack: !!handleEditorBack
+  });
+
   return (
     <div className="flex h-screen bg-slate-50 light">
       {/* Sidebar - Masquée sur mobile, visible sur desktop */}
@@ -199,14 +207,6 @@ export default function AdminLayout({
           editorContent={frontendContent}
           onEditorSave={handleEditorSave}
           onEditorBack={handleEditorBack}
-        
-        {/* Debug logs */}
-        {console.log("🔍 [Layout] AdminSidebar props:", {
-          sidebarMode: sidebarMode === "default" ? "navigation" : sidebarMode,
-          hasEditorContent: !!frontendContent,
-          hasEditorSave: !!handleEditorSave,
-          hasEditorBack: !!handleEditorBack
-        })}
         />
       </div>
 
