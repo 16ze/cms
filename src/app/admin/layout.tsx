@@ -52,7 +52,7 @@ export default function AdminLayout({
 
   // Hook pour gérer le mode de la sidebar
   const { mode: sidebarMode } = useSidebarMode();
-  
+
   console.log("🔍 [Layout] Sidebar mode:", sidebarMode);
   console.log("🔍 [Layout] Pathname:", pathname);
 
@@ -62,13 +62,20 @@ export default function AdminLayout({
       pageSlug: "accueil",
       autoSync: false, // ✅ Désactivé pour éviter le refresh permanent
     });
-  
+
   console.log("🔍 [Layout] Frontend content:", frontendContent);
 
   // Fonction pour sauvegarder le contenu édité
   const handleEditorSave = async (section: string, data: any) => {
     console.log("💾 [Layout] Sauvegarde demandée:", { section, data });
+    
     try {
+      // La structure attendue par l'API:
+      // - pageSlug: "accueil"
+      // - sectionSlug: "hero", "services", etc.
+      // - dataType: "text"
+      // - content: { title, subtitle, ... } (données brutes)
+      
       const response = await fetch("/api/admin/frontend-content", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -76,12 +83,16 @@ export default function AdminLayout({
           pageSlug: "accueil",
           sectionSlug: section,
           dataType: "text",
-          content: data,
+          content: data, // data contient déjà les champs title, subtitle, etc.
         }),
       });
 
-      console.log("📡 [Layout] Réponse API:", response.status, response.statusText);
-      
+      console.log(
+        "📡 [Layout] Réponse API:",
+        response.status,
+        response.statusText
+      );
+
       if (!response.ok) {
         const errorData = await response.text();
         console.error("❌ [Layout] Erreur API:", errorData);
@@ -189,7 +200,7 @@ export default function AdminLayout({
     sidebarMode: sidebarMode === "default" ? "navigation" : sidebarMode,
     hasEditorContent: !!frontendContent,
     hasEditorSave: !!handleEditorSave,
-    hasEditorBack: !!handleEditorBack
+    hasEditorBack: !!handleEditorBack,
   });
 
   return (
