@@ -2,6 +2,7 @@
  * API: RENDEZ-VOUS BEAUTÉ
  * ========================
  * Multi-tenant ready ✅
+ * Multi-métiers ready ✅
  */
 
 import { NextRequest, NextResponse } from "next/server";
@@ -40,6 +41,8 @@ export async function GET(request: NextRequest) {
       where,
       include: {
         treatment: true,
+        professional: true, // Inclure le professionnel assigné
+        client: true, // Inclure le client si disponible
       },
       orderBy: [{ date: "desc" }, { time: "asc" }],
     });
@@ -96,6 +99,8 @@ export async function POST(request: NextRequest) {
       },
       include: {
         treatment: true,
+        professional: true, // Inclure le professionnel assigné
+        client: true, // Inclure le client si disponible
       },
     });
 

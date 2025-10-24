@@ -7,7 +7,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { ensureAuthenticated } from "@/lib/tenant-auth";
-import { getTenantFilter, requireTenant, verifyTenantAccess } from "@/middleware/tenant-context";
+import {
+  getTenantFilter,
+  requireTenant,
+  verifyTenantAccess,
+} from "@/middleware/tenant-context";
 
 // GET - Liste des membres de l'équipe
 export async function GET(request: NextRequest) {
@@ -70,7 +74,7 @@ export async function POST(request: NextRequest) {
 
     const teamMember = await prisma.teamMember.create({
       data: {
-        ...( {
+        ...tenantFilter, // 🔒 ISOLATION
         firstName: data.firstName,
         lastName: data.lastName,
         slug: data.slug,

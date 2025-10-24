@@ -19,6 +19,10 @@ import {
   MapPin,
   RefreshCw,
   ArrowLeft,
+  Layers,
+  Sparkles,
+  X,
+  Eye,
 } from "lucide-react";
 import RealClientPreview from "./real-client-preview";
 import ChangeNotifier from "./change-notifier";
@@ -56,14 +60,25 @@ interface ThemeConfig {
   configJson: any;
 }
 
-type ActiveTab = "header" | "footer" | "themes" | "buttons";
+type ActiveTab = "templates" | "header" | "footer" | "themes" | "buttons";
 
 export default function SiteManager() {
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState<ActiveTab>("header");
+  const [activeTab, setActiveTab] = useState<ActiveTab>("templates");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+
+  // États pour le questionnaire de configuration
+  const [showConfigModal, setShowConfigModal] = useState(false);
+  const [configStep, setConfigStep] = useState(1);
+  const [templateConfig, setTemplateConfig] = useState({
+    pages: [] as string[],
+    features: [] as string[],
+    colors: "",
+    businessType: "",
+    specialties: [] as string[],
+  });
 
   // États pour les configurations
   const [headerConfig, setHeaderConfig] = useState<HeaderConfig>({
@@ -285,6 +300,7 @@ export default function SiteManager() {
       <div className="border-b border-gray-200 overflow-x-auto">
         <nav className="-mb-px flex space-x-4 sm:space-x-8 min-w-max">
           {[
+            { id: "templates", label: "Templates", icon: Layers },
             { id: "header", label: "Header", icon: Navigation },
             { id: "footer", label: "Footer", icon: FileText },
             { id: "themes", label: "Thèmes", icon: Palette },
@@ -314,6 +330,466 @@ export default function SiteManager() {
 
       {/* Contenu des onglets */}
       <div className="space-y-6">
+        {/* Onglet Templates */}
+        {activeTab === "templates" && (
+          <div className="space-y-6">
+            <div className="bg-white border border-gray-200 rounded-lg p-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                <Sparkles className="w-5 h-5 text-pink-600" />
+                Configuration du Template
+              </h3>
+              <p className="text-gray-600 mb-6">
+                Choisissez le template de votre site et configurez-le selon vos
+                besoins
+              </p>
+
+              {/* Template Beauté & Esthétique */}
+              <div className="border border-pink-200 rounded-lg p-6 bg-gradient-to-br from-pink-50 to-purple-50">
+                <div className="flex items-start justify-between mb-4">
+                  <div>
+                    <h4 className="text-xl font-bold text-gray-900 mb-2 flex items-center gap-2">
+                      <Sparkles className="w-6 h-6 text-pink-600" />
+                      Beauté & Esthétique
+                    </h4>
+                    <p className="text-gray-600">
+                      Template complet pour établissements de beauté
+                    </p>
+                  </div>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => setShowConfigModal(true)}
+                      className="px-4 py-2 bg-pink-600 text-white rounded-lg hover:bg-pink-700 transition-colors"
+                    >
+                      Configurer
+                    </button>
+                    <a
+                      href="/beaute"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="px-4 py-2 bg-white text-pink-600 border-2 border-pink-600 rounded-lg hover:bg-pink-50 transition-colors flex items-center gap-2"
+                    >
+                      <Eye className="w-4 h-4" />
+                      Voir le site
+                    </a>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                  <div className="bg-white rounded-lg p-4">
+                    <h5 className="font-semibold text-gray-900 mb-2">
+                      Pages incluses
+                    </h5>
+                    <ul className="text-sm text-gray-600 space-y-1">
+                      <li>✓ Page d'accueil</li>
+                      <li>✓ Nos prestations</li>
+                      <li>✓ Notre équipe</li>
+                      <li>✓ Réserver un rendez-vous</li>
+                      <li>✓ Contact</li>
+                      <li>✓ Galerie</li>
+                    </ul>
+                  </div>
+                  <div className="bg-white rounded-lg p-4">
+                    <h5 className="font-semibold text-gray-900 mb-2">
+                      Fonctionnalités
+                    </h5>
+                    <ul className="text-sm text-gray-600 space-y-1">
+                      <li>✓ Système de réservation</li>
+                      <li>✓ Gestion des professionnels</li>
+                      <li>✓ Gestion des soins</li>
+                      <li>✓ Planning automatique</li>
+                      <li>✓ Gestion de stock</li>
+                      <li>✓ Statistiques</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
+              {/* Message d'information */}
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mt-6">
+                <p className="text-sm text-blue-800">
+                  💡 <strong>Astuce :</strong> Une fois le template configuré,
+                  vous pourrez gérer tout le contenu (photos, vidéos, textes,
+                  sections) depuis la page{" "}
+                  <code className="bg-blue-100 px-1 rounded">
+                    admin/contenu
+                  </code>
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Modal de Configuration du Template */}
+        {showConfigModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-bold text-gray-900">
+                  Configuration du Template Beauté & Esthétique
+                </h2>
+                <button
+                  onClick={() => setShowConfigModal(false)}
+                  className="text-gray-400 hover:text-gray-600"
+                >
+                  <X className="w-6 h-6" />
+                </button>
+              </div>
+
+              {/* Indicateur de progression */}
+              <div className="mb-6">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm font-medium text-gray-700">
+                    Étape {configStep} sur 5
+                  </span>
+                  <span className="text-sm text-gray-500">
+                    {Math.round((configStep / 5) * 100)}%
+                  </span>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div
+                    className="bg-pink-600 h-2 rounded-full transition-all duration-300"
+                    style={{ width: `${(configStep / 5) * 100}%` }}
+                  ></div>
+                </div>
+              </div>
+
+              {/* Étape 1 : Pages */}
+              {configStep === 1 && (
+                <div className="space-y-4">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                    Combien de pages principales voulez-vous ?
+                  </h3>
+                  <div className="space-y-3">
+                    {[
+                      {
+                        value: ["accueil", "services", "contact"],
+                        label: "3 pages (Accueil, Services, Contact)",
+                      },
+                      {
+                        value: [
+                          "accueil",
+                          "services",
+                          "equipe",
+                          "galerie",
+                          "contact",
+                        ],
+                        label: "5 pages (+ Équipe, Galerie)",
+                      },
+                      {
+                        value: [
+                          "accueil",
+                          "services",
+                          "equipe",
+                          "galerie",
+                          "blog",
+                          "apropos",
+                          "contact",
+                        ],
+                        label: "7 pages (+ Blog, À propos)",
+                      },
+                    ].map((option) => (
+                      <label
+                        key={option.label}
+                        className="flex items-center p-4 border border-gray-200 rounded-lg cursor-pointer hover:border-pink-500 transition-colors"
+                      >
+                        <input
+                          type="radio"
+                          name="pages"
+                          value={option.value.join(",")}
+                          onChange={(e) => {
+                            setTemplateConfig({
+                              ...templateConfig,
+                              pages: option.value,
+                            });
+                          }}
+                          className="mr-3"
+                        />
+                        <span className="text-gray-700">{option.label}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Étape 2 : Fonctionnalités */}
+              {configStep === 2 && (
+                <div className="space-y-4">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                    Quelles fonctionnalités souhaitez-vous activer ?
+                  </h3>
+                  <div className="space-y-3">
+                    {[
+                      {
+                        value: "reservation",
+                        label: "Système de réservation en ligne",
+                      },
+                      {
+                        value: "paiement",
+                        label: "Système de paiement en ligne",
+                      },
+                      { value: "blog", label: "Blog / Actualités" },
+                      { value: "galerie", label: "Galerie photos" },
+                      { value: "contact", label: "Formulaire de contact" },
+                      { value: "testimonials", label: "Témoignages clients" },
+                      {
+                        value: "certifications",
+                        label: "Certifications / Diplômes",
+                      },
+                    ].map((feature) => (
+                      <label
+                        key={feature.value}
+                        className="flex items-center p-4 border border-gray-200 rounded-lg cursor-pointer hover:border-pink-500 transition-colors"
+                      >
+                        <input
+                          type="checkbox"
+                          onChange={(e) => {
+                            const newFeatures = e.target.checked
+                              ? [...templateConfig.features, feature.value]
+                              : templateConfig.features.filter(
+                                  (f) => f !== feature.value
+                                );
+                            setTemplateConfig({
+                              ...templateConfig,
+                              features: newFeatures,
+                            });
+                          }}
+                          className="mr-3"
+                        />
+                        <span className="text-gray-700">{feature.label}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Étape 3 : Couleurs */}
+              {configStep === 3 && (
+                <div className="space-y-4">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                    Choisissez votre palette de couleurs
+                  </h3>
+                  <div className="grid grid-cols-2 gap-4">
+                    {[
+                      {
+                        value: "rose-blanc",
+                        label: "Rose & Blanc",
+                        colors: ["bg-pink-500", "bg-white"],
+                      },
+                      {
+                        value: "noir-rose",
+                        label: "Noir & Rose",
+                        colors: ["bg-black", "bg-pink-500"],
+                      },
+                      {
+                        value: "blanc-dore",
+                        label: "Blanc & Doré",
+                        colors: ["bg-white", "bg-yellow-400"],
+                      },
+                      {
+                        value: "personnalise",
+                        label: "Personnalisée",
+                        colors: ["bg-gray-200", "bg-gray-300"],
+                      },
+                    ].map((color) => (
+                      <label
+                        key={color.value}
+                        className="flex items-center p-4 border border-gray-200 rounded-lg cursor-pointer hover:border-pink-500 transition-colors"
+                      >
+                        <input
+                          type="radio"
+                          name="colors"
+                          value={color.value}
+                          onChange={(e) => {
+                            setTemplateConfig({
+                              ...templateConfig,
+                              colors: color.value,
+                            });
+                          }}
+                          className="mr-3"
+                        />
+                        <div className="flex items-center gap-3">
+                          <div className="flex gap-1">
+                            <div
+                              className={`w-6 h-6 ${color.colors[0]} rounded`}
+                            ></div>
+                            <div
+                              className={`w-6 h-6 ${color.colors[1]} rounded`}
+                            ></div>
+                          </div>
+                          <span className="text-gray-700">{color.label}</span>
+                        </div>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Étape 4 : Type d'établissement */}
+              {configStep === 4 && (
+                <div className="space-y-4">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                    Quel type d'établissement ?
+                  </h3>
+                  <div className="grid grid-cols-2 gap-3">
+                    {[
+                      "Salon de beauté",
+                      "Institut de beauté",
+                      "Barbershop",
+                      "Nail Bar",
+                      "Spa",
+                      "Cabinet indépendant",
+                      "Coiffure",
+                      "Centre multi-services",
+                    ].map((type) => (
+                      <label
+                        key={type}
+                        className="flex items-center p-3 border border-gray-200 rounded-lg cursor-pointer hover:border-pink-500 transition-colors"
+                      >
+                        <input
+                          type="radio"
+                          name="businessType"
+                          value={type}
+                          onChange={(e) => {
+                            setTemplateConfig({
+                              ...templateConfig,
+                              businessType: type,
+                            });
+                          }}
+                          className="mr-2"
+                        />
+                        <span className="text-sm text-gray-700">{type}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Étape 5 : Spécialités */}
+              {configStep === 5 && (
+                <div className="space-y-4">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                    Quelles spécialités proposez-vous ?
+                  </h3>
+                  <div className="grid grid-cols-2 gap-3">
+                    {[
+                      "Soins visage",
+                      "Épilation",
+                      "Ongles",
+                      "Cils",
+                      "Sourcils",
+                      "Maquillage",
+                      "Coiffure",
+                      "Barbier",
+                      "Massage",
+                      "Relaxation",
+                    ].map((specialty) => (
+                      <label
+                        key={specialty}
+                        className="flex items-center p-3 border border-gray-200 rounded-lg cursor-pointer hover:border-pink-500 transition-colors"
+                      >
+                        <input
+                          type="checkbox"
+                          onChange={(e) => {
+                            const newSpecialties = e.target.checked
+                              ? [...templateConfig.specialties, specialty]
+                              : templateConfig.specialties.filter(
+                                  (s) => s !== specialty
+                                );
+                            setTemplateConfig({
+                              ...templateConfig,
+                              specialties: newSpecialties,
+                            });
+                          }}
+                          className="mr-2"
+                        />
+                        <span className="text-sm text-gray-700">
+                          {specialty}
+                        </span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Boutons de navigation */}
+              <div className="flex items-center justify-between mt-8 pt-6 border-t border-gray-200">
+                <button
+                  onClick={() => {
+                    if (configStep > 1) {
+                      setConfigStep(configStep - 1);
+                    } else {
+                      setShowConfigModal(false);
+                    }
+                  }}
+                  className="px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors"
+                >
+                  {configStep === 1 ? "Annuler" : "Précédent"}
+                </button>
+                <button
+                  onClick={async () => {
+                    if (configStep < 5) {
+                      setConfigStep(configStep + 1);
+                    } else {
+                      // Sauvegarder la configuration via l'API
+                      try {
+                        setSaving(true);
+                        const response = await fetch(
+                          "/api/admin/site/configuration",
+                          {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify(templateConfig),
+                          }
+                        );
+
+                        const data = await response.json();
+
+                        if (data.success) {
+                          console.log(
+                            "✅ Configuration sauvegardée:",
+                            data.data
+                          );
+                          setShowConfigModal(false);
+                          alert("Configuration sauvegardée avec succès !");
+                          // Réinitialiser le questionnaire
+                          setConfigStep(1);
+                          setTemplateConfig({
+                            pages: [],
+                            features: [],
+                            colors: "",
+                            businessType: "",
+                            specialties: [],
+                          });
+                        } else {
+                          alert(
+                            "Erreur lors de la sauvegarde: " +
+                              (data.error || "Erreur inconnue")
+                          );
+                        }
+                      } catch (error) {
+                        console.error("❌ Erreur:", error);
+                        alert(
+                          "Erreur lors de la sauvegarde de la configuration"
+                        );
+                      } finally {
+                        setSaving(false);
+                      }
+                    }
+                  }}
+                  disabled={saving}
+                  className="px-6 py-2 bg-pink-600 text-white rounded-lg hover:bg-pink-700 transition-colors disabled:opacity-50"
+                >
+                  {saving
+                    ? "Sauvegarde..."
+                    : configStep === 5
+                    ? "Terminer"
+                    : "Suivant"}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Onglet Header */}
         {activeTab === "header" && (
           <div className="space-y-6">

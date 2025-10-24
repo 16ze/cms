@@ -22,10 +22,26 @@ export interface SiteContent {
 export class ContentStore {
   private static contentPath = path.join(process.cwd(), 'src', 'config', 'content.json');
   private static backupPath = path.join(process.cwd(), 'backups', 'content-backup.json');
+  
+  // ⚡ Cache en mémoire pour éviter les rebuilds Fast Refresh
+  private static contentCache: SiteContent | null = null;
+  private static cacheTime: number = 0;
+  private static readonly CACHE_DURATION = 60000; // 60 secondes
 
   // Charger le contenu depuis le fichier JSON
+  // ⚡ Utilise le cache pour éviter les rebuilds Fast Refresh
   static load(): SiteContent {
     try {
+      const now = Date.now();
+      
+      // Retourner le cache si valide
+      if (
+        this.contentCache &&
+        now - this.cacheTime < this.CACHE_DURATION
+      ) {
+        return this.contentCache;
+      }
+      
       if (!fs.existsSync(this.contentPath)) {
         console.warn('⚠️ Fichier content.json non trouvé, utilisation du contenu par défaut');
         return this.getDefaultContent();
@@ -33,6 +49,10 @@ export class ContentStore {
 
       const contentData = fs.readFileSync(this.contentPath, 'utf8');
       const content = JSON.parse(contentData);
+      
+      // Mettre à jour le cache
+      this.contentCache = content;
+      this.cacheTime = now;
       
       console.log('✅ Contenu chargé depuis content.json');
       return content;
@@ -43,6 +63,7 @@ export class ContentStore {
   }
 
   // Sauvegarder le contenu dans le fichier JSON
+  // ⚡ Invalide le cache après sauvegarde
   static save(content: SiteContent): boolean {
     try {
       // Créer un backup avant de sauvegarder
@@ -51,7 +72,11 @@ export class ContentStore {
       // Sauvegarder le nouveau contenu
       fs.writeFileSync(this.contentPath, JSON.stringify(content, null, 2), 'utf8');
       
-      console.log('✅ Contenu sauvegardé dans content.json');
+      // Invalider le cache pour forcer le rechargement
+      this.contentCache = null;
+      this.cacheTime = 0;
+      
+      console.log('✅ Contenu sauvegardé dans content.json et cache invalidé');
       return true;
     } catch (error) {
       console.error('❌ Erreur lors de la sauvegarde du contenu:', error);

@@ -12,40 +12,183 @@ import { ensureSuperAdmin } from "@/lib/tenant-auth";
 // Liste de TOUS les éléments disponibles
 const AVAILABLE_SIDEBAR_ELEMENTS = [
   // Corporate
-  { id: "projets", label: "Projets", icon: "Briefcase", href: "/admin/projets", category: "CORPORATE" },
-  { id: "equipe", label: "Équipe", icon: "Users", href: "/admin/equipe", category: "CORPORATE" },
-  
+  {
+    id: "projets",
+    label: "Projets",
+    icon: "Briefcase",
+    href: "/admin/projets",
+    category: "CORPORATE",
+  },
+  {
+    id: "equipe",
+    label: "Équipe",
+    icon: "Users",
+    href: "/admin/equipe",
+    category: "CORPORATE",
+  },
+
   // E-commerce
-  { id: "produits", label: "Produits", icon: "Package", href: "/admin/produits", category: "ECOMMERCE" },
-  { id: "commandes", label: "Commandes", icon: "ShoppingCart", href: "/admin/commandes", category: "ECOMMERCE" },
-  
+  {
+    id: "produits",
+    label: "Produits",
+    icon: "Package",
+    href: "/admin/produits",
+    category: "ECOMMERCE",
+  },
+  {
+    id: "commandes",
+    label: "Commandes",
+    icon: "ShoppingCart",
+    href: "/admin/commandes",
+    category: "ECOMMERCE",
+  },
+
   // Blog
-  { id: "articles", label: "Articles", icon: "FileText", href: "/admin/articles", category: "BLOG" },
-  { id: "categories", label: "Catégories", icon: "Tag", href: "/admin/categories", category: "BLOG" },
-  { id: "auteurs", label: "Auteurs", icon: "UserCheck", href: "/admin/auteurs", category: "BLOG" },
-  
+  {
+    id: "articles",
+    label: "Articles",
+    icon: "FileText",
+    href: "/admin/articles",
+    category: "BLOG",
+  },
+  {
+    id: "categories",
+    label: "Catégories",
+    icon: "Tag",
+    href: "/admin/categories",
+    category: "BLOG",
+  },
+  {
+    id: "auteurs",
+    label: "Auteurs",
+    icon: "UserCheck",
+    href: "/admin/auteurs",
+    category: "BLOG",
+  },
+
   // Restaurant
-  { id: "menu", label: "Menu", icon: "Utensils", href: "/admin/menu", category: "RESTAURANT" },
-  { id: "tables", label: "Tables", icon: "Grid", href: "/admin/tables", category: "RESTAURANT" },
-  
+  {
+    id: "menu",
+    label: "Menu",
+    icon: "Utensils",
+    href: "/admin/menu",
+    category: "RESTAURANT",
+  },
+  {
+    id: "tables",
+    label: "Tables",
+    icon: "Grid",
+    href: "/admin/tables",
+    category: "RESTAURANT",
+  },
+
   // Bien-être & Fitness
-  { id: "cours", label: "Cours", icon: "Dumbbell", href: "/admin/cours", category: "WELLNESS" },
-  { id: "coaches", label: "Coaches", icon: "UserCheck", href: "/admin/coaches", category: "WELLNESS" },
-  
+  {
+    id: "cours",
+    label: "Cours",
+    icon: "Dumbbell",
+    href: "/admin/cours",
+    category: "WELLNESS",
+  },
+  {
+    id: "coaches",
+    label: "Coaches",
+    icon: "UserCheck",
+    href: "/admin/coaches",
+    category: "WELLNESS",
+  },
+
   // Beauté & Esthétique
-  { id: "soins", label: "Soins", icon: "Sparkles", href: "/admin/soins", category: "BEAUTY" },
-  { id: "rendez-vous-beaute", label: "Rendez-vous", icon: "Calendar", href: "/admin/rendez-vous-beaute", category: "BEAUTY" },
-  
+  {
+    id: "soins",
+    label: "Soins",
+    icon: "Sparkles",
+    href: "/admin/soins",
+    category: "BEAUTY",
+  },
+  {
+    id: "rendez-vous-beaute",
+    label: "Rendez-vous",
+    icon: "Calendar",
+    href: "/admin/rendez-vous-beaute",
+    category: "BEAUTY",
+  },
+  {
+    id: "estheticiennes",
+    label: "Esthéticiennes",
+    icon: "Users",
+    href: "/admin/estheticiennes",
+    category: "BEAUTY",
+  },
+  {
+    id: "clients-beaute",
+    label: "Clients",
+    icon: "UserCheck",
+    href: "/admin/clients-beaute",
+    category: "BEAUTY",
+  },
+  {
+    id: "planning-beaute",
+    label: "Planning",
+    icon: "Calendar",
+    href: "/admin/planning-beaute",
+    category: "BEAUTY",
+  },
+  {
+    id: "produits-beaute",
+    label: "Produits",
+    icon: "Package",
+    href: "/admin/produits-beaute",
+    category: "BEAUTY",
+  },
+  {
+    id: "stats-beaute",
+    label: "Rapports",
+    icon: "BarChart3",
+    href: "/admin/stats-beaute",
+    category: "BEAUTY",
+  },
+
   // Consultation & Thérapie
-  { id: "patients", label: "Patients", icon: "Users", href: "/admin/patients", category: "CONSULTATION" },
-  { id: "therapeutes", label: "Thérapeutes", icon: "UserCheck", href: "/admin/therapeutes", category: "CONSULTATION" },
-  
+  {
+    id: "patients",
+    label: "Patients",
+    icon: "Users",
+    href: "/admin/patients",
+    category: "CONSULTATION",
+  },
+  {
+    id: "therapeutes",
+    label: "Thérapeutes",
+    icon: "UserCheck",
+    href: "/admin/therapeutes",
+    category: "CONSULTATION",
+  },
+
   // Prestations Professionnelles
-  { id: "devis", label: "Devis", icon: "FileText", href: "/admin/devis", category: "SERVICES" },
-  { id: "facturation", label: "Facturation", icon: "CreditCard", href: "/admin/facturation", category: "SERVICES" },
-  
+  {
+    id: "devis",
+    label: "Devis",
+    icon: "FileText",
+    href: "/admin/devis",
+    category: "SERVICES",
+  },
+  {
+    id: "facturation",
+    label: "Facturation",
+    icon: "CreditCard",
+    href: "/admin/facturation",
+    category: "SERVICES",
+  },
+
   // Galerie
-  { id: "galerie", label: "Galerie", icon: "Image", href: "/admin/galerie", category: "PORTFOLIO" },
+  {
+    id: "galerie",
+    label: "Galerie",
+    icon: "Image",
+    href: "/admin/galerie",
+    category: "PORTFOLIO",
+  },
 ];
 
 /**
@@ -92,7 +235,7 @@ export async function GET(
       href: config.href,
       category: config.category,
       orderIndex: config.orderIndex,
-      isFromTemplate: true, // Tous les éléments du template sont non-supprimables
+      isFromTemplate: config.isRequired || false, // Seuls les éléments required sont non-supprimables
     }));
 
     // Éléments disponibles (non encore ajoutés)
@@ -198,7 +341,9 @@ export async function POST(
       },
     });
 
-    console.log(`✅ Élément "${element.label}" ajouté pour tenant ${tenant.name}`);
+    console.log(
+      `✅ Élément "${element.label}" ajouté pour tenant ${tenant.name}`
+    );
 
     return NextResponse.json({
       success: true,
@@ -272,4 +417,3 @@ export async function DELETE(
     );
   }
 }
-

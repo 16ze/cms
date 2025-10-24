@@ -32,6 +32,7 @@ import {
   Dumbbell,
   Sparkles,
   CreditCard,
+  Layout,
 } from "lucide-react";
 import { hasPageAccess, UserRole } from "@/lib/permissions";
 import adminContent from "@/config/admin-content.json";
@@ -39,6 +40,7 @@ import { useAdminPermissions } from "@/hooks/use-admin-permissions";
 import { useNotifications } from "@/hooks/use-notifications";
 import { useTemplate } from "@/hooks/use-template";
 import AccordionMenu from "@/components/admin/AccordionMenu";
+import SiteEditorSidebar from "@/components/admin/SiteEditorSidebar";
 
 interface AdminUser {
   id: string;
@@ -51,15 +53,27 @@ interface AdminSidebarProps {
   activePage: string;
   onLogout: () => void;
   user: AdminUser | null;
+  sidebarMode?: "navigation" | "site-editor";
+  editorContent?: any;
+  onEditorSave?: (section: string, data: any) => Promise<void>;
+  onEditorBack?: () => void;
 }
 
 export default function AdminSidebar({
   activePage,
   onLogout,
   user,
+  sidebarMode = "navigation",
+  editorContent,
+  onEditorSave,
+  onEditorBack,
 }: AdminSidebarProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+
+  // Normaliser activePage pour extraire juste l'ID (ex: "/admin/site" -> "site")
+  const normalizedActivePage =
+    activePage.replace("/admin/", "").split("/")[0] || "dashboard";
 
   // Récupérer les permissions de l'utilisateur connecté
   const { hasPageAccess: hasPermission, loading: permissionsLoading } =
@@ -76,15 +90,24 @@ export default function AdminSidebar({
 
   useEffect(() => {
     if (currentTemplate?.id) {
-      console.log('📋 Loading sidebar for template:', currentTemplate.displayName, currentTemplate.id);
+      console.log(
+        "📋 Loading sidebar for template:",
+        currentTemplate.displayName,
+        currentTemplate.id
+      );
       fetch(`/api/admin/sidebar/${currentTemplate.id}`)
         .then((res) => res.json())
         .then((data) => {
           if (data.success && Array.isArray(data.data)) {
-            console.log('✅ Template sidebar loaded:', data.data.length, 'elements', data.data);
+            console.log(
+              "✅ Template sidebar loaded:",
+              data.data.length,
+              "elements",
+              data.data
+            );
             setTemplateSidebarElements(data.data);
           } else {
-            console.warn('⚠️ Template sidebar response not valid:', data);
+            console.warn("⚠️ Template sidebar response not valid:", data);
           }
         })
         .catch((err) => {
@@ -92,7 +115,7 @@ export default function AdminSidebar({
           // Fallback : continuer avec sidebar par défaut
         });
     } else {
-      console.log('⚠️ No currentTemplate, sidebar will use defaults only');
+      console.log("⚠️ No currentTemplate, sidebar will use defaults only");
     }
   }, [currentTemplate]);
 
@@ -187,26 +210,19 @@ export default function AdminSidebar({
       icon: UserPlus,
       requiredRoles: ["admin", "super_admin"] as UserRole[],
     },
+    {
+      id: "site",
+      href: "/admin/site",
+      label: "Site",
+      icon: Globe2,
+      requiredRoles: ["admin", "super_admin"] as UserRole[],
+    },
   ];
 
   // ============================================
   // ÉLÉMENTS UNIVERSAUX (toujours en bas)
   // ============================================
   const universalEndItems = [
-    {
-      id: "content",
-      href: "/admin/content",
-      label: nav.content || "Contenu",
-      icon: FileText,
-      requiredRoles: ["admin", "super_admin"] as UserRole[], // ✅ Accessible aux tenants
-    },
-    {
-      id: "site",
-      href: "/admin/site",
-      label: nav.site || "Site",
-      icon: Globe2,
-      requiredRoles: ["admin", "super_admin"] as UserRole[], // ✅ Accessible aux tenants
-    },
     {
       id: "templates",
       href: "/admin/templates",
@@ -237,7 +253,8 @@ export default function AdminSidebar({
     id: item.elementId || item.id, // Normaliser l'ID
     icon: getIconComponent(item.icon),
     // ✅ FIX: Autoriser admin et super_admin, pas seulement super_admin
-    requiredRoles: item.requiredRoles || (["admin", "super_admin"] as UserRole[]),
+    requiredRoles:
+      item.requiredRoles || (["admin", "super_admin"] as UserRole[]),
   }));
 
   // FUSION FINALE SANS DOUBLONS
@@ -295,8 +312,14 @@ export default function AdminSidebar({
     : navigationItems.filter((item) => {
         const hasAccess = hasPermission(item.id);
         // Log pour debug
-        if (templateSidebarElements.length > 0 && uniqueTemplateItems.some(t => t.id === item.id)) {
-          console.log(`🔍 Permission check - ${item.label} (${item.id}):`, hasAccess);
+        if (
+          templateSidebarElements.length > 0 &&
+          uniqueTemplateItems.some((t) => t.id === item.id)
+        ) {
+          console.log(
+            `🔍 Permission check - ${item.label} (${item.id}):`,
+            hasAccess
+          );
         }
         return hasAccess;
       });
@@ -399,95 +422,109 @@ export default function AdminSidebar({
             )}
           </div>
 
-          {/* Navigation */}
-          <nav className="px-6 py-2 flex-1 overflow-y-auto">
-            <div className="space-y-2">
-              {accessibleItems.map((item) => {
-                // Pour tous les éléments, rendu normal avec badges
-                const IconComponent = item.icon;
+          {/* Rendu conditionnel selon le mode */}
+          {sidebarMode === "site-editor" &&
+          editorContent &&
+          onEditorSave &&
+          onEditorBack ? (
+            /* Mode Éditeur - Remplacer complètement la navigation */
+            <SiteEditorSidebar
+              content={editorContent}
+              onSave={onEditorSave}
+              onBack={onEditorBack}
+            />
+          ) : (
+            /* Mode Navigation - Navigation standard */
+            <nav className="px-6 py-2 flex-1 overflow-y-auto">
+              <div className="space-y-2">
+                {accessibleItems.map((item) => {
+                  // Pour tous les éléments, rendu normal avec badges
+                  const IconComponent = item.icon;
 
-                // Déterminer le compteur de notifications pour cet élément
-                let notificationCount = 0;
-                const categoryKey = notificationCategoryMap[item.id];
-                if (categoryKey) {
-                  notificationCount = getNotificationCount(categoryKey);
-                }
+                  // Déterminer le compteur de notifications pour cet élément
+                  let notificationCount = 0;
+                  const categoryKey = notificationCategoryMap[item.id];
+                  if (categoryKey) {
+                    notificationCount = getNotificationCount(categoryKey);
+                  }
 
-                // Si c'est "users", on affiche le badge système
-                if (item.id === "users") {
-                  notificationCount = systemCount;
-                }
+                  // Si c'est "users", on affiche le badge système
+                  if (item.id === "users") {
+                    notificationCount = systemCount;
+                  }
 
-                return (
-                  <div key={item.id} className="mb-2">
-                    <Link
-                      href={item.href}
-                      className={`flex items-center justify-between p-3 rounded-xl transition-all duration-200 ${
-                        activePage === item.id
-                          ? "text-blue-600 bg-blue-50 font-semibold shadow-sm"
-                          : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
-                      }`}
-                      onClick={handleNavLinkClick}
-                    >
-                      <div className="flex items-center">
-                        <IconComponent className="w-5 h-5 mr-3" />
-                        {item.label}
-                      </div>
-                      <NotificationBadge count={notificationCount} />
-                    </Link>
+                  return (
+                    <div key={item.id} className="mb-2">
+                      <Link
+                        href={item.href}
+                        className={`flex items-center justify-between p-3 rounded-xl transition-all duration-200 ${
+                          normalizedActivePage === item.id
+                            ? "text-blue-600 bg-blue-50 font-semibold shadow-sm"
+                            : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+                        }`}
+                        onClick={handleNavLinkClick}
+                      >
+                        <div className="flex items-center">
+                          <IconComponent className="w-5 h-5 mr-3" />
+                          {item.label}
+                        </div>
+                        <NotificationBadge count={notificationCount} />
+                      </Link>
+                    </div>
+                  );
+                })}
+
+                {/* Menu accordéon SEO - Toujours visible pour ceux qui ont les permissions */}
+                {(hasPermission("keywords") ||
+                  hasPermission("analysis") ||
+                  hasPermission("performance") ||
+                  hasPermission("seo-settings")) && (
+                  <div className="mb-2">
+                    <AccordionMenu
+                      title="SEO"
+                      icon={TrendingUp}
+                      items={[
+                        {
+                          id: "seo-keywords",
+                          label: "Analyse des mots-clés",
+                          href: "/admin/seo/keywords",
+                          icon: Search,
+                        },
+                        {
+                          id: "seo-analysis",
+                          label: "Analyse Technique",
+                          href: "/admin/seo/analysis",
+                          icon: BarChart3,
+                        },
+                        {
+                          id: "seo-performance",
+                          label: "Performance",
+                          href: "/admin/seo/performance",
+                          icon: Zap,
+                        },
+                        {
+                          id: "seo-settings",
+                          label: "Paramètres SEO",
+                          href: "/admin/seo/settings",
+                          icon: Settings,
+                        },
+                      ]}
+                      isActive={
+                        normalizedActivePage.startsWith("seo") ||
+                        normalizedActivePage === "keywords"
+                      }
+                      defaultOpen={
+                        normalizedActivePage.startsWith("seo") ||
+                        normalizedActivePage === "keywords"
+                      }
+                      className="mb-2"
+                    />
                   </div>
-                );
-              })}
-              
-              {/* Menu accordéon SEO - Toujours visible pour ceux qui ont les permissions */}
-              {(hasPermission("keywords") || 
-                hasPermission("analysis") || 
-                hasPermission("performance") || 
-                hasPermission("seo-settings")) && (
-                <div className="mb-2">
-                  <AccordionMenu
-                    title="SEO"
-                    icon={TrendingUp}
-                    items={[
-                      {
-                        id: "seo-keywords",
-                        label: "Analyse des mots-clés",
-                        href: "/admin/seo/keywords",
-                        icon: Search,
-                      },
-                      {
-                        id: "seo-analysis",
-                        label: "Analyse Technique",
-                        href: "/admin/seo/analysis",
-                        icon: BarChart3,
-                      },
-                      {
-                        id: "seo-performance",
-                        label: "Performance",
-                        href: "/admin/seo/performance",
-                        icon: Zap,
-                      },
-                      {
-                        id: "seo-settings",
-                        label: "Paramètres SEO",
-                        href: "/admin/seo/settings",
-                        icon: Settings,
-                      },
-                    ]}
-                    isActive={
-                      activePage.startsWith("seo") ||
-                      activePage === "keywords"
-                    }
-                    defaultOpen={
-                      activePage.startsWith("seo") ||
-                      activePage === "keywords"
-                    }
-                    className="mb-2"
-                  />
-                </div>
-              )}
-            </div>
-          </nav>
+                )}
+              </div>
+            </nav>
+          )}
+          {/* Fin du rendu conditionnel */}
 
           {/* Profile and logout */}
           <div className="p-6 space-y-4">

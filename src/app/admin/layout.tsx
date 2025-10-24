@@ -7,6 +7,8 @@ import AdminAssistant from "@/components/admin/admin-assistant";
 import NotificationBell from "@/components/admin/NotificationBell";
 import adminContentData from "@/config/admin-content.json";
 import { useAdminSession } from "@/hooks/use-admin-session";
+import { useSidebarMode } from "@/hooks/use-sidebar-mode";
+import { useFrontendContent } from "@/hooks/use-frontend-content";
 import {
   Menu,
   X,
@@ -47,6 +49,46 @@ export default function AdminLayout({
 
   // Récupérer l'utilisateur depuis la session
   const { user: sessionUser, loading: sessionLoading } = useAdminSession();
+
+  // Hook pour gérer le mode de la sidebar
+  const { mode: sidebarMode } = useSidebarMode();
+
+  // Charger le contenu frontend si on est en mode éditeur
+  const { content: frontendContent, reload: reloadContent } =
+    useFrontendContent({
+      pageSlug: "accueil",
+      autoSync: false, // ✅ Désactivé pour éviter le refresh permanent
+    });
+
+  // Fonction pour sauvegarder le contenu édité
+  const handleEditorSave = async (section: string, data: any) => {
+    try {
+      await fetch("/api/admin/frontend-content", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          pageSlug: "accueil",
+          sectionSlug: section,
+          dataType: "text",
+          content: data,
+        }),
+      });
+
+      // Recharger le contenu après sauvegarde
+      await reloadContent();
+
+      // Déclencher un événement pour recharger l'iframe
+      window.dispatchEvent(new CustomEvent("content-updated"));
+    } catch (error) {
+      console.error("Erreur sauvegarde:", error);
+      throw error;
+    }
+  };
+
+  // Fonction pour revenir au menu principal
+  const handleEditorBack = () => {
+    router.push("/admin/dashboard");
+  };
 
   // Vérifier si on est en mode impersonation
   useEffect(() => {
@@ -136,6 +178,10 @@ export default function AdminLayout({
             router.push("/login");
           }}
           user={userInfo}
+          sidebarMode={sidebarMode === "default" ? "navigation" : sidebarMode}
+          editorContent={frontendContent}
+          onEditorSave={handleEditorSave}
+          onEditorBack={handleEditorBack}
         />
       </div>
 
@@ -146,7 +192,7 @@ export default function AdminLayout({
           <div className="bg-gradient-to-r from-purple-600 via-pink-600 to-purple-600 text-white px-4 py-3 shadow-lg relative overflow-hidden">
             {/* Animation background */}
             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent animate-shimmer"></div>
-            
+
             <div className="relative flex items-center justify-between max-w-7xl mx-auto">
               <div className="flex items-center gap-3">
                 <div className="flex items-center gap-2">
@@ -169,7 +215,7 @@ export default function AdminLayout({
             </div>
           </div>
         )}
-        
+
         {/* Header - Design épuré sans bordures marquées */}
         <header className="bg-white/80 backdrop-blur-sm shadow-sm">
           <div className="px-4 lg:px-8 py-4 lg:py-5">

@@ -1457,13 +1457,24 @@ model Tenant {
   users                     TenantUser[]
   siteTemplate              SiteTemplate?
   seoSettings               TenantSeoSettings?
+  siteConfiguration         SiteConfiguration?
+  siteSections              SiteSection[]
+  siteMedias                SiteMedia[]
+  siteButtons               SiteButton[]
   
   // Relations vers données
   clients                   Client[]
+  beautyBusiness            BeautyBusiness?
   beautyTreatments          BeautyTreatment[]
   beautyAppointments        BeautyAppointment[]
+  beautyProfessionals       BeautyProfessional[]
+  beautyClients             BeautyClient[]
+  beautyProfessionalSchedules BeautyProfessionalSchedule[]
+  beautyProducts            BeautyProduct[]
   wellnessCourses           WellnessCourse[]
   wellnessCoaches           WellnessCoach[]
+  frontendContents          FrontendContent[]
+  googleReviews             GoogleReview[]
   wellnessBookings          WellnessBooking[]
   products                  Product[]
   orders                    Order[]
@@ -1521,9 +1532,52 @@ enum TenantUserRole {
   VIEWER
 }
 
+// ===== CONTENU FRONTEND DYNAMIQUE =====
 
+model FrontendContent {
+  id          String   @id @default(uuid())
+  tenantId    String
+  pageSlug    String   // "accueil", "prestations", etc.
+  sectionSlug String   // "hero", "services", "team", etc.
+  dataType    String   // "text", "service", "team", "contact", "review"
+  content     String   // JSON flexible
+  orderIndex  Int      @default(0)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  tenant      Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  
+  @@unique([tenantId, pageSlug, sectionSlug, dataType])
+  @@index([tenantId])
+  @@index([pageSlug])
+  @@index([sectionSlug])
+}
 
+// ===== AVIS GOOGLE =====
 
+model GoogleReview {
+  id          String   @id @default(uuid())
+  tenantId    String
+  authorName  String
+  rating      Int      // 1-5
+  text        String
+  date        DateTime
+  authorUrl   String?
+  photoUrl    String?
+  isVerified  Boolean  @default(false)
+  isVisible   Boolean  @default(true)
+  orderIndex  Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  tenant      Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  
+  @@index([tenantId])
+  @@index([rating])
+  @@index([isVisible])
+  @@index([orderIndex])
+}
 // ===== GESTION DES PROJETS =====
 
 model Project {
@@ -1997,13 +2051,34 @@ enum BookingStatus {
 
 // ===== BEAUTY (BEAUTÉ) TEMPLATE =====
 
+// Configuration de l'établissement de beauté (type et spécialités)
+model BeautyBusiness {
+  id            String              @id @default(uuid())
+  tenantId      String              @unique
+  businessType  BeautyBusinessType
+  specialties   String              // JSON array de BeautySpecialty
+  businessName  String?             // Nom personnalisé de l'établissement
+  customTitle   String?             // Titre personnalisé ("Mes Prestations", "Services", etc.)
+  professionalTitle String?          // Titre des professionnels ("Esthéticiennes", "Coiffeurs", etc.)
+  clientTitle   String?             // Titre des clients ("Clients", "Guests", etc.)
+  appointmentTitle String?          // Titre des rendez-vous ("Rendez-vous", "Consultations", etc.)
+  createdAt     DateTime            @default(now())
+  updatedAt     DateTime            @updatedAt
+  
+  tenant        Tenant              @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  
+  @@index([tenantId])
+  @@index([businessType])
+}
+
 model BeautyTreatment {
   id          String   @id @default(uuid())
   tenantId    String
   name        String
-  slug        String   @unique
+  slug        String
   description String? 
-  category    String
+  specialty   String   @default("SOINS_VISAGE") // BeautySpecialty (stored as string)
+  subcategory String?  // Sous-catégorie flexible : "Pose d'ongles", "Extensions cils", etc.
   duration    Int      // minutes
   price       Float
   imageUrl    String?
@@ -2013,18 +2088,22 @@ model BeautyTreatment {
   
   appointments BeautyAppointment[]
   
-  
   tenant      Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  
+  @@unique([tenantId, slug])
   @@index([slug])
-  @@index([category])
+  @@index([specialty])
+  @@index([subcategory])
   @@index([isActive])
   @@index([tenantId])
 }
 
 model BeautyAppointment {
   id            String   @id @default(uuid())
-  tenantId    String
+  tenantId      String
   treatmentId   String
+  professionalId String?  // Professionnel assigné (BeautyProfessional)
+  clientId      String?   // Client assigné (BeautyClient)
   customerName  String
   customerEmail String
   customerPhone String
@@ -2037,15 +2116,123 @@ model BeautyAppointment {
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
   
-  treatment     BeautyTreatment @relation(fields: [treatmentId], references: [id])
+  treatment     BeautyTreatment      @relation(fields: [treatmentId], references: [id])
+  professional  BeautyProfessional?  @relation(fields: [professionalId], references: [id])
+  client        BeautyClient?        @relation(fields: [clientId], references: [id])
   
+  tenant        Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   
-  tenant      Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   @@index([treatmentId])
+  @@index([professionalId])
+  @@index([clientId])
   @@index([date])
   @@index([status])
   @@index([customerEmail])
   @@index([tenantId])
+}
+
+// Modèle: Professionnels de beauté (generaliste pour tous les métiers)
+model BeautyProfessional {
+  id            String   @id @default(uuid())
+  tenantId      String
+  firstName     String
+  lastName      String
+  email         String
+  phone         String?
+  specialties   String   // JSON array: ["ONGLES", "CILS", "MAQUILLAGE"] (BeautySpecialty)
+  jobTitle      String?  // "Prothésiste ongulaire", "Coiffeur", "Esthéticienne", etc.
+  bio           String?
+  avatarUrl     String?
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  appointments BeautyAppointment[]
+  schedules    BeautyProfessionalSchedule[]
+  
+  tenant       Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  
+  @@index([tenantId])
+  @@index([isActive])
+  @@index([email])
+}
+
+// Nouveau modèle: Clients Beauté
+model BeautyClient {
+  id          String   @id @default(uuid())
+  tenantId    String
+  firstName   String
+  lastName    String
+  email       String
+  phone       String?
+  dateOfBirth DateTime?
+  address     String?
+  city        String?
+  postalCode  String?
+  allergies   String? // JSON: ["Parfum", "Latex"]
+  preferences String? // JSON: ["Soins visage", "Massage"]
+  notes       String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  appointments BeautyAppointment[]
+  
+  tenant      Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  @@index([tenantId])
+  @@index([email])
+  @@index([isActive])
+}
+
+// Modèle: Horaires des Professionnels de beauté
+model BeautyProfessionalSchedule {
+  id              String   @id @default(uuid())
+  tenantId        String
+  professionalId  String
+  dayOfWeek       Int      // 0=Dimanche, 1=Lundi, ..., 6=Samedi
+  startTime       String   // Format "HH:MM"
+  endTime         String   // Format "HH:MM"
+  isActive        Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  professional    BeautyProfessional @relation(fields: [professionalId], references: [id], onDelete: Cascade)
+  tenant          Tenant             @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  
+  @@index([tenantId])
+  @@index([professionalId])
+  @@index([dayOfWeek])
+}
+
+// Nouveau modèle: Produits de Beauté
+model BeautyProduct {
+  id            String   @id @default(uuid())
+  tenantId      String
+  name          String
+  slug          String
+  description   String?
+  category      String   // "Soins visage", "Maquillage", "Accessoires", etc.
+  brand         String?
+  sku           String?  // Code produit
+  price         Float?
+  cost          Float?   // Prix d'achat
+  quantity      Int      @default(0)
+  minQuantity   Int      @default(5) // Seuil d'alerte
+  maxQuantity   Int?     // Stock maximum
+  unit          String   @default("pièce") // "pièce", "ml", "g", etc.
+  imageUrl      String?
+  isActive      Boolean  @default(true)
+  isTracked     Boolean  @default(true) // Suivi du stock
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  tenant        Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  
+  @@unique([tenantId, slug])
+  @@index([tenantId])
+  @@index([category])
+  @@index([isActive])
+  @@index([quantity])
 }
 
 enum AppointmentStatus {
@@ -2055,6 +2242,37 @@ enum AppointmentStatus {
   COMPLETED
   CANCELLED
   NO_SHOW
+}
+
+// ===== ENUMS POUR SYSTÈME MULTI-MÉTIERS BEAUTÉ =====
+
+enum BeautyBusinessType {
+  SALON_BEAUTE
+  INSTITUT_BEAUTE
+  BARBERSHOP
+  NAIL_BAR
+  SPA
+  CABINET_INDEPENDANT
+  COIFFURE
+  CENTRE_MULTI_SERVICES
+}
+
+enum BeautySpecialty {
+  SOINS_VISAGE
+  EPILATION
+  ONGLES
+  CILS
+  SOURCILS
+  MAQUILLAGE
+  COIFFURE
+  BARBER
+  MASSAGE
+  RELAXATION
+  COSMETIQUE
+  MICROBLADING
+  PIERCING
+  TATOUAGE
+  BRONZAGE
 }
 
 // ===== CONSULTATION TEMPLATE =====
@@ -2303,5 +2521,77 @@ model GalleryItem {
   @@index([category])
   @@index([featured])
   @@index([orderIndex])
+  @@index([tenantId])
+}
+
+// ===== CONFIGURATION DU SITE =====
+
+model SiteConfiguration {
+  id              String   @id @default(uuid())
+  tenantId        String   @unique
+  pages           String   // JSON array
+  features        String   // JSON array
+  colors          String
+  businessType    String
+  specialties     String   // JSON array
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  tenant          Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  
+  @@index([tenantId])
+}
+
+model SiteSection {
+  id          String   @id @default(uuid())
+  tenantId    String
+  pageSlug    String   // "accueil", "prestations", etc.
+  sectionId   String   // "hero", "services", etc.
+  content     String   // JSON
+  orderIndex  Int
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  tenant      Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  
+  @@unique([tenantId, pageSlug, sectionId])
+  @@index([tenantId])
+  @@index([pageSlug])
+}
+
+model SiteMedia {
+  id          String   @id @default(uuid())
+  tenantId    String
+  type        String   // "logo", "hero", "gallery", "professional"
+  url         String
+  alt         String?
+  caption     String?
+  orderIndex  Int
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  tenant      Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  
+  @@index([tenantId])
+  @@index([type])
+}
+
+model SiteButton {
+  id          String   @id @default(uuid())
+  tenantId    String
+  key         String   // "reservation", "contact", etc.
+  label       String
+  url         String
+  style       String   // "primary", "secondary", "outline"
+  color       String   // hex color
+  icon        String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  tenant      Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  
+  @@unique([tenantId, key])
   @@index([tenantId])
 }
