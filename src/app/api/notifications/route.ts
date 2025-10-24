@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { notificationService } from "@/lib/notification-service";
 import { ensureAuthenticated } from "@/lib/tenant-auth";
+import { ensureAdmin } from "@/lib/require-admin";
 import { NotificationCategory, NotificationPriority } from "@prisma/client";
 
 /**

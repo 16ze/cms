@@ -5,7 +5,7 @@ import path from "path";
  * 🎯 Service SIMPLIFIÉ de gestion de contenu
  * Charge UNIQUEMENT depuis les fichiers JSON
  * Plus de base de données, plus de conflits !
- * 
+ *
  * ⚡ OPTIMISATION: Cache en mémoire pour éviter les rebuilds Fast Refresh
  */
 export class JSONContentService {
@@ -37,7 +37,7 @@ export class JSONContentService {
   static async loadAll(): Promise<Record<string, any>> {
     try {
       const now = Date.now();
-      
+
       // Retourner le cache si valide
       if (
         this.contentCache &&
@@ -52,11 +52,11 @@ export class JSONContentService {
         "utf-8"
       );
       const content = JSON.parse(fileContent);
-      
+
       // Mettre à jour le cache
       this.contentCache = content;
       this.contentCacheTime = now;
-      
+
       console.log("✅ [JSONContentService] Contenu chargé avec succès");
       return content;
     } catch (error) {
@@ -100,7 +100,7 @@ export class JSONContentService {
   static async loadCompany(): Promise<any> {
     try {
       const now = Date.now();
-      
+
       // Retourner le cache si valide
       if (
         this.companyCache &&
@@ -115,11 +115,11 @@ export class JSONContentService {
         "utf-8"
       );
       const company = JSON.parse(fileContent);
-      
+
       // Mettre à jour le cache
       this.companyCache = company;
       this.companyCacheTime = now;
-      
+
       console.log("✅ [JSONContentService] Company chargé");
       return company;
     } catch (error) {
@@ -142,12 +142,14 @@ export class JSONContentService {
         JSON.stringify(content, null, 2),
         "utf-8"
       );
-      
+
       // Invalider le cache pour forcer le rechargement
       this.contentCache = null;
       this.contentCacheTime = 0;
-      
-      console.log("💾 [JSONContentService] Contenu sauvegardé et cache invalidé");
+
+      console.log(
+        "💾 [JSONContentService] Contenu sauvegardé et cache invalidé"
+      );
     } catch (error) {
       console.error("❌ [JSONContentService] Erreur sauvegarde:", error);
       throw error;
@@ -165,13 +167,3 @@ export class JSONContentService {
     console.log("🔄 [JSONContentService] Cache invalidé");
   }
 }
-
-
-
-
-
-
-
-
-
-

@@ -75,6 +75,8 @@ export function useNotifications(options: UseNotificationsOptions = {}) {
 
       const response = await fetch(url, {
         credentials: "include",
+        // Ajouter un timeout pour éviter les erreurs "Failed to fetch"
+        signal: AbortSignal.timeout(5000),
       });
 
       console.log("📬 Response status:", response.status);
@@ -97,7 +99,14 @@ export function useNotifications(options: UseNotificationsOptions = {}) {
       }
     } catch (err: any) {
       console.error("❌ Erreur récupération notifications:", err);
-      setError(err.message);
+      
+      // Si c'est une erreur de timeout ou de réseau, ne pas interrompre l'application
+      if (err.name === 'TimeoutError' || err.name === 'TypeError') {
+        console.warn("⚠️ Connexion interrompue, utilisation de l'état existant");
+        setError(null); // Ne pas afficher d'erreur pour les problèmes réseau temporaires
+      } else {
+        setError(err.message);
+      }
     } finally {
       setLoading(false);
     }
