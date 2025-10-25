@@ -87,10 +87,16 @@ export default function SiteEditorSidebar({
     initializeFields(sectionId);
   };
 
-  // Initialiser au premier rendu et quand activeSection change
+  // Initialiser au premier rendu et quand activeSection OU content change
   useEffect(() => {
-    initializeFields(activeSection);
-  }, [activeSection]);
+    if (content && Object.keys(content).length > 0) {
+      console.log(
+        "🔄 Contenu chargé, initialisation des champs pour:",
+        activeSection
+      );
+      initializeFields(activeSection);
+    }
+  }, [activeSection, content]);
 
   const handleFieldChange = (fieldId: string, value: any) => {
     setFields((prev: any) => ({ ...prev, [fieldId]: value }));

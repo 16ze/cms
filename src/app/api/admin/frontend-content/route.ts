@@ -57,11 +57,24 @@ export async function POST(request: NextRequest) {
     const { tenantFilter } = await getTenantFilter(request);
 
     const data = await request.json();
+    console.log("📥 [API] Données reçues:", {
+      pageSlug: data.pageSlug,
+      sectionSlug: data.sectionSlug,
+      dataType: data.dataType,
+      content: data.content,
+    });
+
     const { pageSlug, sectionSlug, dataType, content, orderIndex, isActive } =
       data;
 
     // Validation
     if (!pageSlug || !sectionSlug || !dataType || !content) {
+      console.error("❌ [API] Données manquantes:", {
+        pageSlug,
+        sectionSlug,
+        dataType,
+        hasContent: !!content,
+      });
       return NextResponse.json(
         { error: "Données manquantes" },
         { status: 400 }
@@ -84,6 +97,7 @@ export async function POST(request: NextRequest) {
 
     if (existing) {
       // Mettre à jour
+      console.log("🔄 [API] Mise à jour du contenu existant:", existing.id);
       result = await prisma.frontendContent.update({
         where: { id: existing.id },
         data: {
@@ -93,8 +107,10 @@ export async function POST(request: NextRequest) {
           isActive: isActive !== undefined ? isActive : existing.isActive,
         },
       });
+      console.log("✅ [API] Contenu mis à jour avec succès");
     } else {
       // Créer
+      console.log("➕ [API] Création d'un nouveau contenu");
       result = await prisma.frontendContent.create({
         data: {
           ...tenantFilter,
@@ -106,6 +122,7 @@ export async function POST(request: NextRequest) {
           isActive: isActive !== undefined ? isActive : true,
         },
       });
+      console.log("✅ [API] Contenu créé avec succès");
     }
 
     return NextResponse.json(
