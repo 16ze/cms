@@ -66,15 +66,14 @@ export default function AdminLayout({
     autoSync: false, // ✅ Désactivé pour éviter le refresh permanent
   });
 
-  // Charger le contenu manuellement au montage pour l'éditeur
+  // Charger le contenu manuellement UNE SEULE FOIS au montage
+  const [hasLoadedContent, setHasLoadedContent] = useState(false);
+
   useEffect(() => {
-    if (
-      sidebarMode === "site-editor" &&
-      !contentLoading &&
-      Object.keys(frontendContent).length === 0
-    ) {
-      console.log("🔍 [Layout] Chargement manuel du contenu pour l'éditeur");
+    if (sidebarMode === "site-editor" && !contentLoading && !hasLoadedContent) {
+      console.log("🔍 [Layout] Chargement initial du contenu pour l'éditeur");
       reloadContent();
+      setHasLoadedContent(true);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sidebarMode]);
@@ -120,6 +119,9 @@ export default function AdminLayout({
 
       // Recharger le contenu après sauvegarde
       await reloadContent();
+
+      // Réinitialiser le flag pour permettre un nouveau chargement si nécessaire
+      setHasLoadedContent(false);
 
       // Déclencher un événement pour recharger l'iframe
       window.dispatchEvent(new CustomEvent("content-updated"));
