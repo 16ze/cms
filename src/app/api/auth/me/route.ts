@@ -1,18 +1,20 @@
 /**
  * API: GET CURRENT USER
  * Route: GET /api/auth/me
- * 
- * Retourne les informations de l'utilisateur connecté
+ *
+ * Retourne les informations de l'utilisateur connecté (admin ou tenant)
  */
 
 import { NextRequest, NextResponse } from "next/server";
-import { getAuthenticatedUser } from "@/lib/tenant-auth";
+import { verifyAdminSessionFromRequest } from "@/lib/admin-session";
+import { prisma } from "@/lib/prisma";
 
 export async function GET(request: NextRequest) {
   try {
-    const user = await getAuthenticatedUser(request);
+    // Vérifier la session admin (unifiée)
+    const sessionResult = verifyAdminSessionFromRequest(request);
 
-    if (!user) {
+    if (!sessionResult.success) {
       return NextResponse.json(
         {
           success: false,
@@ -22,10 +24,42 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    return NextResponse.json({
-      success: true,
-      user,
-    });
+    const sessionData = sessionResult.data;
+
+    // Déterminer le type d'utilisateur basé sur les données de session
+    if (sessionData.role === "SUPER_ADMIN") {
+      // Utilisateur admin (AdminUser)
+      return NextResponse.json({
+        success: true,
+        user: {
+          id: sessionData.id,
+          name: sessionData.name,
+          email: sessionData.email,
+          type: "SUPER_ADMIN",
+        },
+      });
+    } else if (sessionData.role === "TENANT_ADMIN") {
+      // Utilisateur tenant (TenantUser)
+      return NextResponse.json({
+        success: true,
+        user: {
+          id: sessionData.id,
+          name: sessionData.name,
+          email: sessionData.email,
+          type: "TENANT_ADMIN",
+          tenantId: sessionData.tenantId,
+          tenantSlug: sessionData.tenantSlug,
+        },
+      });
+    } else {
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Type d'utilisateur non reconnu",
+        },
+        { status: 400 }
+      );
+    }
   } catch (error) {
     console.error("❌ Erreur /api/auth/me:", error);
     return NextResponse.json(
@@ -37,4 +71,3 @@ export async function GET(request: NextRequest) {
     );
   }
 }
-

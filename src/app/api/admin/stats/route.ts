@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { ensureAuthenticated } from "@/lib/tenant-auth";
-import { requireTenant } from "@/middleware/tenant-context";
+import { verifyAdminSessionFromRequest } from "@/lib/admin-session";
+import { prisma } from "@/lib/prisma";
 
 // Interface pour les statistiques du dashboard
 interface DashboardStats {
@@ -48,27 +48,32 @@ function getRelativeTime(date: Date): string {
   }
 }
 
-
 export async function GET(request: NextRequest) {
   try {
     console.log("📊 API: Récupération des statistiques du dashboard");
 
-    // Vérifier l'authentification
-    const authResult = await ensureAuthenticated(request);
-    if (authResult instanceof NextResponse) {
-      return authResult; // Erreur d'authentification
+    // Vérifier l'authentification (système unifié)
+    const sessionResult = verifyAdminSessionFromRequest(request);
+    if (!sessionResult.success) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Authentification requise.",
+        },
+        { status: 401 }
+      );
     }
 
-    const user = authResult;
+    const sessionData = sessionResult.data;
     console.log(
       "📊 API: Récupération des statistiques du dashboard pour:",
-      user.email,
+      sessionData.email,
       "Type:",
-      user.type
+      sessionData.role
     );
 
     // Si c'est un Super Admin, rediriger vers son dashboard
-    if (user.type === "SUPER_ADMIN") {
+    if (sessionData.role === "SUPER_ADMIN") {
       return NextResponse.json(
         { error: "Super Admin doit utiliser /super-admin/dashboard" },
         { status: 403 }
@@ -76,7 +81,10 @@ export async function GET(request: NextRequest) {
     }
 
     // Récupérer le tenantId pour filtrer les données
-    const { tenantId } = await requireTenant(request);
+    const tenantId = sessionData.tenantId;
+    if (!tenantId) {
+      return NextResponse.json({ error: "Tenant ID requis" }, { status: 400 });
+    }
 
     console.log("🔒 Tenant ID:", tenantId);
 
@@ -102,7 +110,11 @@ export async function GET(request: NextRequest) {
     // TODO: Implémenter avec les vraies données du tenant
     const sortedActivity: Array<{
       id: string;
-      type: "reservation_created" | "reservation_confirmed" | "reservation_cancelled" | "user_created";
+      type:
+        | "reservation_created"
+        | "reservation_confirmed"
+        | "reservation_cancelled"
+        | "user_created";
       message: string;
       timestamp: string;
       relativeTime: string;
@@ -114,7 +126,9 @@ export async function GET(request: NextRequest) {
       recentActivity: sortedActivity,
     };
 
-    console.log("✅ API: Statistiques du dashboard (Tenant) récupérées avec succès");
+    console.log(
+      "✅ API: Statistiques du dashboard (Tenant) récupérées avec succès"
+    );
     console.log("🔒 Tenant ID:", tenantId);
     console.log("📈 Réservations:", reservationStats);
     console.log("👥 Utilisateurs:", userStats);

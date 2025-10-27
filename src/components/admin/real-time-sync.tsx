@@ -51,18 +51,20 @@ export default function RealTimeSync({ onContentUpdate, autoSync = true }: RealT
     }
   }, [onContentUpdate]);
 
-  // Synchronisation automatique
+  // PLUS DE SYNCHRONISATION AUTOMATIQUE - Polling désactivé pour éviter les auto-refresh
+  // La synchronisation se fait uniquement manuellement ou après une action utilisateur
   useEffect(() => {
     if (!autoSync) return;
 
-    const interval = setInterval(() => {
-      syncContent();
-    }, 30000); // Synchronisation toutes les 30 secondes
+    // DÉSACTIVÉ - Le polling automatique cause des rafraîchissements constants
+    // const interval = setInterval(() => {
+    //   syncContent();
+    // }, 30000);
 
-    return () => clearInterval(interval);
+    // return () => clearInterval(interval);
   }, [autoSync, syncStatus]);
 
-  // Vérifier la connexion
+  // Vérifier la connexion SEULEMENT au montage - plus de polling
   useEffect(() => {
     const checkConnection = async () => {
       try {
@@ -74,9 +76,9 @@ export default function RealTimeSync({ onContentUpdate, autoSync = true }: RealT
     };
 
     checkConnection();
-    const interval = setInterval(checkConnection, 10000); // Vérifier toutes les 10 secondes
-
-    return () => clearInterval(interval);
+    // PLUS DE VÉRIFICATION PERIODIQUE - évite les requêtes inutiles
+    // const interval = setInterval(checkConnection, 10000);
+    // return () => clearInterval(interval);
   }, []);
 
   // Synchronisation immédiate au montage

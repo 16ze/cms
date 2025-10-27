@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { notificationService } from "@/lib/notification-service";
-import { ensureAuthenticated } from "@/lib/tenant-auth";
-import { ensureAdmin } from "@/lib/require-admin";
+import { verifyAdminSessionFromRequest } from "@/lib/admin-session";
 import { NotificationCategory, NotificationPriority } from "@prisma/client";
 
 /**
@@ -12,19 +11,25 @@ export async function GET(request: NextRequest) {
   try {
     console.log("📬 API: Récupération des notifications");
 
-    // Vérifier l'authentification (multi-tenant)
-    const authResult = await ensureAuthenticated(request);
-    if (authResult instanceof NextResponse) {
+    // Vérifier l'authentification (système unifié)
+    const sessionResult = verifyAdminSessionFromRequest(request);
+    if (!sessionResult.success) {
       console.log("📬 API: Authentification échouée");
-      return authResult;
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Authentification requise.",
+        },
+        { status: 401 }
+      );
     }
 
-    const user = authResult;
+    const sessionData = sessionResult.data;
     console.log(
       "📬 API: Utilisateur authentifié:",
-      user.id,
-      user.email,
-      user.type
+      sessionData.id,
+      sessionData.email,
+      sessionData.role
     );
 
     const { searchParams } = new URL(request.url);
@@ -41,7 +46,7 @@ export async function GET(request: NextRequest) {
     const offset = parseInt(searchParams.get("offset") || "0");
 
     const filters: any = {
-      userId: user.id,
+      userId: sessionData.id,
       limit,
       offset,
     };
@@ -65,7 +70,9 @@ export async function GET(request: NextRequest) {
     console.log("📬 API: Notifications récupérées:", notifications.length);
 
     console.log("📬 API: Appel getUnreadCount...");
-    const unreadCount = await notificationService.getUnreadCount(user.id);
+    const unreadCount = await notificationService.getUnreadCount(
+      sessionData.id
+    );
     console.log("📬 API: Unread count:", unreadCount);
 
     return NextResponse.json({

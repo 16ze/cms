@@ -5,8 +5,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { ensureAuthenticated } from "@/lib/tenant-auth";
-import { requireTenant, getTenantFilter } from "@/middleware/tenant-context";
+import { ensureAdmin } from "@/lib/auth";
 
 // GET - Récupérer un élément spécifique
 export async function GET(
@@ -14,16 +13,27 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const authResult = await ensureAuthenticated(request);
+    const authResult = await ensureAdmin(request);
     if (authResult instanceof NextResponse) return authResult;
 
-    const { tenantId } = await requireTenant(request);
     const { id } = await params;
+
+    // Pour l'instant, on récupère le premier tenant actif
+    const tenant = await prisma.tenant.findFirst({
+      where: { isActive: true },
+    });
+
+    if (!tenant) {
+      return NextResponse.json(
+        { error: "Aucun tenant actif trouvé" },
+        { status: 400 }
+      );
+    }
 
     const content = await prisma.frontendContent.findFirst({
       where: {
         id,
-        tenantId,
+        tenantId: tenant.id,
       },
     });
 
@@ -36,7 +46,7 @@ export async function GET(
 
     return NextResponse.json({
       success: true,
-      data: { ...content, content: JSON.parse(content.content) },
+      data: content, // ✅ JSON natif - pas besoin de parse
     });
   } catch (error) {
     console.error("❌ Erreur récupération contenu:", error);
@@ -53,17 +63,28 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const authResult = await ensureAuthenticated(request);
+    const authResult = await ensureAdmin(request);
     if (authResult instanceof NextResponse) return authResult;
 
-    const { tenantId } = await requireTenant(request);
     const { id } = await params;
     const data = await request.json();
+
+    // Pour l'instant, on récupère le premier tenant actif
+    const tenant = await prisma.tenant.findFirst({
+      where: { isActive: true },
+    });
+
+    if (!tenant) {
+      return NextResponse.json(
+        { error: "Aucun tenant actif trouvé" },
+        { status: 400 }
+      );
+    }
 
     const content = await prisma.frontendContent.findFirst({
       where: {
         id,
-        tenantId,
+        tenantId: tenant.id,
       },
     });
 
@@ -77,7 +98,7 @@ export async function PUT(
     const updated = await prisma.frontendContent.update({
       where: { id },
       data: {
-        content: data.content ? JSON.stringify(data.content) : content.content,
+        content: data.content || content.content, // ✅ JSON natif - pas besoin de stringify
         orderIndex:
           data.orderIndex !== undefined ? data.orderIndex : content.orderIndex,
         isActive:
@@ -87,7 +108,7 @@ export async function PUT(
 
     return NextResponse.json({
       success: true,
-      data: { ...updated, content: JSON.parse(updated.content) },
+      data: updated, // ✅ JSON natif - pas besoin de parse
     });
   } catch (error) {
     console.error("❌ Erreur modification contenu:", error);
@@ -104,16 +125,27 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const authResult = await ensureAuthenticated(request);
+    const authResult = await ensureAdmin(request);
     if (authResult instanceof NextResponse) return authResult;
 
-    const { tenantId } = await requireTenant(request);
     const { id } = await params;
+
+    // Pour l'instant, on récupère le premier tenant actif
+    const tenant = await prisma.tenant.findFirst({
+      where: { isActive: true },
+    });
+
+    if (!tenant) {
+      return NextResponse.json(
+        { error: "Aucun tenant actif trouvé" },
+        { status: 400 }
+      );
+    }
 
     const content = await prisma.frontendContent.findFirst({
       where: {
         id,
-        tenantId,
+        tenantId: tenant.id,
       },
     });
 

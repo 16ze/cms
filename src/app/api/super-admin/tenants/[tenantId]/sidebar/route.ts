@@ -7,7 +7,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { ensureSuperAdmin } from "@/lib/tenant-auth";
+import { ensureSuperAdmin } from "@/lib/auth";
 
 // Liste de TOUS les éléments disponibles
 const AVAILABLE_SIDEBAR_ELEMENTS = [

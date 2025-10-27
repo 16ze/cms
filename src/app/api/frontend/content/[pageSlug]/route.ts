@@ -36,13 +36,8 @@ export async function GET(
       orderBy: [{ orderIndex: "asc" }, { createdAt: "desc" }],
     });
 
-    // Parser le JSON pour chaque contenu
-    const parsedContents = contents.map((content) => ({
-      ...content,
-      content: JSON.parse(content.content),
-    }));
-
-    return NextResponse.json({ success: true, data: parsedContents });
+    // ✅ Plus besoin de parser - le contenu est déjà en JSON natif
+    return NextResponse.json({ success: true, data: contents });
   } catch (error) {
     console.error("❌ Erreur récupération contenu frontend:", error);
     return NextResponse.json({ success: true, data: [] });

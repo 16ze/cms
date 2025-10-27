@@ -2,6 +2,7 @@
 
 import { ExternalLink, RefreshCw } from "lucide-react";
 import { useState, useEffect } from "react";
+import { useContentEditor } from "@/context/ContentEditorContext";
 
 interface LivePreviewProps {
   url: string;
@@ -12,15 +13,18 @@ export default function LivePreview({ url, onSectionClick }: LivePreviewProps) {
   const [reloadKey, setReloadKey] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
 
+  // ✅ Récupérer les fonctions du Context (sans auto-refresh)
+  const { triggerManualRefresh } = useContentEditor();
+
   const handleReload = () => {
     setReloadKey((prev) => prev + 1);
     setIsLoading(true);
   };
 
-  // Écouter l'événement de mise à jour du contenu
+  // ✅ Écouter SEULEMENT l'événement de sauvegarde (contrairement au refresh sur chaque modification)
   useEffect(() => {
     const handleContentUpdate = () => {
-      console.log("🔄 Contenu mis à jour, rechargement de l'iframe...");
+      console.log("🔄 Contenu sauvegardé, rechargement de l'iframe...");
       handleReload();
     };
 

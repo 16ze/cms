@@ -234,15 +234,17 @@ export function useNotifications(options: UseNotificationsOptions = {}) {
     fetchNotifications();
   }, [fetchNotifications]);
 
-  // Charger les notifications au montage et auto-refresh
+  // Charger les notifications au montage SEULEMENT - Plus de polling automatique
   useEffect(() => {
     fetchNotifications();
 
-    if (autoRefresh) {
-      const interval = setInterval(fetchNotifications, refreshInterval);
-      return () => clearInterval(interval);
-    }
-  }, [fetchNotifications, autoRefresh, refreshInterval]);
+    // PLUS DE POLLING AUTOMATIQUE - suppression pour éviter les auto-refresh
+    // L'auto-refresh peut être activé manuellement si nécessaire en appelant refresh()
+    // if (autoRefresh) {
+    //   const interval = setInterval(fetchNotifications, refreshInterval);
+    //   return () => clearInterval(interval);
+    // }
+  }, [fetchNotifications]);
 
   return {
     notifications,

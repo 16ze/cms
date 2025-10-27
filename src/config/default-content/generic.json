@@ -1,0 +1,69 @@
+{
+  "template": "generic",
+  "pages": {
+    "accueil": {
+      "hero": {
+        "title": "Bienvenue sur notre site",
+        "subtitle": "Découvrez nos services et solutions adaptées à vos besoins",
+        "primaryButton": {
+          "text": "Commencer",
+          "url": "/contact"
+        },
+        "secondaryButton": {
+          "text": "En savoir plus",
+          "url": "/a-propos"
+        }
+      },
+      "services": {
+        "title": "Nos Services",
+        "subtitle": "Un éventail de solutions pour répondre à vos attentes",
+        "services": [
+          {
+            "title": "Service 1",
+            "description": "Description du premier service que nous proposons",
+            "icon": "Star",
+            "image": "/images/service-1.jpg"
+          },
+          {
+            "title": "Service 2",
+            "description": "Description du deuxième service que nous proposons",
+            "icon": "Heart",
+            "image": "/images/service-2.jpg"
+          },
+          {
+            "title": "Service 3",
+            "description": "Description du troisième service que nous proposons",
+            "icon": "Zap",
+            "image": "/images/service-3.jpg"
+          }
+        ]
+      },
+      "team": {
+        "title": "Notre Équipe",
+        "subtitle": "Des experts passionnés à votre service",
+        "members": [
+          {
+            "name": "Prénom Nom",
+            "role": "Poste",
+            "description": "Description de la personne et de son expertise",
+            "photo": "/images/team-1.jpg"
+          },
+          {
+            "name": "Prénom Nom",
+            "role": "Poste",
+            "description": "Description de la personne et de son expertise",
+            "photo": "/images/team-2.jpg"
+          }
+        ]
+      },
+      "contact": {
+        "title": "Contactez-Nous",
+        "subtitle": "Nous sommes là pour répondre à toutes vos questions",
+        "phone": "+33 1 23 45 67 89",
+        "email": "contact@example.com",
+        "address": "Adresse complète de l'entreprise",
+        "hours": "Horaires d'ouverture"
+      }
+    }
+  }
+}

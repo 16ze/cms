@@ -1,4 +1,5 @@
 import crypto from "crypto";
+import { NextRequest } from "next/server";
 export const ADMIN_SESSION_COOKIE = "admin_session" as const;
 export const ADMIN_SESSION_MAX_AGE_SECONDS = 60 * 60 * 24 * 7; // 7 days
 
@@ -6,8 +7,10 @@ export interface AdminSessionPayload {
   email: string;
   name: string;
   id: string;
-  role: "admin" | "super_admin";
+  role: "SUPER_ADMIN" | "TENANT_ADMIN";
   loginTime: string;
+  tenantId?: string;
+  tenantSlug?: string;
 }
 
 export interface AdminSessionClaims extends AdminSessionPayload {
@@ -130,5 +133,33 @@ export const verifyAdminSession = (
     return { valid: true, claims };
   } catch (error) {
     return { valid: false, reason: "INVALID_FORMAT" };
+  }
+};
+
+// Wrapper pour NextRequest
+export const verifyAdminSessionFromRequest = (request: NextRequest) => {
+  const token = request.cookies.get(ADMIN_SESSION_COOKIE)?.value;
+  const secret = getAdminSessionSecret();
+
+  // Vérifier que le token existe et est une string
+  if (!token || typeof token !== "string") {
+    return {
+      success: false,
+      error: "MISSING_TOKEN",
+    };
+  }
+
+  const result = verifyAdminSession(token, secret);
+
+  if (result.valid) {
+    return {
+      success: true,
+      data: result.claims,
+    };
+  } else {
+    return {
+      success: false,
+      error: result.reason,
+    };
   }
 };

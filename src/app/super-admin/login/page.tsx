@@ -23,7 +23,7 @@ export default function SuperAdminLoginPage() {
     setLoading(true);
 
     try {
-      const response = await fetch("/api/auth/login/super-admin", {
+      const response = await fetch("/api/auth/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -39,8 +39,8 @@ export default function SuperAdminLoginPage() {
         return;
       }
 
-      // Redirection vers le dashboard Super Admin
-      router.push("/super-admin/dashboard");
+      // Redirection vers le dashboard admin
+      router.push("/admin/dashboard");
     } catch (error) {
       console.error("Erreur login:", error);
       setError("Erreur de connexion. Veuillez réessayer.");

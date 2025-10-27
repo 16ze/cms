@@ -4,7 +4,14 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
-import { loginTenantUser } from "@/lib/tenant-auth";
+import { prisma } from "@/lib/prisma";
+import bcrypt from "bcryptjs";
+import {
+  ADMIN_SESSION_COOKIE,
+  ADMIN_SESSION_MAX_AGE_SECONDS,
+  getAdminSessionSecret,
+  signAdminSession,
+} from "@/lib/admin-session";
 
 export async function POST(request: NextRequest) {
   try {
@@ -20,35 +27,87 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const result = await loginTenantUser(email, password);
+    // Chercher l'utilisateur tenant
+    const tenantUser = await prisma.tenantUser.findFirst({
+      where: {
+        email: email.trim().toLowerCase(),
+        isActive: true,
+      },
+      include: {
+        tenant: {
+          include: {
+            template: true,
+          },
+        },
+      },
+    });
 
-    if (!result.success) {
+    if (!tenantUser) {
       return NextResponse.json(
         {
           success: false,
-          error: result.error,
+          error: "Email ou mot de passe incorrect",
         },
         { status: 401 }
       );
     }
 
-    // Créer la response avec le cookie de session
+    // Vérifier le mot de passe
+    const isValidPassword = await bcrypt.compare(password, tenantUser.password);
+    if (!isValidPassword) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Email ou mot de passe incorrect",
+        },
+        { status: 401 }
+      );
+    }
+
+    // Mettre à jour le lastLogin
+    await prisma.tenantUser.update({
+      where: { id: tenantUser.id },
+      data: { lastLogin: new Date() },
+    });
+
+    // Créer une session unifiée
+    const sessionData = {
+      email: tenantUser.email,
+      name: `${tenantUser.firstName} ${tenantUser.lastName}`.trim(),
+      id: tenantUser.id,
+      role: "TENANT_ADMIN", // Les utilisateurs tenant sont des admins de leur tenant
+      tenantId: tenantUser.tenantId,
+      tenantSlug: tenantUser.tenant.slug,
+      loginTime: new Date().toISOString(),
+    };
+
+    // Créer la response avec les informations utilisateur
     const response = NextResponse.json({
       success: true,
       message: "Connexion réussie",
       user: {
-        type: "TENANT_USER",
-        email,
-        tenantSlug: result.tenantSlug,
+        id: tenantUser.id,
+        name: `${tenantUser.firstName} ${tenantUser.lastName}`.trim(),
+        email: tenantUser.email,
+        role: "TENANT_ADMIN",
+        tenantId: tenantUser.tenantId,
+        tenantSlug: tenantUser.tenant.slug,
       },
     });
 
-    // Définir le cookie de session
-    response.cookies.set("auth_session", result.token!, {
+    const token = signAdminSession(
+      sessionData,
+      getAdminSessionSecret(),
+      ADMIN_SESSION_MAX_AGE_SECONDS
+    );
+
+    response.cookies.set({
+      name: ADMIN_SESSION_COOKIE,
+      value: token,
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
-      maxAge: 60 * 60 * 24 * 7, // 7 jours
+      maxAge: ADMIN_SESSION_MAX_AGE_SECONDS,
       path: "/",
     });
 
@@ -64,4 +123,3 @@ export async function POST(request: NextRequest) {
     );
   }
 }
-

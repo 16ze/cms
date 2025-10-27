@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import LivePreview from "@/components/admin/LivePreview";
 import { useFrontendContent } from "@/hooks/use-frontend-content";
 import { useRouter } from "next/navigation";
+import { useContentEditor } from "@/context/ContentEditorContext";
 
 export default function SitePage() {
   const router = useRouter();
@@ -13,27 +14,8 @@ export default function SitePage() {
       autoSync: false, // ✅ Désactivé pour éviter le refresh permanent
     });
 
-  const handleSaveContent = async (section: string, data: any) => {
-    try {
-      await fetch("/api/admin/frontend-content", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          pageSlug: "accueil",
-          sectionSlug: section,
-          dataType: "text",
-          content: data,
-        }),
-      });
-    } catch (error) {
-      console.error("Erreur sauvegarde:", error);
-      throw error;
-    }
-  };
-
-  const handleBack = () => {
-    router.push("/admin/dashboard");
-  };
+  // ✅ Utiliser le Context pour récupérer le contenu édité en temps réel
+  const { editedContent } = useContentEditor();
 
   if (contentLoading) {
     return (

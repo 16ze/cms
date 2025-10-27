@@ -6,9 +6,14 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
-import { ensureSuperAdmin } from "@/lib/tenant-auth";
+import { verifyAdminSessionFromRequest } from "@/lib/admin-session";
 import { prisma } from "@/lib/prisma";
-import { cookies } from "next/headers";
+import {
+  signAdminSession,
+  getAdminSessionSecret,
+  ADMIN_SESSION_COOKIE,
+  ADMIN_SESSION_MAX_AGE_SECONDS,
+} from "@/lib/admin-session";
 
 /**
  * POST - Se connecter en tant qu'un tenant
@@ -16,12 +21,28 @@ import { cookies } from "next/headers";
 export async function POST(request: NextRequest) {
   try {
     // Vérifier que c'est un Super Admin
-    const authResult = await ensureSuperAdmin(request);
-    if (authResult instanceof NextResponse) {
-      return authResult;
+    const sessionResult = verifyAdminSessionFromRequest(request);
+    if (!sessionResult.success) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Authentification requise",
+        },
+        { status: 401 }
+      );
     }
 
-    const superAdmin = authResult;
+    const sessionData = sessionResult.data;
+
+    if (sessionData.role !== "SUPER_ADMIN") {
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Accès refusé. Super Admin requis.",
+        },
+        { status: 403 }
+      );
+    }
     const body = await request.json();
     const { tenantId } = body;
 
@@ -81,69 +102,112 @@ export async function POST(request: NextRequest) {
     }
 
     // Sauvegarder la session Super Admin actuelle dans un cookie séparé
-    const cookieStore = await cookies();
-    const currentSession = cookieStore.get("auth_session")?.value;
+    const currentSession = request.cookies.get(ADMIN_SESSION_COOKIE)?.value;
 
     if (currentSession) {
       // Sauvegarder la session Super Admin pour pouvoir revenir
-      cookieStore.set("super_admin_session_backup", currentSession, {
+      // On va créer une réponse avec le cookie de sauvegarde
+      const response = NextResponse.json({
+        success: true,
+        message: "Connexion en tant que tenant réussie",
+        tenant: {
+          id: tenant.id,
+          name: tenant.name,
+          slug: tenant.slug,
+        },
+        user: {
+          id: tenantUser.id,
+          name: `${tenantUser.firstName} ${tenantUser.lastName}`.trim(),
+          email: tenantUser.email,
+          role: "TENANT_ADMIN",
+          tenantId: tenant.id,
+          tenantSlug: tenant.slug,
+        },
+      });
+
+      // Sauvegarder la session Super Admin
+      response.cookies.set("super_admin_session_backup", currentSession, {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
         sameSite: "lax",
         maxAge: 60 * 60 * 24, // 24 heures
         path: "/",
       });
+
+      // Créer une nouvelle session en tant que tenant user
+      const impersonationSessionData = {
+        email: tenantUser.email,
+        name: `${tenantUser.firstName} ${tenantUser.lastName}`.trim(),
+        id: tenantUser.id,
+        role: "TENANT_ADMIN" as const,
+        tenantId: tenant.id,
+        tenantSlug: tenant.slug,
+        loginTime: new Date().toISOString(),
+      };
+
+      const impersonationToken = signAdminSession(
+        impersonationSessionData,
+        getAdminSessionSecret(),
+        ADMIN_SESSION_MAX_AGE_SECONDS
+      );
+
+      // Définir le cookie d'impersonation
+      response.cookies.set(ADMIN_SESSION_COOKIE, impersonationToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+        maxAge: ADMIN_SESSION_MAX_AGE_SECONDS,
+        path: "/",
+      });
+
+      return response;
     }
 
-    // Créer une nouvelle session en tant que tenant user
-    const impersonationToken = `TENANT_USER:${tenantUser.id}`;
+    // Si pas de session actuelle, créer une nouvelle session tenant
+    const impersonationSessionData = {
+      email: tenantUser.email,
+      name: `${tenantUser.firstName} ${tenantUser.lastName}`.trim(),
+      id: tenantUser.id,
+      role: "TENANT_ADMIN" as const,
+      tenantId: tenant.id,
+      tenantSlug: tenant.slug,
+      loginTime: new Date().toISOString(),
+    };
 
-    cookieStore.set("auth_session", impersonationToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      maxAge: 60 * 60 * 8, // 8 heures
-      path: "/",
-    });
+    const impersonationToken = signAdminSession(
+      impersonationSessionData,
+      getAdminSessionSecret(),
+      ADMIN_SESSION_MAX_AGE_SECONDS
+    );
 
-    // Marquer qu'on est en mode impersonation
-    cookieStore.set("impersonating", "true", {
-      httpOnly: false, // Doit être accessible côté client
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      maxAge: 60 * 60 * 8, // 8 heures
-      path: "/",
-    });
-
-    // Sauvegarder l'ID du Super Admin qui impersonne
-    cookieStore.set("impersonator_id", superAdmin.id, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      maxAge: 60 * 60 * 8, // 8 heures
-      path: "/",
-    });
-
-    return NextResponse.json({
+    const response = NextResponse.json({
       success: true,
-      message: `Connecté en tant que ${tenant.name}`,
-      data: {
-        tenant: {
-          id: tenant.id,
-          name: tenant.name,
-          slug: tenant.slug,
-          email: tenant.email,
-        },
-        user: {
-          id: tenantUser.id,
-          email: tenantUser.email,
-          firstName: tenantUser.firstName,
-          lastName: tenantUser.lastName,
-          role: tenantUser.role,
-        },
-        impersonating: true,
+      message: "Connexion en tant que tenant réussie",
+      tenant: {
+        id: tenant.id,
+        name: tenant.name,
+        slug: tenant.slug,
+      },
+      user: {
+        id: tenantUser.id,
+        name: `${tenantUser.firstName} ${tenantUser.lastName}`.trim(),
+        email: tenantUser.email,
+        role: "TENANT_ADMIN",
+        tenantId: tenant.id,
+        tenantSlug: tenant.slug,
       },
     });
+
+    // Définir le cookie d'impersonation
+    response.cookies.set(ADMIN_SESSION_COOKIE, impersonationToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: ADMIN_SESSION_MAX_AGE_SECONDS,
+      path: "/",
+    });
+
+    return response;
   } catch (error: any) {
     console.error("❌ Erreur impersonation:", error);
     return NextResponse.json(
@@ -164,7 +228,9 @@ export async function DELETE(request: NextRequest) {
     const cookieStore = await cookies();
 
     // Récupérer la session Super Admin sauvegardée
-    const superAdminSession = cookieStore.get("super_admin_session_backup")?.value;
+    const superAdminSession = cookieStore.get(
+      "super_admin_session_backup"
+    )?.value;
 
     if (!superAdminSession) {
       return NextResponse.json(
@@ -205,4 +271,3 @@ export async function DELETE(request: NextRequest) {
     );
   }
 }
-

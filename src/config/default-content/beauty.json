@@ -1,0 +1,87 @@
+{
+  "template": "beauty",
+  "pages": {
+    "accueil": {
+      "hero": {
+        "title": "Bienvenue dans votre institut de beauté",
+        "subtitle": "Découvrez nos soins professionnels et nos expertises pour sublimer votre beauté naturelle",
+        "primaryButton": {
+          "text": "Prendre rendez-vous",
+          "url": "/rendez-vous"
+        },
+        "secondaryButton": {
+          "text": "Découvrir nos soins",
+          "url": "/soins"
+        },
+        "image": "/images/hero-beauty.jpg"
+      },
+      "services": {
+        "title": "Nos Services de Beauté",
+        "subtitle": "Un éventail de soins pour prendre soin de vous de la tête aux pieds",
+        "services": [
+          {
+            "title": "Soins du visage",
+            "description": "Rituels de beauté adaptés à votre type de peau",
+            "icon": "Sparkles",
+            "image": "/images/service-facial.jpg"
+          },
+          {
+            "title": "Manucure & Beauté des ongles",
+            "description": "Pose de vernis, nail art et soins des ongles",
+            "icon": "Heart",
+            "image": "/images/service-nails.jpg"
+          },
+          {
+            "title": "Soins corporels",
+            "description": "Massages relaxants et soins du corps",
+            "icon": "User",
+            "image": "/images/service-body.jpg"
+          },
+          {
+            "title": "Épilation",
+            "description": "Épilation définitive et temporaire",
+            "icon": "Scissors",
+            "image": "/images/service-epilation.jpg"
+          }
+        ]
+      },
+      "team": {
+        "title": "Notre Équipe d'Experts",
+        "subtitle": "Des professionnels passionnés à votre service",
+        "members": [
+          {
+            "name": "Sophie Martin",
+            "role": "Esthéticienne Expert",
+            "description": "Spécialisée en soins du visage depuis 10 ans",
+            "photo": "/images/team-1.jpg"
+          },
+          {
+            "name": "Marie Dubois",
+            "role": "Spécialiste Beauté des Mains",
+            "description": "Nail artiste certifiée en techniques récentes",
+            "photo": "/images/team-2.jpg"
+          },
+          {
+            "name": "Julie Leroy",
+            "role": "Massothérapeute",
+            "description": "Massages relaxants et thérapeutiques",
+            "photo": "/images/team-3.jpg"
+          }
+        ]
+      },
+      "contact": {
+        "title": "Prenez Rendez-Vous",
+        "subtitle": "Contactez-nous pour réserver votre créneau",
+        "phone": "+33 1 23 45 67 89",
+        "email": "contact@beaute.fr",
+        "address": "123 Avenue de la Beauté, 75000 Paris",
+        "hours": "Lun-Sam: 9h-19h"
+      },
+      "reviews": {
+        "title": "Avis Clients",
+        "subtitle": "Ils nous font confiance",
+        "rating": 4.8
+      }
+    }
+  }
+}

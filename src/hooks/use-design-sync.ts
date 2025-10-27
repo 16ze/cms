@@ -99,14 +99,8 @@ export function useDesignSync() {
     fetchDesignSettings();
   }, []);
 
-  // Polling pour la synchronisation en temps réel (toutes les 15 secondes)
-  useEffect(() => {
-    const interval = setInterval(() => {
-      fetchDesignSettings();
-    }, 15000); // 15 secondes
-
-    return () => clearInterval(interval);
-  }, []);
+  // PLUS DE POLLING AUTOMATIQUE - suppression pour éviter les auto-refresh
+  // La synchronisation se fait uniquement après une action utilisateur
 
   // Fonction pour forcer la synchronisation
   const refreshDesignSettings = () => {

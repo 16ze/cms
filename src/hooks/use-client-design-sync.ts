@@ -67,53 +67,28 @@ export function useClientDesignSync() {
     // Créer ou mettre à jour les variables CSS personnalisées
     const root = document.documentElement;
 
-    root.style.setProperty("--color-primary", colors.primary);
-    root.style.setProperty("--color-secondary", colors.secondary);
-    root.style.setProperty("--color-accent", colors.accent);
+    // Vérifier si les valeurs ont vraiment changé pour éviter les effets flash
+    const currentPrimary = root.style.getPropertyValue("--color-primary");
+    const currentSecondary = root.style.getPropertyValue("--color-secondary");
+    const currentAccent = root.style.getPropertyValue("--color-accent");
+
+    // Ne mettre à jour que si les valeurs ont changé
+    if (currentPrimary !== colors.primary) {
+      root.style.setProperty("--color-primary", colors.primary);
+    }
+    if (currentSecondary !== colors.secondary) {
+      root.style.setProperty("--color-secondary", colors.secondary);
+    }
+    if (currentAccent !== colors.accent) {
+      root.style.setProperty("--color-accent", colors.accent);
+    }
+
     root.style.setProperty("--color-background", colors.background);
     root.style.setProperty("--color-text", colors.text);
     root.style.setProperty("--color-footer-text", colors.footerText);
 
-    // Appliquer les couleurs aux éléments spécifiques
-    applyThemeColors(colors);
-  };
-
-  const applyThemeColors = (colors: ClientDesignSettings["colors"]) => {
-    // Appliquer les couleurs aux éléments du header
-    const header = document.querySelector("header");
-    if (header) {
-      header.style.setProperty("--header-background", colors.background);
-      header.style.setProperty("--header-text", colors.text);
-    }
-
-    // Appliquer les couleurs aux éléments du footer
-    const footer = document.querySelector("footer");
-    if (footer) {
-      footer.style.setProperty("--footer-background", colors.background);
-      footer.style.setProperty("--footer-text", colors.footerText);
-    }
-
-    // Appliquer les couleurs aux boutons
-    const buttons = document.querySelectorAll("button, .btn");
-    buttons.forEach((button) => {
-      if (button.classList.contains("bg-blue-600")) {
-        button.style.backgroundColor = colors.primary;
-      }
-      if (button.classList.contains("bg-purple-600")) {
-        button.style.backgroundColor = colors.secondary;
-      }
-    });
-
-    // Appliquer les couleurs aux liens
-    const links = document.querySelectorAll("a");
-    links.forEach((link) => {
-      if (
-        link.style.color === "rgb(59, 130, 246)" ||
-        link.classList.contains("text-blue-600")
-      ) {
-        link.style.color = colors.primary;
-      }
-    });
+    // DÉSACTIVÉ - L'application manuelle des couleurs causaient des effets flash
+    // Les styles sont maintenant gérés via les CSS variables globales uniquement
   };
 
   // Charger les paramètres au montage
@@ -121,14 +96,8 @@ export function useClientDesignSync() {
     fetchDesignSettings();
   }, []);
 
-  // Polling pour la synchronisation en temps réel (toutes les 20 secondes)
-  useEffect(() => {
-    const interval = setInterval(() => {
-      fetchDesignSettings();
-    }, 20000); // 20 secondes
-
-    return () => clearInterval(interval);
-  }, []);
+  // PLUS DE POLLING AUTOMATIQUE - suppression pour éviter les auto-refresh
+  // La synchronisation se fait uniquement après une action utilisateur
 
   // Fonction pour forcer la synchronisation
   const refreshDesignSettings = () => {

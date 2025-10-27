@@ -6,23 +6,29 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { ensureAuthenticated } from "@/lib/tenant-auth";
-import { requireTenant, getTenantFilter } from "@/middleware/tenant-context";
+import { ensureAdmin } from "@/lib/auth";
 
 // GET - Liste tout le contenu frontend pour un tenant
 export async function GET(request: NextRequest) {
   try {
-    const authResult = await ensureAuthenticated(request);
+    const authResult = await ensureAdmin(request);
     if (authResult instanceof NextResponse) return authResult;
-
-    const { tenantId } = await requireTenant(request);
-    const { tenantFilter } = await getTenantFilter(request);
 
     const { searchParams } = new URL(request.url);
     const pageSlug = searchParams.get("pageSlug");
     const sectionSlug = searchParams.get("sectionSlug");
 
-    const where: any = { ...tenantFilter };
+    // Pour l'instant, on récupère le premier tenant actif
+    // TODO: Détecter le tenant depuis le domaine ou la session
+    const tenant = await prisma.tenant.findFirst({
+      where: { isActive: true },
+    });
+
+    if (!tenant) {
+      return NextResponse.json({ success: true, data: [] });
+    }
+
+    const where: any = { tenantId: tenant.id };
     if (pageSlug) where.pageSlug = pageSlug;
     if (sectionSlug) where.sectionSlug = sectionSlug;
 
@@ -31,13 +37,8 @@ export async function GET(request: NextRequest) {
       orderBy: [{ orderIndex: "asc" }, { createdAt: "desc" }],
     });
 
-    // Parser le JSON pour chaque contenu
-    const parsedContents = contents.map((content) => ({
-      ...content,
-      content: JSON.parse(content.content),
-    }));
-
-    return NextResponse.json({ success: true, data: parsedContents });
+    // ✅ Plus besoin de parser - le contenu est déjà en JSON natif
+    return NextResponse.json({ success: true, data: contents });
   } catch (error) {
     console.error("❌ Erreur récupération contenu frontend:", error);
     return NextResponse.json(
@@ -50,11 +51,21 @@ export async function GET(request: NextRequest) {
 // POST - Créer/Mettre à jour un élément de contenu
 export async function POST(request: NextRequest) {
   try {
-    const authResult = await ensureAuthenticated(request);
+    const authResult = await ensureAdmin(request);
     if (authResult instanceof NextResponse) return authResult;
 
-    const { tenantId } = await requireTenant(request);
-    const { tenantFilter } = await getTenantFilter(request);
+    // Pour l'instant, on récupère le premier tenant actif
+    // TODO: Détecter le tenant depuis le domaine ou la session
+    const tenant = await prisma.tenant.findFirst({
+      where: { isActive: true },
+    });
+
+    if (!tenant) {
+      return NextResponse.json(
+        { error: "Aucun tenant actif trouvé" },
+        { status: 400 }
+      );
+    }
 
     const data = await request.json();
     console.log("📥 [API] Données reçues:", {
@@ -85,7 +96,7 @@ export async function POST(request: NextRequest) {
     const existing = await prisma.frontendContent.findUnique({
       where: {
         tenantId_pageSlug_sectionSlug_dataType: {
-          tenantId,
+          tenantId: tenant.id,
           pageSlug,
           sectionSlug,
           dataType,
@@ -101,7 +112,7 @@ export async function POST(request: NextRequest) {
       result = await prisma.frontendContent.update({
         where: { id: existing.id },
         data: {
-          content: JSON.stringify(content),
+          content: content, // ✅ JSON natif - pas besoin de stringify
           orderIndex:
             orderIndex !== undefined ? orderIndex : existing.orderIndex,
           isActive: isActive !== undefined ? isActive : existing.isActive,
@@ -113,11 +124,11 @@ export async function POST(request: NextRequest) {
       console.log("➕ [API] Création d'un nouveau contenu");
       result = await prisma.frontendContent.create({
         data: {
-          ...tenantFilter,
+          tenantId: tenant.id,
           pageSlug,
           sectionSlug,
           dataType,
-          content: JSON.stringify(content),
+          content: content, // ✅ JSON natif - pas besoin de stringify
           orderIndex: orderIndex || 0,
           isActive: isActive !== undefined ? isActive : true,
         },
@@ -128,7 +139,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
       {
         success: true,
-        data: { ...result, content: JSON.parse(result.content) },
+        data: result, // ✅ JSON natif - pas besoin de parse
       },
       { status: existing ? 200 : 201 }
     );

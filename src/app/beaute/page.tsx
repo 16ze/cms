@@ -24,9 +24,6 @@ interface SiteConfig {
 }
 
 export default function BeauteAccueilPage() {
-  const [config, setConfig] = useState<SiteConfig | null>(null);
-  const [loading, setLoading] = useState(true);
-
   // Charger le contenu dynamique frontend
   const { content: frontendContent, loading: contentLoading } =
     useFrontendContent({
@@ -37,20 +34,7 @@ export default function BeauteAccueilPage() {
   // Charger les avis Google
   const { reviews } = useGoogleReviews({ autoSync: true });
 
-  useEffect(() => {
-    // Charger la configuration du site
-    fetch("/api/admin/site/configuration")
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.success) {
-          setConfig(data.data);
-        }
-      })
-      .catch((err) => console.error("Erreur:", err))
-      .finally(() => setLoading(false));
-  }, []);
-
-  if (loading || contentLoading) {
+  if (contentLoading) {
     return (
       <div className="flex items-center justify-center h-screen">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-500"></div>
@@ -58,76 +42,79 @@ export default function BeauteAccueilPage() {
     );
   }
 
-  if (!config) {
-    return (
-      <div className="flex items-center justify-center h-screen">
-        <div className="text-center">
-          <Sparkles className="w-16 h-16 text-pink-500 mx-auto mb-4" />
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">Bienvenue</h1>
-          <p className="text-gray-600">
-            Configurez votre site depuis l'espace admin
-          </p>
-        </div>
-      </div>
-    );
-  }
-
-  // Valeurs par défaut avec fallback
+  // ✅ Valeurs par défaut avec fallback - Support structure plate ET nested
   const heroTitle =
+    frontendContent?.hero?.title ||
     frontendContent?.hero?.text?.title ||
     "Bienvenue dans votre salon de beauté";
   const heroSubtitle =
+    frontendContent?.hero?.subtitle ||
     frontendContent?.hero?.text?.subtitle ||
     "Prenez soin de vous avec nos prestations professionnelles";
-  const heroPrimaryButton = frontendContent?.hero?.button?.primary || {
-    text: "Réserver un rendez-vous",
-    url: "/reservation",
-  };
-  const heroSecondaryButton = frontendContent?.hero?.button?.secondary || {
-    text: "En savoir plus",
-    url: "/prestations",
-  };
+  const heroPrimaryButton = frontendContent?.hero?.primaryButton ||
+    frontendContent?.hero?.button?.primary || {
+      text: "Réserver un rendez-vous",
+      url: "/reservation",
+    };
+  const heroSecondaryButton = frontendContent?.hero?.secondaryButton ||
+    frontendContent?.hero?.button?.secondary || {
+      text: "En savoir plus",
+      url: "/prestations",
+    };
 
   const servicesTitle =
-    frontendContent?.services?.text?.title || "Nos Prestations";
+    frontendContent?.services?.title ||
+    frontendContent?.services?.text?.title ||
+    "Nos Prestations";
   const servicesSubtitle =
+    frontendContent?.services?.subtitle ||
     frontendContent?.services?.text?.subtitle ||
     "Découvrez notre gamme de services professionnels";
-  const services = frontendContent?.services?.service || [
-    {
-      name: "Soins Visage",
-      description: "Prestation professionnelle réalisée par nos experts",
-    },
-    {
-      name: "Pose d'Ongles",
-      description: "Prestation professionnelle réalisée par nos experts",
-    },
-    {
-      name: "Maquillage",
-      description: "Prestation professionnelle réalisée par nos experts",
-    },
-  ];
+  const services = frontendContent?.services?.services ||
+    frontendContent?.services?.service || [
+      {
+        name: "Soins Visage",
+        description: "Prestation professionnelle réalisée par nos experts",
+      },
+      {
+        name: "Pose d'Ongles",
+        description: "Prestation professionnelle réalisée par nos experts",
+      },
+      {
+        name: "Maquillage",
+        description: "Prestation professionnelle réalisée par nos experts",
+      },
+    ];
 
-  const teamTitle = frontendContent?.team?.text?.title || "Notre Équipe";
+  const teamTitle =
+    frontendContent?.team?.title ||
+    frontendContent?.team?.text?.title ||
+    "Notre Équipe";
   const teamSubtitle =
+    frontendContent?.team?.subtitle ||
     frontendContent?.team?.text?.subtitle ||
     "Des professionnels à votre service";
-  const teamMembers = frontendContent?.team?.member || [
-    { name: "Sophie", role: "Esthéticienne professionnelle", rating: 5 },
-    { name: "Marie", role: "Esthéticienne professionnelle", rating: 5 },
-    { name: "Julie", role: "Esthéticienne professionnelle", rating: 5 },
-  ];
+  const teamMembers = frontendContent?.team?.members ||
+    frontendContent?.team?.member || [
+      { name: "Sophie", role: "Esthéticienne professionnelle", rating: 5 },
+      { name: "Marie", role: "Esthéticienne professionnelle", rating: 5 },
+      { name: "Julie", role: "Esthéticienne professionnelle", rating: 5 },
+    ];
 
   const contactTitle =
-    frontendContent?.contact?.text?.title || "Contactez-nous";
+    frontendContent?.contact?.title ||
+    frontendContent?.contact?.text?.title ||
+    "Contactez-nous";
   const contactSubtitle =
+    frontendContent?.contact?.subtitle ||
     frontendContent?.contact?.text?.subtitle ||
     "Nous sommes là pour répondre à vos questions";
-  const contactInfo = frontendContent?.contact?.info || {
-    phone: "01 23 45 67 89",
-    email: "contact@example.com",
-    address: "123 Rue de la Beauté, Paris",
-  };
+  const contactInfo = frontendContent?.contact ||
+    frontendContent?.contact?.info || {
+      phone: "01 23 45 67 89",
+      email: "contact@example.com",
+      address: "123 Rue de la Beauté, Paris",
+    };
 
   return (
     <div className="min-h-screen bg-white">

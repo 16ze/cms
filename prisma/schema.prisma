@@ -1540,7 +1540,7 @@ model FrontendContent {
   pageSlug    String   // "accueil", "prestations", etc.
   sectionSlug String   // "hero", "services", "team", etc.
   dataType    String   // "text", "service", "team", "contact", "review"
-  content     String   // JSON flexible
+  content     Json     // ✅ JSON natif - plus simple et plus sûr
   orderIndex  Int      @default(0)
   isActive    Boolean  @default(true)
   createdAt   DateTime @default(now())

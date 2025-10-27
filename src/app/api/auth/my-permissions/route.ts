@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { ensureAuthenticated } from "@/lib/tenant-auth";
+import { verifyAdminSessionFromRequest } from "@/lib/admin-session";
 import { adminPermissionService } from "@/lib/admin-permission-service";
 import { prisma } from "@/lib/prisma";
 
@@ -10,26 +10,40 @@ import { prisma } from "@/lib/prisma";
  */
 export async function GET(request: NextRequest) {
   try {
-    console.log("🔐 API: Récupération des permissions de l'utilisateur connecté");
+    console.log(
+      "🔐 API: Récupération des permissions de l'utilisateur connecté"
+    );
 
-    // Vérifier l'authentification (multi-tenant)
-    const authResult = await ensureAuthenticated(request);
-    if (authResult instanceof NextResponse) {
-      return authResult;
+    // Vérifier l'authentification (système unifié)
+    const sessionResult = verifyAdminSessionFromRequest(request);
+    if (!sessionResult.success) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Authentification requise.",
+        },
+        { status: 401 }
+      );
     }
 
-    const currentUser = authResult;
-    console.log("🔐 Récupération des permissions pour:", currentUser.email, currentUser.type);
+    const sessionData = sessionResult.data;
+    console.log(
+      "🔐 Récupération des permissions pour:",
+      sessionData.email,
+      sessionData.role
+    );
 
     // Si super admin, retourner tous les accès
-    if (currentUser.type === "SUPER_ADMIN") {
-      const allPages = adminPermissionService.getAvailablePages();
-      const fullPermissions = allPages.map((page) => ({
-        page: page.id,
-        canView: true,
-        canEdit: true,
-        canDelete: true,
-      }));
+    if (sessionData.role === "SUPER_ADMIN") {
+      const fullPermissions = [
+        { page: "dashboard", canView: true, canEdit: true, canDelete: true },
+        { page: "reservations", canView: true, canEdit: true, canDelete: true },
+        { page: "clients", canView: true, canEdit: true, canDelete: true },
+        { page: "content", canView: true, canEdit: true, canDelete: true },
+        { page: "site", canView: true, canEdit: true, canDelete: true },
+        { page: "users", canView: true, canEdit: true, canDelete: true },
+        { page: "settings", canView: true, canEdit: true, canDelete: true },
+      ];
 
       return NextResponse.json({
         success: true,
@@ -60,28 +74,32 @@ export async function GET(request: NextRequest) {
     // Charger les éléments sidebar du template pour ajouter leurs permissions
     let allPermissions = [...basePermissions];
 
-    if (currentUser.tenantId) {
+    if (sessionData.tenantId) {
       const tenant = await prisma.tenant.findUnique({
-        where: { id: currentUser.tenantId },
+        where: { id: sessionData.tenantId },
         include: {
           template: {
             include: {
-              sidebarConfigs: true
-            }
-          }
-        }
+              sidebarConfigs: true,
+            },
+          },
+        },
       });
 
       if (tenant && tenant.template && tenant.template.sidebarConfigs) {
-        const templatePermissions = tenant.template.sidebarConfigs.map((config) => ({
-          page: config.elementId,
-          canView: true,
-          canEdit: true,
-          canDelete: true,
-        }));
+        const templatePermissions = tenant.template.sidebarConfigs.map(
+          (config) => ({
+            page: config.elementId,
+            canView: true,
+            canEdit: true,
+            canDelete: true,
+          })
+        );
         allPermissions = [...allPermissions, ...templatePermissions];
-        
-        console.log(`✅ ${templatePermissions.length} permissions template ajoutées pour ${tenant.template.displayName}`);
+
+        console.log(
+          `✅ ${templatePermissions.length} permissions template ajoutées pour ${tenant.template.displayName}`
+        );
       }
     }
 
@@ -91,7 +109,7 @@ export async function GET(request: NextRequest) {
       success: true,
       data: {
         permissions: allPermissions,
-        role: currentUser.role || "ADMIN",
+        role: "TENANT_ADMIN",
       },
     });
   } catch (error) {
@@ -102,4 +120,3 @@ export async function GET(request: NextRequest) {
     );
   }
 }
-

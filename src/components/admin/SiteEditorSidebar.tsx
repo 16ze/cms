@@ -8,7 +8,14 @@ import {
   Users,
   Phone,
   Calendar,
+  Image as ImageIcon,
+  Monitor,
+  Tablet,
+  Smartphone,
 } from "lucide-react";
+import { useContentEditor } from "@/context/ContentEditorContext";
+import MediaPicker from "./MediaPicker";
+import ColorPicker from "./ColorPicker";
 
 interface SiteEditorSidebarProps {
   content: any;
@@ -24,6 +31,15 @@ export default function SiteEditorSidebar({
   const [activeSection, setActiveSection] = useState<string>("hero");
   const [fields, setFields] = useState<any>({});
   const [saving, setSaving] = useState(false);
+  const [showMediaPicker, setShowMediaPicker] = useState(false);
+  const [mediaPickerField, setMediaPickerField] = useState<string>("");
+  const [previewMode, setPreviewMode] = useState<
+    "desktop" | "tablet" | "mobile"
+  >("desktop");
+  const [showUndo, setShowUndo] = useState(false);
+
+  // ✅ Utiliser le Context pour la gestion d'état global
+  const { updateSectionContent, getSectionContent } = useContentEditor();
 
   const sections = [
     { id: "hero", label: "Hero", icon: Sparkles },
@@ -99,7 +115,15 @@ export default function SiteEditorSidebar({
   }, [activeSection, content]);
 
   const handleFieldChange = (fieldId: string, value: any) => {
-    setFields((prev: any) => ({ ...prev, [fieldId]: value }));
+    // Mise à jour du state local
+    setFields((prev: any) => {
+      const newFields = { ...prev, [fieldId]: value };
+
+      // ✅ Mise à jour immédiate via le Context pour synchronisation globale
+      updateSectionContent(activeSection, newFields);
+
+      return newFields;
+    });
   };
 
   const handleSave = async () => {
@@ -186,6 +210,34 @@ export default function SiteEditorSidebar({
             />
           </div>
 
+          {/* Image Hero */}
+          {activeSection === "hero" && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Image de fond
+              </label>
+              <div className="flex items-center gap-2">
+                <input
+                  type="text"
+                  value={fields.image || ""}
+                  onChange={(e) => handleFieldChange("image", e.target.value)}
+                  className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+                  placeholder="/images/hero.jpg"
+                />
+                <button
+                  onClick={() => {
+                    setMediaPickerField("image");
+                    setShowMediaPicker(true);
+                  }}
+                  className="px-3 py-2 bg-gray-100 hover:bg-gray-200 border border-gray-300 rounded-lg transition-colors"
+                  title="Sélectionner une image"
+                >
+                  <ImageIcon className="w-5 h-5 text-gray-600" />
+                </button>
+              </div>
+            </div>
+          )}
+
           {/* Boutons (Hero uniquement) */}
           {activeSection === "hero" && (
             <>
@@ -218,6 +270,16 @@ export default function SiteEditorSidebar({
                     }
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"
                   />
+                  <ColorPicker
+                    label="Couleur du bouton"
+                    value={fields.primaryButton?.color || "#ec4899"}
+                    onChange={(color) =>
+                      handleFieldChange("primaryButton", {
+                        ...fields.primaryButton,
+                        color,
+                      })
+                    }
+                  />
                 </div>
               </div>
 
@@ -249,6 +311,16 @@ export default function SiteEditorSidebar({
                       })
                     }
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+                  />
+                  <ColorPicker
+                    label="Couleur du bouton"
+                    value={fields.secondaryButton?.color || "#ffffff"}
+                    onChange={(color) =>
+                      handleFieldChange("secondaryButton", {
+                        ...fields.secondaryButton,
+                        color,
+                      })
+                    }
                   />
                 </div>
               </div>
@@ -297,7 +369,44 @@ export default function SiteEditorSidebar({
       </div>
 
       {/* Footer avec bouton sauvegarder */}
-      <div className="p-4 border-t border-gray-200">
+      <div className="p-4 border-t border-gray-200 space-y-3">
+        {/* Boutons de contrôle */}
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setPreviewMode("desktop")}
+            className={`flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-sm transition-colors ${
+              previewMode === "desktop"
+                ? "bg-gray-900 text-white"
+                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+            }`}
+            title="Mode Desktop"
+          >
+            <Monitor className="w-4 h-4" />
+          </button>
+          <button
+            onClick={() => setPreviewMode("tablet")}
+            className={`flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-sm transition-colors ${
+              previewMode === "tablet"
+                ? "bg-gray-900 text-white"
+                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+            }`}
+            title="Mode Tablette"
+          >
+            <Tablet className="w-4 h-4" />
+          </button>
+          <button
+            onClick={() => setPreviewMode("mobile")}
+            className={`flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-sm transition-colors ${
+              previewMode === "mobile"
+                ? "bg-gray-900 text-white"
+                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+            }`}
+            title="Mode Mobile"
+          >
+            <Smartphone className="w-4 h-4" />
+          </button>
+        </div>
+
         <button
           onClick={handleSave}
           disabled={saving}
@@ -307,6 +416,18 @@ export default function SiteEditorSidebar({
           {saving ? "Sauvegarde..." : "Sauvegarder"}
         </button>
       </div>
+
+      {/* Media Picker Modal */}
+      {showMediaPicker && (
+        <MediaPicker
+          onSelect={(url) => {
+            handleFieldChange(mediaPickerField, url);
+            setShowMediaPicker(false);
+          }}
+          onClose={() => setShowMediaPicker(false)}
+          currentValue={fields[mediaPickerField]}
+        />
+      )}
     </div>
   );
 }

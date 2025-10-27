@@ -1,4 +1,4 @@
-# 🔄 COMMENT REDÉMARRER NEXT.JS
+simplifier avec du JSON est préférable. Il serait plus simple de stocker les données en JSON/texte plutôt que du JSON brut SQL.# 🔄 COMMENT REDÉMARRER NEXT.JS
 
 ## 🎯 **OPTION 1 : Script Automatique (Recommandé)**
 

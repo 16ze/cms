@@ -5,8 +5,9 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
-import { ensureSuperAdmin } from "@/lib/tenant-auth";
+import { ensureSuperAdmin } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import bcrypt from "bcryptjs";
 
 /**
  * GET - Lister tous les tenants
@@ -153,11 +154,20 @@ export async function POST(request: NextRequest) {
     }
 
     // Créer le tenant avec le premier utilisateur en une transaction
-    const bcrypt = require("bcryptjs");
     const password = userPassword || "demo2025";
+
+    console.log("🔍 [API] Création tenant:", { name, email, slug, templateId });
+    console.log("🔍 [API] Mot de passe:", password ? "***" : "demo2025");
+
     const hashedPassword = await bcrypt.hash(password, 10);
+    console.log(
+      "🔍 [API] Mot de passe hashé:",
+      hashedPassword ? "***" : "ERREUR"
+    );
 
     const result = await prisma.$transaction(async (tx) => {
+      console.log("🔍 [API] Début transaction");
+
       // 1. Créer le tenant
       const newTenant = await tx.tenant.create({
         data: {
@@ -172,6 +182,8 @@ export async function POST(request: NextRequest) {
           template: true,
         },
       });
+
+      console.log("✅ [API] Tenant créé:", newTenant.id);
 
       // 2. Créer le premier utilisateur admin
       const firstName = name.split(" ")[0] || "Admin";
@@ -189,6 +201,8 @@ export async function POST(request: NextRequest) {
         },
       });
 
+      console.log("✅ [API] Utilisateur créé:", tenantUser.id);
+
       // 3. Activer le template pour ce tenant (créer SiteTemplate)
       await tx.siteTemplate.create({
         data: {
@@ -198,6 +212,8 @@ export async function POST(request: NextRequest) {
           activatedAt: new Date(),
         },
       });
+
+      console.log("✅ [API] Template activé");
 
       return { tenant: newTenant, user: tenantUser };
     });
@@ -225,4 +241,3 @@ export async function POST(request: NextRequest) {
     );
   }
 }
-

@@ -4,7 +4,8 @@ import { prisma } from "@/lib/prisma";
 
 const main = async () => {
   const email =
-    process.env.ADMIN_DEFAULT_EMAIL?.trim().toLowerCase() || "admin@example.com";
+    process.env.ADMIN_DEFAULT_EMAIL?.trim().toLowerCase() ||
+    "admin@example.com";
   const password = process.env.ADMIN_DEFAULT_PASSWORD || "ChangeMe123!";
 
   const existing = await prisma.adminUser.findUnique({ where: { email } });
@@ -18,6 +19,7 @@ const main = async () => {
   await prisma.adminUser.create({
     data: {
       email,
+      name: "Administrateur",
       hashedPassword,
       role: "SUPER_ADMIN",
     },
