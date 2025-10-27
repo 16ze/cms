@@ -149,8 +149,8 @@ export default function AdminLayout({
     };
 
     checkImpersonation();
-    // Vérifier périodiquement au cas où
-    const interval = setInterval(checkImpersonation, 2000);
+    // Vérifier périodiquement au cas où - RALENTI pour éviter les mini-refresh
+    const interval = setInterval(checkImpersonation, 15000); // 15 secondes au lieu de 2
     return () => clearInterval(interval);
   }, []);
 
