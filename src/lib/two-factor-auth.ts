@@ -8,7 +8,7 @@
  */
 
 import * as speakeasy from "speakeasy";
-import * as QRCode from "qrcode";
+import QRCode from "qrcode";
 import { prisma } from "./prisma";
 import { encrypt, decrypt, generateSecureToken } from "./crypto-utils";
 import { enhancedLogger } from "./logger";
