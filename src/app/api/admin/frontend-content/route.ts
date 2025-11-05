@@ -7,6 +7,17 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { ensureAdmin } from "@/lib/auth";
+import { validateRequest, commonSchemas } from "@/lib/validation";
+import { z } from "zod";
+
+const frontendContentSchema = z.object({
+  pageSlug: commonSchemas.nonEmptyString,
+  sectionSlug: commonSchemas.nonEmptyString,
+  dataType: z.enum(["text", "image", "video", "button", "list", "form"]),
+  content: z.any(), // JSON flexible pour le contenu
+  orderIndex: z.number().int().min(0).optional(),
+  isActive: z.boolean().optional(),
+});
 
 // GET - Liste tout le contenu frontend pour un tenant
 export async function GET(request: NextRequest) {
@@ -67,30 +78,14 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const data = await request.json();
-    console.log("📥 [API] Données reçues:", {
-      pageSlug: data.pageSlug,
-      sectionSlug: data.sectionSlug,
-      dataType: data.dataType,
-      content: data.content,
-    });
+    // Validation avec Zod
+    const validation = await validateRequest(request, frontendContentSchema);
+    if (!validation.success) {
+      return validation.response;
+    }
 
     const { pageSlug, sectionSlug, dataType, content, orderIndex, isActive } =
-      data;
-
-    // Validation
-    if (!pageSlug || !sectionSlug || !dataType || !content) {
-      console.error("❌ [API] Données manquantes:", {
-        pageSlug,
-        sectionSlug,
-        dataType,
-        hasContent: !!content,
-      });
-      return NextResponse.json(
-        { error: "Données manquantes" },
-        { status: 400 }
-      );
-    }
+      validation.data;
 
     // Vérifier si le contenu existe déjà
     const existing = await prisma.frontendContent.findUnique({

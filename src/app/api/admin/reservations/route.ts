@@ -9,6 +9,24 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { ensureAuthenticated } from "@/lib/tenant-auth";
 import { getTenantFilter, requireTenant } from "@/middleware/tenant-context";
+import { validateRequest, commonSchemas } from "@/lib/validation";
+import { z } from "zod";
+
+const createReservationSchema = z.object({
+  customerName: commonSchemas.nonEmptyString,
+  customerEmail: commonSchemas.email,
+  customerPhone: commonSchemas.phone,
+  date: z.string().datetime().or(z.coerce.date()),
+  time: z.string().regex(/^([01]?[0-9]|2[0-3]):[0-5][0-9]$/, "Format d'heure invalide (HH:MM)"),
+  guests: z.coerce.number().int().min(1).max(50),
+  tableId: z.string().uuid().optional().nullable(),
+  notes: z.string().optional().nullable(),
+});
+
+const updateReservationSchema = z.object({
+  id: z.string().uuid(),
+  status: z.enum(["PENDING", "CONFIRMED", "CANCELLED", "COMPLETED"]),
+});
 
 export async function GET(request: NextRequest) {
   try {
@@ -84,7 +102,12 @@ export async function POST(request: NextRequest) {
     // 🔒 Récupérer le tenantId
     const { tenantId } = await requireTenant(request);
 
-    const body = await request.json();
+    // Validation avec Zod
+    const validation = await validateRequest(request, createReservationSchema);
+    if (!validation.success) {
+      return validation.response;
+    }
+
     const {
       customerName,
       customerEmail,
@@ -94,15 +117,7 @@ export async function POST(request: NextRequest) {
       guests,
       tableId,
       notes,
-    } = body;
-
-    // Validation
-    if (!customerName || !customerEmail || !customerPhone || !date || !time || !guests) {
-      return NextResponse.json(
-        { success: false, error: "Champs requis manquants" },
-        { status: 400 }
-      );
-    }
+    } = validation.data;
 
     // Créer la réservation avec tenantId
     const reservation = await prisma.restaurantReservation.create({
@@ -113,7 +128,7 @@ export async function POST(request: NextRequest) {
         customerPhone,
         date: new Date(date),
         time,
-        guests: parseInt(guests),
+        guests,
         tableId: tableId || null,
         notes: notes || null,
         status: "PENDING",
@@ -149,15 +164,13 @@ export async function PATCH(request: NextRequest) {
     // 🔒 Récupérer le tenantId
     const { tenantId } = await requireTenant(request);
 
-    const body = await request.json();
-    const { id, status } = body;
-
-    if (!id || !status) {
-      return NextResponse.json(
-        { success: false, error: "ID et status requis" },
-        { status: 400 }
-      );
+    // Validation avec Zod
+    const validation = await validateRequest(request, updateReservationSchema);
+    if (!validation.success) {
+      return validation.response;
     }
+
+    const { id, status } = validation.data;
 
     // Vérifier que la réservation appartient au tenant
     const existing = await prisma.restaurantReservation.findFirst({

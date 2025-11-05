@@ -1,6 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { adminUserService } from "@/lib/admin-user-service";
 import { ensureAdmin } from "@/lib/require-admin";
+import { validateRequest, commonSchemas } from "@/lib/validation";
+import { z } from "zod";
+
+const createUserSchema = z.object({
+  name: commonSchemas.nonEmptyString,
+  email: commonSchemas.email,
+  password: z.string().min(8, "Le mot de passe doit contenir au moins 8 caractères"),
+  role: z.enum(["ADMIN", "SUPER_ADMIN"]).optional(),
+});
 
 export async function GET(request: NextRequest) {
   console.log("👥 API: Récupération des utilisateurs");
@@ -50,15 +59,13 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const body = await request.json();
-    const { name, email, password, role } = body;
-
-    if (!name || !email || !password) {
-      return NextResponse.json(
-        { error: "Nom, email et mot de passe sont requis" },
-        { status: 400 }
-      );
+    // Validation avec Zod
+    const validation = await validateRequest(request, createUserSchema);
+    if (!validation.success) {
+      return validation.response;
     }
+
+    const { name, email, password, role } = validation.data;
 
     const user = await adminUserService.create({
       name,

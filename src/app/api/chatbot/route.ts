@@ -478,15 +478,13 @@ Ou souhaitez-vous :
 
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json();
-    const { message, sessionId, conversationHistory = [] } = body;
-
-    if (!message || !sessionId) {
-      return NextResponse.json(
-        { error: "Message et sessionId requis" },
-        { status: 400 }
-      );
+    // Validation avec Zod
+    const validation = await validateRequest(request, chatbotMessageSchema);
+    if (!validation.success) {
+      return validation.response;
     }
+
+    const { message, sessionId, conversationHistory } = validation.data;
 
     const startTime = Date.now();
 
