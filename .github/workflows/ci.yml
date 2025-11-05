@@ -20,6 +20,16 @@ jobs:
           node-version: "20"
           cache: "npm"
 
+      - name: Cache Prisma
+        uses: actions/cache@v4
+        with:
+          path: |
+            node_modules/.prisma
+            node_modules/@prisma/client
+          key: ${{ runner.os }}-prisma-${{ hashFiles('**/prisma/schema.prisma') }}
+          restore-keys: |
+            ${{ runner.os }}-prisma-
+
       - name: Install dependencies
         run: npm ci
 
@@ -40,6 +50,8 @@ jobs:
 
       - name: Build application
         run: npm run build
+        env:
+          NODE_ENV: production
 
       - name: Install Playwright browsers
         run: npx playwright install --with-deps

@@ -1,5 +1,8 @@
 # CMS KAIRO Digital
 
+[![CI](https://github.com/16ze/cms/workflows/CI/badge.svg)](https://github.com/16ze/cms/actions)
+[![Quality](https://github.com/16ze/cms/workflows/Quality%20%26%20Security/badge.svg)](https://github.com/16ze/cms/actions)
+
 CMS modulaire multi-tenant développé par KAIRO Digital.
 
 ## 🚀 Stack Technique

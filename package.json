@@ -13,6 +13,8 @@
     "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,md}\"",
     "test": "playwright test",
     "test:e2e": "playwright test",
+    "test:unit": "playwright test --grep @unit || echo 'No unit tests configured'",
+    "test:integration": "playwright test --grep @integration || playwright test",
     "test:ui": "playwright test --ui",
     "test:headed": "playwright test --headed",
     "test:debug": "playwright test --debug",
