@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { MessageCircle, X, Send, Bot } from "lucide-react";
 import { useRouter } from "next/navigation";
 import contentData from "@/config/content.json";
+import { SafeHTML } from "@/components/SafeHTML";
 
 interface ChatMessage {
   id: string;
@@ -279,12 +280,14 @@ export default function KAIROChatbot({
               <div
                 key={message.id}
                 className={`message ${message.sender}-message`}
+                onClick={handleLinkClick}
               >
-                <div
+                <SafeHTML
+                  html={renderMessageWithLinks(message.message)}
                   className="message-bubble"
-                  onClick={handleLinkClick}
-                  dangerouslySetInnerHTML={{
-                    __html: renderMessageWithLinks(message.message),
+                  tag="div"
+                  onThreatDetected={(threat) => {
+                    console.warn("Threat detected in chatbot message:", threat);
                   }}
                 />
                 <span className="message-time">

@@ -6,6 +6,7 @@ import {
   AlignLeft, AlignCenter, AlignRight, Code, Quote, Undo, Redo 
 } from "lucide-react";
 import MediaManager from "./media-manager";
+import { useSafeHTML } from "@/components/SafeHTML";
 
 interface RichTextEditorProps {
   value: string;
@@ -20,6 +21,9 @@ export default function RichTextEditor({ value, onChange, placeholder, className
   const editorRef = useRef<HTMLDivElement>(null);
   const [history, setHistory] = useState<string[]>([value]);
   const [historyIndex, setHistoryIndex] = useState(0);
+  
+  // Sanitizer le HTML avant de l'afficher dans l'éditeur
+  const sanitizedValue = useSafeHTML(value);
 
   useEffect(() => {
     if (value !== history[historyIndex]) {
@@ -239,10 +243,14 @@ export default function RichTextEditor({ value, onChange, placeholder, className
         ref={editorRef}
         contentEditable
         className="p-4 min-h-[200px] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-inset"
-        onInput={(e) => onChange(e.currentTarget.innerHTML)}
+        onInput={(e) => {
+          // Le contenu est déjà sanitizer par DOMPurify via sanitizedValue
+          // Ici on passe juste le contenu brut car l'éditeur doit permettre l'édition
+          onChange(e.currentTarget.innerHTML);
+        }}
         onBlur={saveSelection}
         onFocus={restoreSelection}
-        dangerouslySetInnerHTML={{ __html: value }}
+        dangerouslySetInnerHTML={{ __html: sanitizedValue }}
         placeholder={placeholder}
       />
 

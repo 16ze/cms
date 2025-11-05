@@ -5,6 +5,7 @@ import { Eye, Monitor, Tablet, Smartphone, Save, Undo, Redo, Image as ImageIcon,
 import RichTextEditor from "./rich-text-editor";
 import MediaManager from "./media-manager";
 import DesignManager from "./design-manager";
+import { SafeHTML } from "@/components/SafeHTML";
 
 interface SectionEditorProps {
   section: {
@@ -384,13 +385,13 @@ export default function SectionEditor({ section, onSave }: SectionEditorProps) {
                 {section.sectionType === 'TEXT' && (
                   <div>
                     {content.bubble1 && (
-                      <div className="mb-3" dangerouslySetInnerHTML={{ __html: content.bubble1 }} />
+                      <SafeHTML html={content.bubble1} className="mb-3" />
                     )}
                     {content.bubble2 && (
-                      <div className="mb-3" dangerouslySetInnerHTML={{ __html: content.bubble2 }} />
+                      <SafeHTML html={content.bubble2} className="mb-3" />
                     )}
                     {content.bubble3 && (
-                      <div className="mb-3" dangerouslySetInnerHTML={{ __html: content.bubble3 }} />
+                      <SafeHTML html={content.bubble3} className="mb-3" />
                     )}
                   </div>
                 )}
@@ -400,7 +401,7 @@ export default function SectionEditor({ section, onSave }: SectionEditorProps) {
                     <h2 className="text-2xl font-bold text-gray-900 mb-2">
                       {content.title || 'Titre des services'}
                     </h2>
-                    <div className="text-gray-600 mb-4" dangerouslySetInnerHTML={{ __html: content.subtitle || 'Description des services' }} />
+                    <SafeHTML html={content.subtitle || 'Description des services'} className="text-gray-600 mb-4" />
                     <p className="text-lg font-medium text-gray-800 mb-4">
                       {content.slogan || 'Slogan des services'}
                     </p>
@@ -414,7 +415,7 @@ export default function SectionEditor({ section, onSave }: SectionEditorProps) {
                         <h4 className="font-medium text-gray-900 capitalize">
                           {key.replace(/([A-Z])/g, ' $1').trim()}
                         </h4>
-                        <div className="text-sm text-gray-600" dangerouslySetInnerHTML={{ __html: value as string }} />
+                        <SafeHTML html={value as string} className="text-sm text-gray-600" />
                       </div>
                     ))}
                   </div>

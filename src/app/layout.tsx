@@ -14,6 +14,7 @@ import DynamicStyleInjector from "@/components/design/DynamicStyleInjector";
 import { ScrollToTop } from "@/components/ui/scroll-to-top";
 import { BackToTop } from "@/components/ui/back-to-top";
 import { ErrorHandlerSetup } from "@/components/ErrorHandlerSetup";
+import { SecuritySetup } from "@/components/SecuritySetup";
 import { Suspense } from "react";
 import {
   GoogleAnalyticsLazy,
@@ -347,6 +348,7 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <ErrorHandlerSetup />
+          <SecuritySetup />
           <ScrollToTop />
           <BackToTop />
           <DynamicStyleInjector />
