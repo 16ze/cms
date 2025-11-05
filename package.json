@@ -16,6 +16,8 @@
     "test:unit": "playwright test --grep @unit || echo 'No unit tests configured'",
     "test:integration": "playwright test --grep @integration || playwright test",
     "test:stability": "playwright test tests/e2e/isolation.spec.ts tests/e2e/auth.spec.ts tests/e2e/crud.spec.ts tests/e2e/dashboard.spec.ts",
+    "test:security:e2e": "playwright test tests/e2e/rate-limiting.spec.ts tests/e2e/validation-zod.spec.ts tests/e2e/security-headers.spec.ts tests/e2e/isolation.spec.ts",
+    "test:security:all": "npm run test:security && npm run test:security:e2e",
     "test:isolation": "playwright test tests/e2e/isolation.spec.ts",
     "test:ui": "playwright test --ui",
     "test:headed": "playwright test --headed",
