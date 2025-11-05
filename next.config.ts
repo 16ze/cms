@@ -12,7 +12,29 @@ const nextConfig: NextConfig = {
 
   // 🔒 Headers de sécurité HTTP
   async headers() {
+    const isDev = process.env.NODE_ENV !== "production";
+
     const securityHeaders = [
+      {
+        key: "Content-Security-Policy",
+        value: `
+          default-src 'self';
+          script-src 'self' 'unsafe-inline' 'strict-dynamic' https:;
+          style-src 'self' 'unsafe-inline';
+          img-src 'self' data: https:;
+          font-src 'self' data:;
+          connect-src 'self' https://api.sentry.io ${isDev ? "http://localhost:* ws://localhost:*" : ""};
+          frame-ancestors 'none';
+          base-uri 'self';
+          form-action 'self';
+          object-src 'none';
+          frame-src 'none';
+          upgrade-insecure-requests;
+          report-uri /api/security/report;
+        `
+          .replace(/\s{2,}/g, " ")
+          .trim(),
+      },
       {
         key: "X-Frame-Options",
         value: "DENY",
@@ -36,11 +58,6 @@ const nextConfig: NextConfig = {
       {
         key: "Strict-Transport-Security",
         value: "max-age=63072000; includeSubDomains; preload",
-      },
-      {
-        key: "Content-Security-Policy",
-        value:
-          "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https:; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests;",
       },
     ];
 
