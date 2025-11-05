@@ -7,7 +7,7 @@
  */
 
 import { Counter, Histogram, register } from "prom-client";
-import { enhancedLogger } from "./logger";
+import { enhancedLogger } from "@/lib/logger";
 
 /**
  * Métriques Prometheus
