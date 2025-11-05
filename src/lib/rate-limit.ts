@@ -19,13 +19,23 @@ const redis = new Redis({
 });
 
 /**
- * Rate limiter global pour les routes API
+ * Rate limiter global pour les routes API (10 req/sec = 600 req/min)
  */
 export const globalApiRateLimiter = new Ratelimit({
   redis,
-  limiter: Ratelimit.slidingWindow(100, "1 m"), // 100 requêtes par minute
+  limiter: Ratelimit.slidingWindow(600, "1 m"), // 600 requêtes par minute (10/sec)
   analytics: true,
   prefix: "@upstash/ratelimit/api",
+});
+
+/**
+ * Rate limiter strict pour les routes API publiques (10 req/sec)
+ */
+export const apiRateLimiter = new Ratelimit({
+  redis,
+  limiter: Ratelimit.slidingWindow(10, "1 s"), // 10 requêtes par seconde
+  analytics: true,
+  prefix: "@upstash/ratelimit/api-strict",
 });
 
 /**

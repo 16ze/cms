@@ -14,6 +14,71 @@
 const isEdgeRuntime =
   typeof process !== "undefined" && process.env.NEXT_RUNTIME === "edge";
 
+/**
+ * Masquer les données sensibles dans les logs
+ */
+function sanitizeLogData(data: unknown): unknown {
+  if (typeof data === "string") {
+    // Masquer les tokens, mots de passe, clés API
+    return data
+      .replace(/(password|passwd|pwd|token|secret|key|api[_-]?key|auth[_-]?token)\s*[:=]\s*["']?([^"'\s]+)/gi, "$1: [MASQUÉ]")
+      .replace(/(Bearer\s+)([A-Za-z0-9\-._~+/]+)/g, "$1[MASQUÉ]")
+      .replace(/(\b[A-Za-z0-9\-._~+/]{32,}\b)/g, (match) => {
+        // Masquer les tokens longs
+        if (match.length > 32) return "[TOKEN_MASQUÉ]";
+        return match;
+      });
+  }
+
+  if (Array.isArray(data)) {
+    return data.map(sanitizeLogData);
+  }
+
+  if (data && typeof data === "object") {
+    const sanitized: Record<string, unknown> = {};
+    const sensitiveKeys = [
+      "password",
+      "passwd",
+      "pwd",
+      "token",
+      "secret",
+      "key",
+      "apiKey",
+      "api_key",
+      "authToken",
+      "auth_token",
+      "refreshToken",
+      "refresh_token",
+      "accessToken",
+      "access_token",
+      "authorization",
+      "cookie",
+    ];
+
+    for (const [key, value] of Object.entries(data)) {
+      if (sensitiveKeys.includes(key.toLowerCase())) {
+        sanitized[key] = "[MASQUÉ]";
+      } else {
+        sanitized[key] = sanitizeLogData(value);
+      }
+    }
+
+    return sanitized;
+  }
+
+  return data;
+}
+
+/**
+ * Masquer les IDs Prisma dans les messages
+ */
+function maskPrismaIds(message: string): string {
+  return message.replace(
+    /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/gi,
+    "[ID_MASQUÉ]"
+  );
+}
+
 // Types pour le contexte de log
 export interface LogContext {
   tenantId?: string;
@@ -52,18 +117,48 @@ class EdgeLogger {
   }
 
   error(message: string, error?: Error | unknown, context?: LogContext): void {
+    const sanitizedContext = sanitizeLogData(context) as LogContext;
+    const sanitizedMessage = maskPrismaIds(message);
+    
     const errorContext = {
-      ...context,
+      ...sanitizedContext,
       error:
         error instanceof Error
           ? {
               name: error.name,
-              message: error.message,
-              stack: error.stack,
+              message: maskPrismaIds(error.message),
+              stack: typeof process !== "undefined" && process.env.NODE_ENV !== "production" ? error.stack : undefined,
             }
-          : error,
+          : sanitizeLogData(error),
     };
-    console.error(this.formatMessage("error", message, errorContext));
+    
+    console.error(this.formatMessage("error", sanitizedMessage, errorContext));
+    
+    // Envoyer à Sentry si disponible
+    if (typeof process !== "undefined" && process.env.NEXT_PUBLIC_SENTRY_DSN) {
+      try {
+        const Sentry = require("@sentry/nextjs");
+        if (error instanceof Error) {
+          Sentry.captureException(error, {
+            contexts: {
+              log: sanitizedContext,
+            },
+            tags: {
+              logger: "edge",
+            },
+          });
+        } else {
+          Sentry.captureMessage(sanitizedMessage, {
+            level: "error",
+            contexts: {
+              log: errorContext,
+            },
+          });
+        }
+      } catch {
+        // Sentry non disponible, ignorer
+      }
+    }
   }
 
   tenant(
@@ -141,22 +236,51 @@ class EnhancedLogger {
   }
 
   error(message: string, error?: Error | unknown, context?: LogContext): void {
+    const sanitizedContext = sanitizeLogData(context) as LogContext;
+    const sanitizedMessage = maskPrismaIds(message);
+    
     const errorContext = {
-      ...context,
+      ...sanitizedContext,
       error:
         error instanceof Error
           ? {
               name: error.name,
-              message: error.message,
+              message: maskPrismaIds(error.message),
               stack: typeof process !== "undefined" && process.env.NODE_ENV !== "production" ? error.stack : undefined,
             }
-          : error,
+          : sanitizeLogData(error),
     };
 
     if (this.logger?.error) {
-      this.logger.error(errorContext, message);
+      this.logger.error(errorContext, sanitizedMessage);
     } else {
-      console.error(`[ERROR] ${message}`, errorContext);
+      console.error(`[ERROR] ${sanitizedMessage}`, errorContext);
+    }
+
+    // Envoyer à Sentry si disponible
+    if (typeof process !== "undefined" && process.env.NEXT_PUBLIC_SENTRY_DSN) {
+      try {
+        const Sentry = require("@sentry/nextjs");
+        if (error instanceof Error) {
+          Sentry.captureException(error, {
+            contexts: {
+              log: sanitizedContext,
+            },
+            tags: {
+              logger: "pino",
+            },
+          });
+        } else {
+          Sentry.captureMessage(sanitizedMessage, {
+            level: "error",
+            contexts: {
+              log: errorContext,
+            },
+          });
+        }
+      } catch {
+        // Sentry non disponible, ignorer
+      }
     }
   }
 

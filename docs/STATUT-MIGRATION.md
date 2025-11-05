@@ -41,17 +41,22 @@
 
 ### Priorité Haute (Semaine 1)
 
-- [ ] `/api/admin/clients` → Migrer vers route refactorisée
-- [ ] `/api/admin/projets` → Migrer vers route refactorisée
-- [ ] `/api/auth/login/super-admin` → Migrer vers safeHandler
-- [ ] `/api/admin/users` → Migrer vers route refactorisée
+- [x] `/api/admin/clients` → Migrer vers route refactorisée ✅
+- [x] `/api/admin/projets` → Migrer vers route refactorisée ✅
+- [x] `/api/auth/login/tenant` → Migrer vers route refactorisée ✅
+- [x] `/api/admin/users` → Migrer vers route refactorisée ✅
+- [x] `/api/super-admin/tenants` → Migrer vers route refactorisée ✅
+- [x] `/api/admin/reservations` → Migrer vers route refactorisée ✅
+- [x] `/api/admin/commandes` → Migrer vers route refactorisée ✅
 
 ### Priorité Moyenne (Semaine 2-3)
 
-- [ ] `/api/admin/reservations/*`
-- [ ] `/api/admin/commandes/*`
-- [ ] `/api/admin/content/*`
-- [ ] `/api/admin/content/media/*`
+- [x] `/api/admin/content/sections` → Migrer vers route refactorisée ✅
+- [x] `/api/admin/content/media` → Migrer vers route refactorisée ✅
+- [ ] `/api/admin/content/pages` → Migrer vers safeHandler
+- [ ] `/api/admin/content/media/upload` → Migrer vers safeHandler
+- [ ] `/api/admin/rendez-vous-beaute/*` → Migrer vers safeHandler
+- [ ] `/api/admin/produits/*` → Migrer vers safeHandler
 
 ### Priorité Basse (Semaine 4+)
 
@@ -70,6 +75,13 @@ npm run migrate:routes -- --file src/app/api/admin/clients/route.ts
 
 # Analyser tous les fichiers
 npm run migrate:routes -- --all --dry-run
+
+# Remplacer une route par sa version migrée
+npm run replace:route -- --from src/app/api/admin/reservations/route.ts \\
+                            --to src/app/api/admin/reservations-refactored/route.ts
+
+# Remplacer toutes les routes migrées automatiquement
+npm run replace:route -- --all --dry-run
 ```
 
 ### Configuration Infrastructure

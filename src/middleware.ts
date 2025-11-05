@@ -1,10 +1,12 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { applySecureHeaders } from "@/lib/secure-headers";
-import { applyRateLimit, adminRateLimiter, superAdminRateLimiter } from "@/lib/rate-limit";
+import { applyRateLimit, adminRateLimiter, superAdminRateLimiter, apiRateLimiter } from "@/lib/rate-limit";
 import { setTenantContext } from "@/lib/prisma-middleware";
 import { getAuthenticatedUser } from "@/lib/tenant-auth";
 import { enhancedLogger } from "@/lib/logger";
+import { applyWAF } from "@/lib/waf";
+import { validateOriginAndReferer } from "@/lib/tenant-context-validator";
 import { v4 as uuidv4 } from "uuid";
 
 /**
@@ -32,11 +34,47 @@ export async function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
   const requestId = uuidv4();
 
+  // 🛡️ WAF - Vérifier toutes les requêtes API en premier
+  if (pathname.startsWith("/api")) {
+    const wafResponse = await applyWAF(request);
+    if (wafResponse) {
+      // Ajouter le header X-Edge-Security
+      wafResponse.headers.set("X-Edge-Security", "blocked");
+      return wafResponse;
+    }
+  }
+
   // 🔒 Bloquer l'accès public aux routes admin et super-admin
   if (
     pathname.startsWith("/api/admin") ||
     pathname.startsWith("/api/super-admin")
   ) {
+    // Vérifier l'origine et le referer pour les routes sensibles
+    const allowedOrigins = process.env.NEXT_PUBLIC_ADMIN_ALLOWED_ORIGINS
+      ? process.env.NEXT_PUBLIC_ADMIN_ALLOWED_ORIGINS.split(",").map((o) => o.trim())
+      : [];
+
+    const originCheck = validateOriginAndReferer(request, allowedOrigins);
+    if (!originCheck.valid) {
+      enhancedLogger.warn("Origin/Referer validation failed", {
+        requestId,
+        path: pathname,
+        ip: request.headers.get("x-forwarded-for") || request.ip || "unknown",
+        error: originCheck.error,
+      });
+
+      return applySecureHeaders(
+        NextResponse.json(
+          {
+            success: false,
+            error: "Forbidden",
+            message: "Invalid origin",
+          },
+          { status: 403 }
+        )
+      );
+    }
+
     const user = await getAuthenticatedUser(request);
     
     if (!user) {
@@ -89,9 +127,9 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  // Appliquer rate limiting sur les autres routes API
+  // Appliquer rate limiting sur les autres routes API (10 req/sec)
   if (pathname.startsWith("/api") && !pathname.startsWith("/api/admin") && !pathname.startsWith("/api/super-admin")) {
-    const rateLimitResponse = await applyRateLimit(request);
+    const rateLimitResponse = await applyRateLimit(request, apiRateLimiter);
     if (rateLimitResponse) {
       return rateLimitResponse;
     }
@@ -148,7 +186,14 @@ export async function middleware(request: NextRequest) {
 
   // Laisser passer toutes les autres requêtes avec headers de sécurité
   const response = NextResponse.next();
-  return applySecureHeaders(response);
+  const securedResponse = applySecureHeaders(response);
+  
+  // Ajouter le header X-Edge-Security pour indiquer que le WAF est actif
+  if (pathname.startsWith("/api")) {
+    securedResponse.headers.set("X-Edge-Security", "active");
+  }
+  
+  return securedResponse;
 }
 
 // Configuration pour spécifier sur quelles routes le middleware s'applique
