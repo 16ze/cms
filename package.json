@@ -15,6 +15,8 @@
     "test:e2e": "playwright test",
     "test:unit": "playwright test --grep @unit || echo 'No unit tests configured'",
     "test:integration": "playwright test --grep @integration || playwright test",
+    "test:stability": "playwright test tests/e2e/isolation.spec.ts tests/e2e/auth.spec.ts tests/e2e/crud.spec.ts tests/e2e/dashboard.spec.ts",
+    "test:isolation": "playwright test tests/e2e/isolation.spec.ts",
     "test:ui": "playwright test --ui",
     "test:headed": "playwright test --headed",
     "test:debug": "playwright test --debug",

@@ -18,7 +18,7 @@ if (process.env.NODE_ENV !== "production") {
  * @see https://playwright.dev/docs/test-configuration
  */
 export default defineConfig({
-  testDir: "./tests",
+  testDir: "./tests/e2e",
   /* Run tests in files in parallel */
   fullyParallel: true,
   /* Fail the build on CI if you accidentally left test.only in the source code. */
@@ -39,6 +39,12 @@ export default defineConfig({
   use: {
     /* Base URL to use in actions like `await page.goto('/')`. */
     baseURL: "http://localhost:3000",
+
+    /* Storage state for authentication */
+    storageState: process.env.CI ? undefined : "tests/.auth-state.json",
+
+    /* Headless mode */
+    headless: process.env.CI ? true : false,
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: "on-first-retry",
