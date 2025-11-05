@@ -50,13 +50,22 @@ Les fichiers de configuration Sentry sont déjà créés :
 
 ## ✅ Vérification de la Configuration
 
-### 1. Vérifier que Sentry est bien initialisé
+### 1. Utiliser le script de vérification automatique
 
-Après avoir ajouté les variables d'environnement, redémarrez votre serveur de développement :
+Un script de vérification automatique est disponible :
 
 ```bash
-npm run dev
+npm run check:sentry
 ```
+
+Ce script vérifie :
+- ✅ Présence des variables d'environnement
+- ✅ Format du DSN
+- ✅ Présence des fichiers de configuration
+- ✅ Intégration dans `next.config.ts`
+- ✅ Configuration du sample rate
+
+Il affiche un rapport détaillé avec les erreurs et avertissements.
 
 ### 2. Tester la capture d'erreurs
 
@@ -83,6 +92,8 @@ Si vous voyez des erreurs, vérifiez :
 - Que `NEXT_PUBLIC_SENTRY_DSN` est correctement défini
 - Que le DSN commence bien par `https://`
 - Que votre projet Sentry est actif
+
+### 4. Vérifier la configuration via le script
 
 ## 📊 Utilisation en Production
 

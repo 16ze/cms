@@ -46,6 +46,33 @@ jobs:
         run: npm run test:security || echo "Security tests completed"
         continue-on-error: true
 
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps
+
+      - name: Setup test database
+        run: |
+          mkdir -p prisma
+          DATABASE_URL="file:./prisma/test.db" npx prisma migrate deploy || echo "Migration skipped"
+        env:
+          DATABASE_URL: "file:./prisma/test.db"
+
+      - name: Run security E2E tests
+        run: npm run test:security:e2e
+        env:
+          DATABASE_URL: "file:./prisma/test.db"
+          NODE_ENV: test
+        continue-on-error: true
+
+      - name: Upload security E2E test reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: security-e2e-reports
+          path: |
+            playwright-report/
+            tests-logs/ci-report/
+          retention-days: 30
+
       - name: Generate Security Report
         run: npm run report:audit
 

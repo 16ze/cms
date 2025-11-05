@@ -38,7 +38,8 @@
     "audit:security": "npm audit --production",
     "lint:strict": "eslint . --ext .ts,.tsx --max-warnings=0",
     "test:security": "ts-node scripts/test-security.ts",
-    "report:audit": "tsx scripts/generate-security-report.ts"
+    "report:audit": "tsx scripts/generate-security-report.ts",
+    "check:sentry": "tsx scripts/check-sentry.ts"
   },
   "dependencies": {
     "@faker-js/faker": "^10.1.0",

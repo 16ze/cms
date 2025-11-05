@@ -68,6 +68,13 @@ jobs:
           DATABASE_URL: "file:./prisma/test.db"
         continue-on-error: true
 
+      - name: Run security E2E tests
+        run: npm run test:security:e2e
+        env:
+          DATABASE_URL: "file:./prisma/test.db"
+          NODE_ENV: test
+        continue-on-error: true
+
       - name: Upload test reports
         if: always()
         uses: actions/upload-artifact@v4
