@@ -191,9 +191,6 @@ export async function POST(request: NextRequest) {
 
     // Créer le nouveau client avec Prisma + tenantId
     const newClient = await prisma.client.create({
-
-    // Créer le nouveau client avec Prisma + tenantId
-    const newClient = await prisma.client.create({
       data: {
         tenantId, // 🔒 ISOLATION
         firstName: firstName.trim(),
