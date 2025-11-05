@@ -50,8 +50,8 @@ tests-logs/
 
 # documentation et informations sensibles
 /documentation/
-/docs/
 /docs_web/
+!docs/
 lighthouse-report.html
 test-email.js
 
