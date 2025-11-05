@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import { withSentryConfig } from "@sentry/nextjs";
 
 const nextConfig: NextConfig = {
   /* config options here */
@@ -73,4 +74,29 @@ const nextConfig: NextConfig = {
   productionBrowserSourceMaps: false,
 };
 
-export default nextConfig;
+// Configuration Sentry (si DSN est défini)
+const sentryOptions = {
+  // Silently print source maps
+  silent: true,
+  org: process.env.SENTRY_ORG,
+  project: process.env.SENTRY_PROJECT,
+  // Only upload source maps in production
+  widenClientFileUpload: true,
+  // Transpiles SDK to be compatible with IE11
+  transpileClientSDK: true,
+  // Route browser requests to Sentry through a Next.js rewrite to circumvent ad-blockers
+  tunnelRoute: "/monitoring",
+  // Hides source maps from generated client bundles
+  hideSourceMaps: true,
+  // Automatically tree-shake Sentry logger statements to reduce bundle size
+  disableLogger: true,
+  // Enables automatic instrumentation of Vercel Cron Monitors
+  automaticVercelMonitors: true,
+};
+
+// Wrapper avec Sentry si configuré
+const isSentryEnabled = Boolean(process.env.NEXT_PUBLIC_SENTRY_DSN && process.env.NODE_ENV === "production");
+
+export default isSentryEnabled
+  ? withSentryConfig(nextConfig, sentryOptions)
+  : nextConfig;
