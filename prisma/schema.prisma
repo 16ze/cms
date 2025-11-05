@@ -2595,3 +2595,38 @@ model SiteButton {
   @@unique([tenantId, key])
   @@index([tenantId])
 }
+
+// ===== GESTION DES SESSIONS & REFRESH TOKENS =====
+
+model RefreshToken {
+  id            String   @id @default(uuid())
+  token         String   @unique // Token chiffré (AES-256-GCM)
+  userId        String   // ID de l'utilisateur (SuperAdmin ou TenantUser)
+  userType      String   // "SUPER_ADMIN" ou "TENANT_USER"
+  tenantId      String?  // Optionnel, pour TenantUser
+  expiresAt     DateTime
+  revoked       Boolean  @default(false)
+  revokedAt     DateTime?
+  lastUsedAt    DateTime?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  @@index([token])
+  @@index([userId, userType])
+  @@index([expiresAt])
+  @@index([revoked])
+}
+
+// ===== 2FA POUR SUPER ADMIN =====
+
+model SuperAdmin2FA {
+  id            String   @id @default(uuid())
+  superAdminId  String   @unique
+  secret        String   // Secret TOTP chiffré (AES-256-GCM)
+  isEnabled     Boolean  @default(false)
+  backupCodes   String?  // Codes de secours chiffrés (JSON array)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  @@index([superAdminId])
+}
