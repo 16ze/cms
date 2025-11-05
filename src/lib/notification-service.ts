@@ -5,6 +5,13 @@ import {
   NotificationPriority,
 } from "@prisma/client";
 
+export interface NotificationMetadata {
+  reservationId?: string;
+  clientId?: string;
+  contentId?: string;
+  [key: string]: unknown;
+}
+
 export interface CreateNotificationInput {
   userId: string;
   type: NotificationType;
@@ -14,7 +21,7 @@ export interface CreateNotificationInput {
   priority?: NotificationPriority;
   actionUrl?: string;
   actionLabel?: string;
-  metadata?: any;
+  metadata?: NotificationMetadata;
   expiresAt?: Date;
 }
 
@@ -89,7 +96,13 @@ export class NotificationService {
    */
   async getNotifications(filters: NotificationFilters) {
     try {
-      const where: any = {
+      const where: {
+        userId: string;
+        category?: NotificationCategory;
+        read?: boolean;
+        priority?: NotificationPriority;
+        OR?: Array<{ expiresAt: null } | { expiresAt: { gte: Date } }>;
+      } = {
         userId: filters.userId,
       };
 
@@ -277,7 +290,23 @@ export class NotificationService {
   /**
    * Mettre à jour les préférences d'un utilisateur
    */
-  async updateUserPreferences(userId: string, preferences: any) {
+  async updateUserPreferences(
+    userId: string,
+    preferences: Partial<{
+      emailEnabled: boolean;
+      pushEnabled: boolean;
+      soundEnabled: boolean;
+      reservations: boolean;
+      clients: boolean;
+      seo: boolean;
+      system: boolean;
+      content: boolean;
+      security: boolean;
+      quietHoursEnabled: boolean;
+      quietHoursStart: string;
+      quietHoursEnd: string;
+    }>
+  ) {
     try {
       const updated = await prisma.notificationPreference.upsert({
         where: { userId },
@@ -304,7 +333,7 @@ export class NotificationService {
     notificationId: string,
     userId: string,
     action: string,
-    metadata?: any
+    metadata?: NotificationMetadata
   ) {
     try {
       await prisma.notificationHistory.create({
@@ -325,7 +354,14 @@ export class NotificationService {
    * Vérifier si une catégorie est activée pour l'utilisateur
    */
   private isCategoryEnabled(
-    preferences: any,
+    preferences: {
+      reservations?: boolean;
+      clients?: boolean;
+      seo?: boolean;
+      system?: boolean;
+      content?: boolean;
+      security?: boolean;
+    },
     category: NotificationCategory
   ): boolean {
     const categoryMap: Record<NotificationCategory, keyof typeof preferences> =
@@ -346,7 +382,11 @@ export class NotificationService {
   /**
    * Vérifier si on est dans les heures calmes
    */
-  private isInQuietHours(preferences: any): boolean {
+  private isInQuietHours(preferences: {
+    quietHoursEnabled: boolean;
+    quietHoursStart?: string;
+    quietHoursEnd?: string;
+  }): boolean {
     if (!preferences.quietHoursEnabled) {
       return false;
     }
@@ -379,8 +419,8 @@ export class NotificationService {
   // Nouvelle réservation
   async notifyNewReservation(
     userId: string,
-    reservation: any
-  ): Promise<any | null> {
+    reservation: { id: string; clientName: string; startTime: string | Date }
+  ) {
     return this.create({
       userId,
       type: NotificationType.INFO,
@@ -401,8 +441,8 @@ export class NotificationService {
   // Réservation confirmée
   async notifyReservationConfirmed(
     userId: string,
-    reservation: any
-  ): Promise<any | null> {
+    reservation: { id: string; clientName: string }
+  ) {
     return this.create({
       userId,
       type: NotificationType.SUCCESS,
@@ -419,8 +459,8 @@ export class NotificationService {
   // Réservation annulée
   async notifyReservationCancelled(
     userId: string,
-    reservation: any
-  ): Promise<any | null> {
+    reservation: { id: string; clientName: string }
+  ) {
     return this.create({
       userId,
       type: NotificationType.WARNING,
@@ -435,7 +475,7 @@ export class NotificationService {
   }
 
   // Nouveau client
-  async notifyNewClient(userId: string, client: any): Promise<any | null> {
+  async notifyNewClient(userId: string, client: { id: string; firstName: string; lastName: string }) {
     return this.create({
       userId,
       type: NotificationType.SUCCESS,
@@ -450,7 +490,7 @@ export class NotificationService {
   }
 
   // Client mis à jour
-  async notifyClientUpdated(userId: string, client: any): Promise<any | null> {
+  async notifyClientUpdated(userId: string, client: { id: string; firstName: string; lastName: string }) {
     return this.create({
       userId,
       type: NotificationType.INFO,
@@ -469,7 +509,7 @@ export class NotificationService {
     userId: string,
     message: string,
     priority: NotificationPriority = NotificationPriority.MEDIUM
-  ): Promise<any | null> {
+  ) {
     return this.create({
       userId,
       type: NotificationType.WARNING,
@@ -499,8 +539,8 @@ export class NotificationService {
   // Contenu publié
   async notifyContentPublished(
     userId: string,
-    content: any
-  ): Promise<any | null> {
+    content: { id: string; title: string; slug: string }
+  ) {
     return this.create({
       userId,
       type: NotificationType.SUCCESS,

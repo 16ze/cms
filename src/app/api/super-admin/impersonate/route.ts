@@ -14,6 +14,7 @@ import {
   ADMIN_SESSION_COOKIE,
   ADMIN_SESSION_MAX_AGE_SECONDS,
 } from "@/lib/admin-session";
+import { setSecureCookie } from "@/lib/cookie-utils";
 
 /**
  * POST - Se connecter en tant qu'un tenant
@@ -151,13 +152,9 @@ export async function POST(request: NextRequest) {
         ADMIN_SESSION_MAX_AGE_SECONDS
       );
 
-      // Définir le cookie d'impersonation
-      response.cookies.set(ADMIN_SESSION_COOKIE, impersonationToken, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
+      // Définir le cookie d'impersonation avec le helper standardisé
+      setSecureCookie(response, ADMIN_SESSION_COOKIE, impersonationToken, {
         maxAge: ADMIN_SESSION_MAX_AGE_SECONDS,
-        path: "/",
       });
 
       return response;
@@ -198,13 +195,9 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    // Définir le cookie d'impersonation
-    response.cookies.set(ADMIN_SESSION_COOKIE, impersonationToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
+    // Définir le cookie d'impersonation avec le helper standardisé
+    setSecureCookie(response, ADMIN_SESSION_COOKIE, impersonationToken, {
       maxAge: ADMIN_SESSION_MAX_AGE_SECONDS,
-      path: "/",
     });
 
     return response;

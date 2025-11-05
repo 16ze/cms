@@ -5,6 +5,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { loginSuperAdmin } from "@/lib/tenant-auth";
+import { setSecureCookie } from "@/lib/cookie-utils";
 
 export async function POST(request: NextRequest) {
   try {
@@ -42,13 +43,9 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    // Définir le cookie de session (httpOnly, secure, sameSite)
-    response.cookies.set("auth_session", result.token!, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
+    // Définir le cookie de session avec les paramètres sécurisés standardisés
+    setSecureCookie(response, "auth_session", result.token!, {
       maxAge: 60 * 60 * 24 * 7, // 7 jours
-      path: "/",
     });
 
     return response;

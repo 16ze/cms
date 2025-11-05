@@ -12,6 +12,7 @@ import {
   getAdminSessionSecret,
   signAdminSession,
 } from "@/lib/admin-session";
+import { setSecureCookie } from "@/lib/cookie-utils";
 
 export async function POST(request: NextRequest) {
   try {
@@ -101,14 +102,9 @@ export async function POST(request: NextRequest) {
       ADMIN_SESSION_MAX_AGE_SECONDS
     );
 
-    response.cookies.set({
-      name: ADMIN_SESSION_COOKIE,
-      value: token,
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
+    // Utiliser le helper standardisé pour définir le cookie
+    setSecureCookie(response, ADMIN_SESSION_COOKIE, token, {
       maxAge: ADMIN_SESSION_MAX_AGE_SECONDS,
-      path: "/",
     });
 
     return response;

@@ -6,6 +6,7 @@ import {
   getAdminSessionSecret,
   signAdminSession,
 } from "@/lib/admin-session";
+import { setSecureCookie } from "@/lib/cookie-utils";
 
 // Interface pour les données de connexion
 interface LoginRequest {
@@ -77,14 +78,9 @@ export async function POST(request: NextRequest) {
       ADMIN_SESSION_MAX_AGE_SECONDS
     );
 
-    response.cookies.set({
-      name: ADMIN_SESSION_COOKIE,
-      value: token,
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax", // Permet les navigations GET (window.location.href)
+    // Utiliser le helper standardisé pour définir le cookie
+    setSecureCookie(response, ADMIN_SESSION_COOKIE, token, {
       maxAge: ADMIN_SESSION_MAX_AGE_SECONDS,
-      path: "/", // Cookie accessible sur tout le site, y compris les APIs
     });
 
     console.log("📝 API: Fin de traitement POST /api/auth/login");
