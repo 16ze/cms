@@ -9,12 +9,17 @@ import "@/styles/micro-interactions.css";
 import "@/styles/button-enhancements.css";
 import CookieConsent from "@/components/CookieConsent";
 import ConditionalChatbot from "@/components/conditional-chatbot";
-import GoogleAnalytics from "@/components/GoogleAnalytics";
 import { DesignSyncProvider } from "@/components/design-sync-provider";
 import DynamicStyleInjector from "@/components/design/DynamicStyleInjector";
 import { ScrollToTop } from "@/components/ui/scroll-to-top";
 import { BackToTop } from "@/components/ui/back-to-top";
 import { ErrorHandlerSetup } from "@/components/ErrorHandlerSetup";
+import { Suspense } from "react";
+import {
+  GoogleAnalyticsLazy,
+  ConditionalChatbotLazy,
+  LazyComponentWrapper,
+} from "@/lib/lazy-components";
 import companyData from "@/config/company.json";
 import contentData from "@/config/content.json";
 
@@ -349,7 +354,10 @@ export default function RootLayout({
             {children}
             <Toaster />
             <CookieConsent />
-            <ConditionalChatbot />
+            <LazyComponentWrapper>
+              <GoogleAnalyticsLazy />
+              <ConditionalChatbotLazy />
+            </LazyComponentWrapper>
           </DesignSyncProvider>
         </ThemeProvider>
       </body>

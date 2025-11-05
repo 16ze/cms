@@ -2,9 +2,19 @@
 
 import { useRouter, usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
+import dynamic from "next/dynamic";
 import AdminSidebar from "@/app/admin/components/AdminSidebar";
-import AdminAssistant from "@/components/admin/admin-assistant";
-import NotificationBell from "@/components/admin/NotificationBell";
+
+// Lazy loading des composants lourds
+const AdminAssistant = dynamic(() => import("@/components/admin/admin-assistant"), {
+  loading: () => <div className="animate-pulse bg-gray-200 h-10 w-10 rounded" />,
+  ssr: false,
+});
+
+const NotificationBell = dynamic(() => import("@/components/admin/NotificationBell"), {
+  loading: () => <div className="animate-pulse bg-gray-200 h-8 w-8 rounded-full" />,
+  ssr: false,
+});
 import adminContentData from "@/config/admin-content.json";
 import { useAdminSession } from "@/hooks/use-admin-session";
 import { useSidebarMode } from "@/hooks/use-sidebar-mode";
@@ -79,8 +89,6 @@ export default function AdminLayout({
 
   // Fonction pour sauvegarder le contenu édité
   const handleEditorSave = async (section: string, data: any) => {
-    console.log("💾 [Layout] Sauvegarde demandée:", { section, data });
-
     try {
       // La structure attendue par l'API:
       // - pageSlug: "accueil"
@@ -88,31 +96,25 @@ export default function AdminLayout({
       // - dataType: "text"
       // - content: { title, subtitle, ... } (données brutes)
 
-      const response = await fetch("/api/admin/frontend-content", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          pageSlug: "accueil",
-          sectionSlug: section,
-          dataType: "text",
-          content: data, // data contient déjà les champs title, subtitle, etc.
-        }),
-      });
-
-      console.log(
-        "📡 [Layout] Réponse API:",
-        response.status,
-        response.statusText
+      await safeApiCall(
+        "/api/admin/frontend-content",
+        {
+          method: "POST",
+          body: JSON.stringify({
+            pageSlug: "accueil",
+            sectionSlug: section,
+            dataType: "text",
+            content: data, // data contient déjà les champs title, subtitle, etc.
+          }),
+        },
+        {
+          component: "AdminLayout",
+          action: "editor-save",
+          metadata: { section },
+        }
       );
 
-      if (!response.ok) {
-        const errorData = await response.text();
-        console.error("❌ [Layout] Erreur API:", errorData);
-        throw new Error(`Erreur ${response.status}: ${errorData}`);
-      }
-
-      const result = await response.json();
-      console.log("✅ [Layout] Sauvegarde réussie:", result);
+      toast.success("Contenu sauvegardé avec succès");
 
       // Recharger le contenu après sauvegarde
       await reloadContent();
@@ -123,7 +125,13 @@ export default function AdminLayout({
       // Déclencher un événement pour recharger l'iframe
       window.dispatchEvent(new CustomEvent("content-updated"));
     } catch (error) {
-      console.error("❌ [Layout] Erreur sauvegarde:", error);
+      const errorMessage = error instanceof Error ? error.message : "Erreur lors de la sauvegarde";
+      toast.error(errorMessage);
+      captureClientError(error, {
+        component: "AdminLayout",
+        action: "editor-save-error",
+        metadata: { section },
+      });
       throw error;
     }
   };
@@ -172,8 +180,12 @@ export default function AdminLayout({
         alert(`Erreur: ${data.error}`);
       }
     } catch (error) {
-      console.error("Erreur sortie impersonation:", error);
-      alert("Erreur lors de la sortie du mode impersonation");
+      const errorMessage = error instanceof Error ? error.message : "Erreur lors de la sortie du mode impersonation";
+      toast.error(errorMessage);
+      captureClientError(error, {
+        component: "AdminLayout",
+        action: "exit-impersonation-error",
+      });
     }
   };
 
@@ -213,14 +225,6 @@ export default function AdminLayout({
     email: sessionUser.email,
     role: normalizedRole,
   };
-
-  // Debug logs pour AdminSidebar props
-  console.log("🔍 [Layout] AdminSidebar props:", {
-    sidebarMode: sidebarMode === "default" ? "navigation" : sidebarMode,
-    hasEditorContent: !!frontendContent,
-    hasEditorSave: !!handleEditorSave,
-    hasEditorBack: !!handleEditorBack,
-  });
 
   return (
     <ContentEditorProvider initialContent={frontendContent}>
@@ -342,7 +346,10 @@ export default function AdminLayout({
                           router.push("/login");
                         }
                       } catch (error) {
-                        console.error("Erreur déconnexion:", error);
+                        captureClientError(error, {
+                          component: "AdminLayout",
+                          action: "logout-error",
+                        });
                         router.push("/login");
                       }
                     }}
