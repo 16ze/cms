@@ -237,12 +237,22 @@ export async function loginSuperAdmin(
   password: string
 ): Promise<{ success: boolean; token?: string; error?: string }> {
   try {
+    // Normaliser l'email (lowercase et trim)
+    const normalizedEmail = email.trim().toLowerCase();
+    
     const superAdmin = await prisma.superAdmin.findUnique({
-      where: { email, isActive: true },
+      where: { email: normalizedEmail },
+      // Note: isActive n'est pas dans la clause where car Prisma ne supporte pas
+      // les conditions multiples avec findUnique. On vérifie isActive après.
     });
 
     if (!superAdmin) {
       return { success: false, error: "Email ou mot de passe incorrect" };
+    }
+
+    // Vérifier que le compte est actif
+    if (!superAdmin.isActive) {
+      return { success: false, error: "Compte désactivé. Contactez le support." };
     }
 
     const isPasswordValid = await bcrypt.compare(password, superAdmin.password);

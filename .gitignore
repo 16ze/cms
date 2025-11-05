@@ -31,6 +31,7 @@ yarn-error.log*
 .env.development
 .env.production
 .env.test
+.env.backup
 
 # credentials et secrets
 *.key
@@ -39,6 +40,13 @@ yarn-error.log*
 *.p12
 **/credentials.json
 **/service-account.json
+
+# fichiers sensibles
+cookies.txt
+admin-cookies.txt
+temp-reservations.json
+tests-logs/
+*.log
 
 # documentation et informations sensibles
 /documentation/
@@ -76,3 +84,5 @@ next-env.d.ts
 *.zip
 *.tar.gz
 *.rar
+# Prettier
+.prettiercache

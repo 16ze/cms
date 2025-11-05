@@ -23,7 +23,8 @@ export default function SuperAdminLoginPage() {
     setLoading(true);
 
     try {
-      const response = await fetch("/api/auth/login", {
+      // Utiliser la bonne API pour le Super Admin
+      const response = await fetch("/api/auth/login/super-admin", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
