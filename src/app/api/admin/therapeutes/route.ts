@@ -46,7 +46,6 @@ export async function POST(request: NextRequest) {
         .replace(/[^a-z0-9]+/g, "-");
     const therapist = await prisma.therapist.create({
       data: {
-        ...( {
         ...data,
         tenantId, // 🔒 ISOLATION
       },

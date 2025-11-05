@@ -3,6 +3,7 @@
 import { Component, ReactNode } from "react";
 import { AlertTriangle, RefreshCw, Home } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { captureClientError } from "@/lib/errors";
 
 /**
  * 🛡️ ERROR BOUNDARY POUR L'ESPACE ADMIN
@@ -55,15 +56,17 @@ export class AdminErrorBoundary extends Component<Props, State> {
   }
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    // Log détaillé de l'erreur
-    console.error("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
-    console.error("❌ ERROR BOUNDARY : Une erreur a été interceptée");
-    console.error("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
-    console.error("⏰ Timestamp:", new Date().toISOString());
-    console.error("📋 Erreur:", error);
-    console.error("🔍 Stack:", error.stack);
-    console.error("🌳 Component Stack:", errorInfo.componentStack);
-    console.error("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+    // En développement, logger dans la console
+    if (process.env.NODE_ENV === "development") {
+      console.error("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+      console.error("❌ ERROR BOUNDARY : Une erreur a été interceptée");
+      console.error("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+      console.error("⏰ Timestamp:", new Date().toISOString());
+      console.error("📋 Erreur:", error);
+      console.error("🔍 Stack:", error.stack);
+      console.error("🌳 Component Stack:", errorInfo.componentStack);
+      console.error("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+    }
 
     // Mettre à jour l'état avec les infos d'erreur
     this.setState({ errorInfo });
@@ -73,11 +76,15 @@ export class AdminErrorBoundary extends Component<Props, State> {
       this.props.onError(error, errorInfo);
     }
 
-    // En production, envoyer à un service de monitoring (Sentry, etc.)
-    if (process.env.NODE_ENV === "production") {
-      // TODO: Intégrer Sentry ou autre service de monitoring
-      // Sentry.captureException(error, { contexts: { react: errorInfo } });
-    }
+    // Capturer dans Sentry avec contexte React
+    captureClientError(error, {
+      component: "AdminErrorBoundary",
+      action: "react-error-boundary",
+      metadata: {
+        componentStack: errorInfo.componentStack,
+        timestamp: new Date().toISOString(),
+      },
+    });
   }
 
   handleReset = () => {

@@ -74,7 +74,6 @@ export async function POST(request: NextRequest) {
 
     const project = await prisma.project.create({
       data: {
-        ...( {
         title: data.title,
         slug: data.slug,
         description: data.description,
@@ -90,6 +89,7 @@ export async function POST(request: NextRequest) {
         endDate: data.endDate ? new Date(data.endDate) : null,
         featured: data.featured || false,
         orderIndex: data.orderIndex || 0,
+        tenantId, // 🔒 ISOLATION
       },
     });
 

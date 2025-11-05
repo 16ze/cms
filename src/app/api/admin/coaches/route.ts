@@ -46,7 +46,6 @@ export async function POST(request: NextRequest) {
         .replace(/[^a-z0-9]+/g, "-");
     const coach = await prisma.wellnessCoach.create({
       data: {
-        ...( {
         ...data,
         tenantId, // 🔒 ISOLATION
       },

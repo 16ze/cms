@@ -42,7 +42,6 @@ export async function POST(request: NextRequest) {
     if (!data.slug) data.slug = `${data.firstName}-${data.lastName}`.toLowerCase().replace(/[^a-z0-9]+/g, "-");
     const author = await prisma.author.create({
       data: {
-        ...( {
         ...data,
         tenantId, // 🔒 ISOLATION
       },

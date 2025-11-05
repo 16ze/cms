@@ -42,7 +42,6 @@ export async function POST(request: NextRequest) {
     const data = await request.json();
     const patient = await prisma.patient.create({
       data: {
-        ...( {
         ...data,
         tenantId, // 🔒 ISOLATION
       },

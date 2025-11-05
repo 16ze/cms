@@ -9,6 +9,9 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Users, Mail, Lock, AlertCircle, Loader2, Sparkles } from "lucide-react";
+import { validateEmail, validatePassword } from "@/lib/validation-client";
+import { safeApiCall, captureClientError } from "@/lib/errors";
+import { toast } from "sonner";
 
 export default function TenantLoginPage() {
   const router = useRouter();
@@ -16,34 +19,75 @@ export default function TenantLoginPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [emailError, setEmailError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+
+  const handleEmailChange = (value: string) => {
+    setEmail(value);
+    setEmailError("");
+    setError("");
+  };
+
+  const handlePasswordChange = (value: string) => {
+    setPassword(value);
+    setPasswordError("");
+    setError("");
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+    setEmailError("");
+    setPasswordError("");
+
+    // Validation côté client
+    const emailValidation = validateEmail(email);
+    if (!emailValidation.valid) {
+      setEmailError(emailValidation.error || "");
+      return;
+    }
+
+    const passwordValidation = validatePassword(password);
+    if (!passwordValidation.valid) {
+      setPasswordError(passwordValidation.error || "");
+      return;
+    }
+
     setLoading(true);
 
     try {
-      const response = await fetch("/api/auth/login/tenant", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+      const data = await safeApiCall<{ success: boolean; error?: string }>(
+        "/api/auth/login/tenant",
+        {
+          method: "POST",
+          body: JSON.stringify({ email, password }),
         },
-        body: JSON.stringify({ email, password }),
-      });
+        {
+          component: "TenantLoginPage",
+          action: "login-attempt",
+        }
+      );
 
-      const data = await response.json();
-
-      if (!response.ok || !data.success) {
-        setError(data.error || "Échec de la connexion");
+      if (!data.success) {
+        const errorMessage = data.error || "Échec de la connexion";
+        setError(errorMessage);
+        toast.error(errorMessage);
         setLoading(false);
         return;
       }
 
-      // Redirection vers le dashboard admin
-      router.push("/admin/dashboard");
+      // Redirection sécurisée vers le dashboard
+      toast.success("Connexion réussie");
+      const redirectTo = new URLSearchParams(window.location.search).get("redirect") || "/admin/dashboard";
+      router.push(redirectTo);
     } catch (error) {
-      console.error("Erreur login:", error);
-      setError("Erreur de connexion. Veuillez réessayer.");
+      const errorMessage = error instanceof Error ? error.message : "Erreur de connexion. Veuillez réessayer.";
+      setError(errorMessage);
+      toast.error(errorMessage);
+      captureClientError(error, {
+        component: "TenantLoginPage",
+        action: "login-error",
+      });
       setLoading(false);
     }
   };
@@ -103,12 +147,31 @@ export default function TenantLoginPage() {
                   id="email"
                   type="email"
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={(e) => handleEmailChange(e.target.value)}
+                  onBlur={() => {
+                    if (email) {
+                      const validation = validateEmail(email);
+                      if (!validation.valid) {
+                        setEmailError(validation.error || "");
+                      }
+                    }
+                  }}
                   required
                   placeholder="votre@email.fr"
-                  className="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                  aria-invalid={!!emailError}
+                  aria-describedby={emailError ? "email-error" : undefined}
+                  className={`w-full pl-11 pr-4 py-3 bg-gray-50 border rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:border-transparent transition-all ${
+                    emailError
+                      ? "border-red-300 focus:ring-red-500"
+                      : "border-gray-200 focus:ring-blue-500"
+                  }`}
                 />
               </div>
+              {emailError && (
+                <p id="email-error" className="mt-1 text-sm text-red-600" role="alert">
+                  {emailError}
+                </p>
+              )}
             </div>
 
             {/* Password */}
@@ -125,12 +188,32 @@ export default function TenantLoginPage() {
                   id="password"
                   type="password"
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  onChange={(e) => handlePasswordChange(e.target.value)}
+                  onBlur={() => {
+                    if (password) {
+                      const validation = validatePassword(password);
+                      if (!validation.valid) {
+                        setPasswordError(validation.error || "");
+                      }
+                    }
+                  }}
                   required
                   placeholder="••••••••"
-                  className="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                  minLength={8}
+                  aria-invalid={!!passwordError}
+                  aria-describedby={passwordError ? "password-error" : undefined}
+                  className={`w-full pl-11 pr-4 py-3 bg-gray-50 border rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:border-transparent transition-all ${
+                    passwordError
+                      ? "border-red-300 focus:ring-red-500"
+                      : "border-gray-200 focus:ring-blue-500"
+                  }`}
                 />
               </div>
+              {passwordError && (
+                <p id="password-error" className="mt-1 text-sm text-red-600" role="alert">
+                  {passwordError}
+                </p>
+              )}
             </div>
 
             {/* Remember & Forgot */}

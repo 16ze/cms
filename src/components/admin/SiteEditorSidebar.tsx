@@ -14,6 +14,10 @@ import {
   Smartphone,
 } from "lucide-react";
 import { useContentEditor } from "@/context/ContentEditorContext";
+import { useDebounce } from "@/hooks/use-debounce";
+import { validateContent } from "@/lib/sanitize";
+import { captureClientError } from "@/lib/errors";
+import { toast } from "sonner";
 import MediaPicker from "./MediaPicker";
 import ColorPicker from "./ColorPicker";
 
@@ -50,14 +54,9 @@ export default function SiteEditorSidebar({
 
   // Initialiser les champs selon la section active
   const initializeFields = (sectionId: string) => {
-    console.log("📝 Initialisation des champs pour la section:", sectionId);
-    console.log("📦 Contenu reçu:", content);
-
     // Structure attendue: content.hero.text (données directes)
     // La structure est: { hero: { text: { title, subtitle, ... } } }
     const sectionContent = content?.[sectionId]?.text || {};
-
-    console.log("📄 Contenu de la section:", sectionContent);
 
     switch (sectionId) {
       case "hero":
@@ -106,13 +105,38 @@ export default function SiteEditorSidebar({
   // Initialiser au premier rendu et quand activeSection OU content change
   useEffect(() => {
     if (content && Object.keys(content).length > 0) {
-      console.log(
-        "🔄 Contenu chargé, initialisation des champs pour:",
-        activeSection
-      );
       initializeFields(activeSection);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeSection, content]);
+
+  // Debounce des champs pour sauvegarde automatique après 500ms d'inactivité
+  const debouncedFields = useDebounce(fields, 500);
+
+  // Sauvegarde automatique avec debounce
+  useEffect(() => {
+    if (debouncedFields && Object.keys(debouncedFields).length > 0) {
+      // Valider le contenu avant sauvegarde
+      if (!validateContent(debouncedFields)) {
+        captureClientError(new Error("Contenu invalide détecté"), {
+          component: "SiteEditorSidebar",
+          action: "auto-save-validation-failed",
+          metadata: { section: activeSection },
+        });
+        return;
+      }
+
+      // Sauvegarde automatique silencieuse
+      onSave(activeSection, debouncedFields).catch((error) => {
+        captureClientError(error, {
+          component: "SiteEditorSidebar",
+          action: "auto-save-error",
+          metadata: { section: activeSection },
+        });
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [debouncedFields]);
 
   const handleFieldChange = (fieldId: string, value: any) => {
     // Mise à jour du state local
@@ -127,18 +151,32 @@ export default function SiteEditorSidebar({
   };
 
   const handleSave = async () => {
-    console.log("💾 Sauvegarde demandée:", { activeSection, fields });
+    // Valider le contenu avant sauvegarde manuelle
+    if (!validateContent(fields)) {
+      toast.error("Le contenu contient des erreurs. Veuillez vérifier.");
+      captureClientError(new Error("Contenu invalide lors de la sauvegarde manuelle"), {
+        component: "SiteEditorSidebar",
+        action: "manual-save-validation-failed",
+        metadata: { section: activeSection },
+      });
+      return;
+    }
+
     setSaving(true);
     try {
       await onSave(activeSection, fields);
-      console.log("✅ Sauvegarde réussie");
-      alert("✅ Contenu sauvegardé avec succès !");
+      toast.success("Contenu sauvegardé avec succès");
 
       // Déclencher l'événement de mise à jour pour recharger l'iframe
       window.dispatchEvent(new CustomEvent("content-updated"));
     } catch (error) {
-      console.error("❌ Erreur lors de la sauvegarde:", error);
-      alert("❌ Erreur lors de la sauvegarde");
+      const errorMessage = error instanceof Error ? error.message : "Erreur lors de la sauvegarde";
+      toast.error(errorMessage);
+      captureClientError(error, {
+        component: "SiteEditorSidebar",
+        action: "manual-save-error",
+        metadata: { section: activeSection },
+      });
     } finally {
       setSaving(false);
     }

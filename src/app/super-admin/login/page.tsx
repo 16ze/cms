@@ -9,6 +9,9 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Shield, Mail, Lock, AlertCircle, Loader2 } from "lucide-react";
+import { validateEmail, validatePassword } from "@/lib/validation-client";
+import { safeApiCall, captureClientError } from "@/lib/errors";
+import { toast } from "sonner";
 
 export default function SuperAdminLoginPage() {
   const router = useRouter();
@@ -16,35 +19,75 @@ export default function SuperAdminLoginPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [emailError, setEmailError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+
+  const handleEmailChange = (value: string) => {
+    setEmail(value);
+    setEmailError("");
+    setError("");
+  };
+
+  const handlePasswordChange = (value: string) => {
+    setPassword(value);
+    setPasswordError("");
+    setError("");
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+    setEmailError("");
+    setPasswordError("");
+
+    // Validation côté client stricte
+    const emailValidation = validateEmail(email);
+    if (!emailValidation.valid) {
+      setEmailError(emailValidation.error || "");
+      return;
+    }
+
+    const passwordValidation = validatePassword(password);
+    if (!passwordValidation.valid) {
+      setPasswordError(passwordValidation.error || "");
+      return;
+    }
+
     setLoading(true);
 
     try {
-      // Utiliser la bonne API pour le Super Admin
-      const response = await fetch("/api/auth/login/super-admin", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+      const data = await safeApiCall<{ success: boolean; error?: string }>(
+        "/api/auth/login/super-admin",
+        {
+          method: "POST",
+          body: JSON.stringify({ email, password }),
         },
-        body: JSON.stringify({ email, password }),
-      });
+        {
+          component: "SuperAdminLoginPage",
+          action: "super-admin-login-attempt",
+        }
+      );
 
-      const data = await response.json();
-
-      if (!response.ok || !data.success) {
-        setError(data.error || "Échec de la connexion");
+      if (!data.success) {
+        const errorMessage = data.error || "Échec de la connexion";
+        setError(errorMessage);
+        toast.error(errorMessage);
         setLoading(false);
         return;
       }
 
-      // Redirection vers le dashboard admin
-      router.push("/admin/dashboard");
+      // Redirection sécurisée vers le dashboard
+      toast.success("Connexion réussie");
+      const redirectTo = new URLSearchParams(window.location.search).get("redirect") || "/admin/dashboard";
+      router.push(redirectTo);
     } catch (error) {
-      console.error("Erreur login:", error);
-      setError("Erreur de connexion. Veuillez réessayer.");
+      const errorMessage = error instanceof Error ? error.message : "Erreur de connexion. Veuillez réessayer.";
+      setError(errorMessage);
+      toast.error(errorMessage);
+      captureClientError(error, {
+        component: "SuperAdminLoginPage",
+        action: "super-admin-login-error",
+      });
       setLoading(false);
     }
   };
@@ -99,12 +142,31 @@ export default function SuperAdminLoginPage() {
                   id="email"
                   type="email"
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={(e) => handleEmailChange(e.target.value)}
+                  onBlur={() => {
+                    if (email) {
+                      const validation = validateEmail(email);
+                      if (!validation.valid) {
+                        setEmailError(validation.error || "");
+                      }
+                    }
+                  }}
                   required
                   placeholder="admin@kairodigital.com"
-                  className="w-full pl-11 pr-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-purple-300 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                  aria-invalid={!!emailError}
+                  aria-describedby={emailError ? "email-error" : undefined}
+                  className={`w-full pl-11 pr-4 py-3 bg-white/10 border rounded-lg text-white placeholder-purple-300 focus:outline-none focus:ring-2 focus:border-transparent transition-all ${
+                    emailError
+                      ? "border-red-400/50 focus:ring-red-500"
+                      : "border-white/20 focus:ring-purple-500"
+                  }`}
                 />
               </div>
+              {emailError && (
+                <p id="email-error" className="mt-1 text-sm text-red-300" role="alert">
+                  {emailError}
+                </p>
+              )}
             </div>
 
             {/* Password */}
@@ -121,12 +183,32 @@ export default function SuperAdminLoginPage() {
                   id="password"
                   type="password"
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  onChange={(e) => handlePasswordChange(e.target.value)}
+                  onBlur={() => {
+                    if (password) {
+                      const validation = validatePassword(password);
+                      if (!validation.valid) {
+                        setPasswordError(validation.error || "");
+                      }
+                    }
+                  }}
                   required
                   placeholder="••••••••"
-                  className="w-full pl-11 pr-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-purple-300 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                  minLength={8}
+                  aria-invalid={!!passwordError}
+                  aria-describedby={passwordError ? "password-error" : undefined}
+                  className={`w-full pl-11 pr-4 py-3 bg-white/10 border rounded-lg text-white placeholder-purple-300 focus:outline-none focus:ring-2 focus:border-transparent transition-all ${
+                    passwordError
+                      ? "border-red-400/50 focus:ring-red-500"
+                      : "border-white/20 focus:ring-purple-500"
+                  }`}
                 />
               </div>
+              {passwordError && (
+                <p id="password-error" className="mt-1 text-sm text-red-300" role="alert">
+                  {passwordError}
+                </p>
+              )}
             </div>
 
             {/* Submit Button */}

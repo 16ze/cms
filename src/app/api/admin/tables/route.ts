@@ -41,7 +41,6 @@ export async function POST(request: NextRequest) {
     const data = await request.json();
     const table = await prisma.restaurantTable.create({
       data: {
-        ...( {
         ...data,
         tenantId, // 🔒 ISOLATION
       },

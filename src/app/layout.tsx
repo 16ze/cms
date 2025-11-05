@@ -14,6 +14,7 @@ import { DesignSyncProvider } from "@/components/design-sync-provider";
 import DynamicStyleInjector from "@/components/design/DynamicStyleInjector";
 import { ScrollToTop } from "@/components/ui/scroll-to-top";
 import { BackToTop } from "@/components/ui/back-to-top";
+import { ErrorHandlerSetup } from "@/components/ErrorHandlerSetup";
 import companyData from "@/config/company.json";
 import contentData from "@/config/content.json";
 
@@ -340,6 +341,7 @@ export default function RootLayout({
           enableSystem={false}
           disableTransitionOnChange
         >
+          <ErrorHandlerSetup />
           <ScrollToTop />
           <BackToTop />
           <DynamicStyleInjector />

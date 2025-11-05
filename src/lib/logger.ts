@@ -6,44 +6,13 @@
  * Utilise pino pour un logging performant et structuré
  * - Format JSON en production
  * - Format lisible en développement
+ * - Compatible Edge Runtime (fallback sur console)
  * - Rotation automatique des logs
  */
 
-import pino from "pino";
-
-const isDevelopment = process.env.NODE_ENV !== "production";
-const logLevel = (process.env.LOG_LEVEL as string) || (isDevelopment ? "debug" : "info");
-
-// Configuration du transport (pretty en dev, JSON en prod)
-const transport =
-  isDevelopment
-    ? {
-        target: "pino-pretty",
-        options: {
-          colorize: true,
-          translateTime: "SYS:standard",
-          ignore: "pid,hostname",
-        },
-      }
-    : undefined;
-
-// Instance principale du logger
-export const logger = pino(
-  {
-    level: logLevel,
-    formatters: {
-      level: (label) => {
-        return { level: label };
-      },
-    },
-    // Ajouter contexte par défaut
-    base: {
-      env: process.env.NODE_ENV || "development",
-      service: "kairo-cms",
-    },
-  },
-  transport ? pino.transport({ target: transport.target, options: transport.options }) : undefined
-);
+// Détecter si on est dans Edge Runtime (Next.js)
+const isEdgeRuntime =
+  typeof process !== "undefined" && process.env.NEXT_RUNTIME === "edge";
 
 // Types pour le contexte de log
 export interface LogContext {
@@ -57,25 +26,25 @@ export interface LogContext {
 }
 
 /**
- * Logger enrichi avec méthodes spécifiques
+ * Logger simple pour Edge Runtime (utilise console)
+ * Compatible avec le middleware Next.js
  */
-class EnhancedLogger {
-  private pinoLogger: pino.Logger;
-
-  constructor(pinoLogger: pino.Logger) {
-    this.pinoLogger = pinoLogger;
+class EdgeLogger {
+  private formatMessage(level: string, message: string, context?: LogContext): string {
+    const contextStr = context ? ` ${JSON.stringify(context)}` : "";
+    return `[${level.toUpperCase()}] ${message}${contextStr}`;
   }
 
   debug(message: string, context?: LogContext): void {
-    this.pinoLogger.debug(context || {}, message);
+    console.debug(this.formatMessage("debug", message, context));
   }
 
   info(message: string, context?: LogContext): void {
-    this.pinoLogger.info(context || {}, message);
+    console.info(this.formatMessage("info", message, context));
   }
 
   warn(message: string, context?: LogContext): void {
-    this.pinoLogger.warn(context || {}, message);
+    console.warn(this.formatMessage("warn", message, context));
   }
 
   error(message: string, error?: Error | unknown, context?: LogContext): void {
@@ -86,28 +55,22 @@ class EnhancedLogger {
           ? {
               name: error.name,
               message: error.message,
-              stack: isDevelopment ? error.stack : undefined,
+              stack: error.stack,
             }
           : error,
     };
-    this.pinoLogger.error(errorContext, message);
+    console.error(this.formatMessage("error", message, errorContext));
   }
 
-  /**
-   * Logger spécifique pour les opérations multi-tenant
-   */
   tenant(
     level: "debug" | "info" | "warn" | "error",
     message: string,
     tenantId: string,
     context?: Omit<LogContext, "tenantId">
   ): void {
-    this.pinoLogger[level]({ ...context, tenantId }, message);
+    this[level](message, { ...context, tenantId });
   }
 
-  /**
-   * Logger spécifique pour les opérations API
-   */
   api(
     level: "debug" | "info" | "warn" | "error",
     method: string,
@@ -115,41 +78,196 @@ class EnhancedLogger {
     statusCode?: number,
     context?: LogContext
   ): void {
-    this.pinoLogger[level](
-      {
-        ...context,
-        method,
-        path,
-        statusCode,
-        endpoint: `${method} ${path}`,
-      },
-      `API ${method} ${path}`
-    );
+    this[level](`API ${method} ${path}`, {
+      ...context,
+      method,
+      path,
+      statusCode,
+      endpoint: `${method} ${path}`,
+    });
   }
 
-  /**
-   * Logger pour les erreurs Prisma
-   */
   prisma(
     level: "debug" | "info" | "warn" | "error",
     operation: string,
     model: string,
     context?: LogContext
   ): void {
-    this.pinoLogger[level](
-      {
-        ...context,
-        operation,
-        model,
-        source: "prisma",
-      },
-      `Prisma ${operation} on ${model}`
-    );
+    this[level](`Prisma ${operation} on ${model}`, {
+      ...context,
+      operation,
+      model,
+      source: "prisma",
+    });
   }
 }
 
-// Export d'une instance enrichie
-export const enhancedLogger = new EnhancedLogger(logger);
+/**
+ * Logger enrichi avec méthodes spécifiques pour Node.js runtime
+ */
+class EnhancedLogger {
+  private logger: any;
+
+  constructor(logger: any) {
+    this.logger = logger;
+  }
+
+  debug(message: string, context?: LogContext): void {
+    if (this.logger?.debug) {
+      this.logger.debug(context || {}, message);
+    } else {
+      console.debug(`[DEBUG] ${message}`, context || {});
+    }
+  }
+
+  info(message: string, context?: LogContext): void {
+    if (this.logger?.info) {
+      this.logger.info(context || {}, message);
+    } else {
+      console.info(`[INFO] ${message}`, context || {});
+    }
+  }
+
+  warn(message: string, context?: LogContext): void {
+    if (this.logger?.warn) {
+      this.logger.warn(context || {}, message);
+    } else {
+      console.warn(`[WARN] ${message}`, context || {});
+    }
+  }
+
+  error(message: string, error?: Error | unknown, context?: LogContext): void {
+    const errorContext = {
+      ...context,
+      error:
+        error instanceof Error
+          ? {
+              name: error.name,
+              message: error.message,
+              stack: typeof process !== "undefined" && process.env.NODE_ENV !== "production" ? error.stack : undefined,
+            }
+          : error,
+    };
+
+    if (this.logger?.error) {
+      this.logger.error(errorContext, message);
+    } else {
+      console.error(`[ERROR] ${message}`, errorContext);
+    }
+  }
+
+  tenant(
+    level: "debug" | "info" | "warn" | "error",
+    message: string,
+    tenantId: string,
+    context?: Omit<LogContext, "tenantId">
+  ): void {
+    this[level](message, { ...context, tenantId });
+  }
+
+  api(
+    level: "debug" | "info" | "warn" | "error",
+    method: string,
+    path: string,
+    statusCode?: number,
+    context?: LogContext
+  ): void {
+    this[level](`API ${method} ${path}`, {
+      ...context,
+      method,
+      path,
+      statusCode,
+      endpoint: `${method} ${path}`,
+    });
+  }
+
+  prisma(
+    level: "debug" | "info" | "warn" | "error",
+    operation: string,
+    model: string,
+    context?: LogContext
+  ): void {
+    this[level](`Prisma ${operation} on ${model}`, {
+      ...context,
+      operation,
+      model,
+      source: "prisma",
+    });
+  }
+}
+
+// Initialiser le logger selon l'environnement
+let loggerInstance: EdgeLogger | EnhancedLogger;
+let pinoLogger: any = null;
+
+if (isEdgeRuntime) {
+  // Edge Runtime : utiliser console logger
+  loggerInstance = new EdgeLogger();
+} else {
+  // Node.js Runtime : utiliser pino avec import conditionnel
+  try {
+    // Import conditionnel seulement en Node.js
+    const pino = require("pino");
+    const isDevelopment = typeof process !== "undefined" && process.env.NODE_ENV !== "production";
+    const logLevel = (typeof process !== "undefined" && process.env.LOG_LEVEL) || (isDevelopment ? "debug" : "info");
+
+    // Configuration du transport (pretty en dev, JSON en prod)
+    const transport =
+      isDevelopment && typeof pino.transport !== "undefined"
+        ? {
+            target: "pino-pretty",
+            options: {
+              colorize: true,
+              translateTime: "SYS:standard",
+              ignore: "pid,hostname",
+            },
+          }
+        : undefined;
+
+    // Créer l'instance pino
+    pinoLogger = transport
+      ? pino(
+          {
+            level: logLevel,
+            formatters: {
+              level: (label: string) => {
+                return { level: label };
+              },
+            },
+            base: {
+              env: typeof process !== "undefined" ? process.env.NODE_ENV || "development" : "development",
+              service: "kairo-cms",
+            },
+          },
+          pino.transport({ target: transport.target, options: transport.options })
+        )
+      : pino({
+          level: logLevel,
+          formatters: {
+            level: (label: string) => {
+              return { level: label };
+            },
+          },
+          base: {
+            env: typeof process !== "undefined" ? process.env.NODE_ENV || "development" : "development",
+            service: "kairo-cms",
+          },
+        });
+
+    loggerInstance = new EnhancedLogger(pinoLogger);
+  } catch (error) {
+    // Fallback si pino n'est pas disponible
+    loggerInstance = new EdgeLogger();
+  }
+}
+
+// Export pour compatibilité
+export const logger = pinoLogger || loggerInstance;
+
+// Export de l'instance enrichie
+export const enhancedLogger = loggerInstance;
 
 // Export par défaut pour compatibilité
 export default enhancedLogger;
+
+

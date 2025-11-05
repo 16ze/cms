@@ -62,8 +62,8 @@ export async function POST(request: NextRequest) {
 
     const order = await prisma.order.create({
       data: {
-        ...( {
         ...data,
+        tenantId, // 🔒 ISOLATION
         items: {
           create: data.items,
         },

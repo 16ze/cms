@@ -44,7 +44,6 @@ export async function POST(request: NextRequest) {
       data.slug = data.title.toLowerCase().replace(/[^a-z0-9]+/g, "-");
     const item = await prisma.galleryItem.create({
       data: {
-        ...( {
         ...data,
         tenantId, // 🔒 ISOLATION
       },
