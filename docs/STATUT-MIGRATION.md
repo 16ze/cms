@@ -1,8 +1,6 @@
 # ✅ Migration Progressive - Statut Actuel
 
-## 📊 Routes Migrées vers safeHandler
-
-### ✅ Routes Critiques (Phase 1)
+### ✅ Routes Migrées vers safeHandler
 
 1. **`/api/auth/login/tenant`** ✅
    - Fichier: `src/app/api/auth/login/tenant-refactored/route.ts`
@@ -21,6 +19,36 @@
    - Accès super-admin uniquement
    - Pagination et recherche
    - Validation complète
+
+4. **`/api/admin/reservations`** ✅
+   - Fichier: `src/app/api/admin/reservations-refactored/route.ts`
+   - GET, POST, PATCH, DELETE complets
+   - Isolation tenant garantie
+
+5. **`/api/admin/commandes`** ✅
+   - Fichier: `src/app/api/admin/commandes-refactored/route.ts`
+   - GET, POST avec validation complète
+   - Pagination
+
+6. **`/api/admin/content/sections`** ✅
+   - Fichier: `src/app/api/admin/content/sections-refactored/route.ts`
+   - GET, PUT, DELETE avec authentification ajoutée
+   - Sanitization du contenu JSON
+
+7. **`/api/admin/content/media`** ✅
+   - Fichier: `src/app/api/admin/content/media-refactored/route.ts`
+   - GET, DELETE avec authentification ajoutée
+   - Pagination et filtres
+
+8. **`/api/admin/content/pages`** ✅
+   - Fichier: `src/app/api/admin/content/pages-refactored/route.ts`
+   - GET, POST avec authentification ajoutée
+   - Isolation tenant garantie
+
+9. **`/api/admin/rendez-vous-beaute`** ✅
+   - Fichier: `src/app/api/admin/rendez-vous-beaute-refactored/route.ts`
+   - GET, POST avec validation complète
+   - Isolation tenant garantie
 
 ### ✅ Routes Exemples (Références)
 
@@ -51,11 +79,9 @@
 
 ### Priorité Moyenne (Semaine 2-3)
 
-- [x] `/api/admin/content/sections` → Migrer vers route refactorisée ✅
-- [x] `/api/admin/content/media` → Migrer vers route refactorisée ✅
-- [ ] `/api/admin/content/pages` → Migrer vers safeHandler
+- [x] `/api/admin/content/pages` → Migrer vers route refactorisée ✅
+- [x] `/api/admin/rendez-vous-beaute` → Migrer vers route refactorisée ✅
 - [ ] `/api/admin/content/media/upload` → Migrer vers safeHandler
-- [ ] `/api/admin/rendez-vous-beaute/*` → Migrer vers safeHandler
 - [ ] `/api/admin/produits/*` → Migrer vers safeHandler
 
 ### Priorité Basse (Semaine 4+)
