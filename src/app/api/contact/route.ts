@@ -1,48 +1,31 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { sendEmail } from "../../../lib/email-service";
+import { validateRequest, commonSchemas } from "@/lib/validation";
+import { z } from "zod";
 
-interface ContactRequest {
-  firstName: string;
-  lastName: string;
-  email: string;
-  phone?: string;
-  subject: string;
-  project: string;
-  consent: boolean;
-}
+const contactSchema = z.object({
+  firstName: commonSchemas.nonEmptyString,
+  lastName: commonSchemas.nonEmptyString,
+  email: commonSchemas.email,
+  phone: commonSchemas.phone.optional(),
+  subject: commonSchemas.nonEmptyString,
+  project: commonSchemas.nonEmptyString,
+  consent: z.boolean().refine((val) => val === true, {
+    message: "Le consentement est requis",
+  }),
+});
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   console.log("📝 API: Début de traitement POST /api/contact");
 
   try {
-    // Extraire les données de la requête
-    let data: ContactRequest;
-    try {
-      data = await request.json();
-      console.log("📝 Données reçues:", JSON.stringify(data, null, 2));
-    } catch (parseError) {
-      console.error("❌ Erreur de parsing JSON:", parseError);
-      return NextResponse.json(
-        { error: "Format de données invalide" },
-        { status: 400 }
-      );
+    // Validation avec Zod
+    const validation = await validateRequest(request, contactSchema);
+    if (!validation.success) {
+      return validation.response;
     }
 
-    // Valider les données reçues
-    if (
-      !data.firstName ||
-      !data.lastName ||
-      !data.email ||
-      !data.subject ||
-      !data.project ||
-      !data.consent
-    ) {
-      console.error("❌ Données de contact incomplètes:", data);
-      return NextResponse.json(
-        { error: "Informations manquantes pour le contact" },
-        { status: 400 }
-      );
-    }
+    const data = validation.data;
 
     // Formatage du message pour l'email
     const fullName = `${data.firstName} ${data.lastName}`;

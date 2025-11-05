@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { sendEmail } from "../../../../lib/email-service";
 import { notificationService as notificationServiceWS } from "../../../../lib/websocket";
 import { notificationService } from "@/lib/notification-service";
@@ -7,63 +7,33 @@ import {
   reservationsStoreInstance,
   type ReservationData,
 } from "../../../../lib/reservations-store";
+import { validateRequest, commonSchemas } from "@/lib/validation";
+import { z } from "zod";
 
-// Types pour la réservation
-type ReservationStatus = "PENDING" | "CONFIRMED" | "CANCELLED";
+// Schéma de validation pour les réservations
+const reservationSchema = z.object({
+  clientName: commonSchemas.nonEmptyString,
+  clientEmail: commonSchemas.email,
+  clientPhone: commonSchemas.phone.optional(),
+  projectDescription: commonSchemas.nonEmptyString,
+  communicationMethod: z.enum(["VISIO", "PHONE"]),
+  reservationType: z.enum(["DISCOVERY", "CONSULTATION", "PRESENTATION", "FOLLOWUP"]),
+  startTime: z.string().datetime().or(z.coerce.date()),
+  endTime: z.string().datetime().or(z.coerce.date()),
+  userId: z.string().uuid(),
+});
 
-interface ReservationRequest {
-  clientName: string;
-  clientEmail: string;
-  clientPhone?: string;
-  projectDescription: string;
-  communicationMethod: "VISIO" | "PHONE";
-  reservationType: "DISCOVERY" | "CONSULTATION" | "PRESENTATION" | "FOLLOWUP";
-  startTime: Date;
-  endTime: Date;
-  userId: string;
-}
-
-// Utilisation du store partagé des réservations
-
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   console.log("📝 API: Début de traitement POST /api/booking/reservation");
-  console.log("📝 ENV MODE: ", process.env.NODE_ENV || "non défini");
-  console.log("📝 ENV EMAIL CONFIG: ", {
-    EMAIL_SERVER: process.env.EMAIL_SERVER,
-    EMAIL_PORT: process.env.EMAIL_PORT,
-    EMAIL_USER: process.env.EMAIL_USER,
-    EMAIL_FROM: process.env.EMAIL_FROM,
-    ADMIN_EMAIL: process.env.ADMIN_EMAIL,
-    EMAIL_PASSWORD: process.env.EMAIL_PASSWORD ? "DÉFINI" : "NON DÉFINI",
-  });
 
   try {
-    // Extraire les données de la requête
-    let data: ReservationRequest;
-    try {
-      data = await request.json();
-      console.log("📝 Données reçues:", JSON.stringify(data, null, 2));
-    } catch (parseError) {
-      console.error("❌ Erreur de parsing JSON:", parseError);
-      return NextResponse.json(
-        { error: "Format de données invalide" },
-        { status: 400 }
-      );
+    // Validation avec Zod
+    const validation = await validateRequest(request, reservationSchema);
+    if (!validation.success) {
+      return validation.response;
     }
 
-    // Valider les données reçues
-    if (
-      !data.clientName ||
-      !data.clientEmail ||
-      !data.startTime ||
-      !data.endTime
-    ) {
-      console.error("❌ Données de réservation incomplètes:", data);
-      return NextResponse.json(
-        { error: "Informations manquantes pour la réservation" },
-        { status: 400 }
-      );
-    }
+    const data = validation.data;
 
     // Créer un ID unique pour la réservation
     const reservationId = `res-${Date.now()}-${Math.floor(

@@ -4,6 +4,21 @@ import { ClientStatus, ClientSource } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { ensureAuthenticated } from "@/lib/tenant-auth";
 import { getTenantFilter, requireTenant } from "@/middleware/tenant-context";
+import { validateRequest, commonSchemas } from "@/lib/validation";
+import { z } from "zod";
+
+// Schéma de validation pour créer un client
+const createClientSchema = z.object({
+  firstName: commonSchemas.nonEmptyString,
+  lastName: commonSchemas.nonEmptyString,
+  email: commonSchemas.email,
+  phone: commonSchemas.phone.optional(),
+  company: z.string().optional(),
+  address: z.string().optional(),
+  status: z.enum(["PROSPECT", "CLIENT", "INACTIVE"]),
+  source: z.enum(["WEBSITE", "REFERRAL", "SOCIAL", "DIRECT"]),
+  notes: z.string().optional(),
+});
 
 // GET /api/admin/clients - Récupérer tous les clients
 export async function GET(request: NextRequest) {
@@ -144,8 +159,12 @@ export async function POST(request: NextRequest) {
     // 🔒 Récupérer le tenantId
     const { tenantId } = await requireTenant(request);
 
-    // Récupérer les données de la requête
-    const body = await request.json();
+    // Validation avec Zod
+    const validation = await validateRequest(request, createClientSchema);
+    if (!validation.success) {
+      return validation.response;
+    }
+
     const {
       firstName,
       lastName,
@@ -156,24 +175,7 @@ export async function POST(request: NextRequest) {
       status,
       source,
       notes,
-    } = body;
-
-    // Validation des données
-    if (!firstName || !lastName || !email) {
-      return NextResponse.json(
-        { error: "Prénom, nom et email sont requis" },
-        { status: 400 }
-      );
-    }
-
-    // Validation de l'email
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      return NextResponse.json(
-        { error: "Format d'email invalide" },
-        { status: 400 }
-      );
-    }
+    } = validation.data;
 
     // Vérifier si l'email existe déjà
     const existingClient = await prisma.client.findUnique({
@@ -187,21 +189,13 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Validation du statut et de la source
-    const validStatuses: ClientStatus[] = ["PROSPECT", "CLIENT", "INACTIVE"];
-    const validSources: ClientSource[] = [
-      "WEBSITE",
-      "REFERRAL",
-      "SOCIAL",
-      "DIRECT",
-    ];
+    // Créer le nouveau client avec Prisma + tenantId
 
-    if (!validStatuses.includes(status)) {
-      return NextResponse.json({ error: "Statut invalide" }, { status: 400 });
-    }
-
-    if (!validSources.includes(source)) {
-      return NextResponse.json({ error: "Source invalide" }, { status: 400 });
+    if (existingClient) {
+      return NextResponse.json(
+        { error: "Un client avec cet email existe déjà" },
+        { status: 409 }
+      );
     }
 
     // Créer le nouveau client avec Prisma + tenantId

@@ -13,20 +13,23 @@ import {
   signAdminSession,
 } from "@/lib/admin-session";
 import { setSecureCookie } from "@/lib/cookie-utils";
+import { validateRequest, commonSchemas } from "@/lib/validation";
+import { z } from "zod";
+
+const loginSchema = z.object({
+  email: commonSchemas.email,
+  password: z.string().min(1, "Mot de passe requis"),
+});
 
 export async function POST(request: NextRequest) {
   try {
-    const { email, password } = await request.json();
-
-    if (!email || !password) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: "Email et mot de passe requis",
-        },
-        { status: 400 }
-      );
+    // Validation avec Zod
+    const validation = await validateRequest(request, loginSchema);
+    if (!validation.success) {
+      return validation.response;
     }
+
+    const { email, password } = validation.data;
 
     // Chercher l'utilisateur tenant
     const tenantUser = await prisma.tenantUser.findFirst({
