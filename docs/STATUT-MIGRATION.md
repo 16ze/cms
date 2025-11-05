@@ -50,6 +50,62 @@
    - GET, POST avec validation complète
    - Isolation tenant garantie
 
+10. **`/api/admin/content/media/upload`** ✅
+    - Fichier: `src/app/api/admin/content/media/upload-refactored/route.ts`
+    - POST avec authentification ajoutée
+    - Validation des fichiers (type, taille)
+    - Isolation tenant garantie
+
+11. **`/api/admin/produits`** ✅
+    - Fichier: `src/app/api/admin/produits-refactored/route.ts`
+    - GET, POST avec validation complète
+    - Isolation tenant garantie
+
+12. **`/api/admin/produits-beaute`** ✅
+    - Fichier: `src/app/api/admin/produits-beaute-refactored/route.ts`
+    - GET, POST avec validation complète
+    - Recherche et filtres avancés
+    - Isolation tenant garantie
+
+13. **`/api/admin/soins`** ✅
+    - Fichier: `src/app/api/admin/soins-refactored/route.ts`
+    - GET, POST avec validation complète
+    - Isolation tenant garantie
+
+14. **`/api/admin/articles`** ✅
+    - Fichier: `src/app/api/admin/articles-refactored/route.ts`
+    - GET, POST avec validation complète
+    - Sanitization du contenu
+    - Isolation tenant garantie
+
+15. **`/api/admin/professionnels`** ✅
+    - Fichier: `src/app/api/admin/professionnels-refactored/route.ts`
+    - GET, POST avec validation complète
+    - Vérification unicité email
+    - Isolation tenant garantie
+
+16. **`/api/admin/categories`** ✅
+    - Fichier: `src/app/api/admin/categories-refactored/route.ts`
+    - GET, POST avec validation complète
+    - Isolation tenant garantie
+
+17. **`/api/admin/auteurs`** ✅
+    - Fichier: `src/app/api/admin/auteurs-refactored/route.ts`
+    - GET, POST avec validation complète
+    - Isolation tenant garantie
+
+18. **`/api/admin/clients-beaute`** ✅
+    - Fichier: `src/app/api/admin/clients-beaute-refactored/route.ts`
+    - GET, POST avec validation complète
+    - Recherche et filtres
+    - Isolation tenant garantie
+
+19. **`/api/admin/equipe`** ✅
+    - Fichier: `src/app/api/admin/equipe-refactored/route.ts`
+    - GET, POST avec validation complète
+    - Filtres par département
+    - Isolation tenant garantie
+
 ### ✅ Routes Exemples (Références)
 
 1. **`/api/admin/clients`** ✅
@@ -81,8 +137,16 @@
 
 - [x] `/api/admin/content/pages` → Migrer vers route refactorisée ✅
 - [x] `/api/admin/rendez-vous-beaute` → Migrer vers route refactorisée ✅
-- [ ] `/api/admin/content/media/upload` → Migrer vers safeHandler
-- [ ] `/api/admin/produits/*` → Migrer vers safeHandler
+- [x] `/api/admin/content/media/upload` → Migrer vers safeHandler ✅
+- [x] `/api/admin/produits` → Migrer vers safeHandler ✅
+- [x] `/api/admin/produits-beaute` → Migrer vers safeHandler ✅
+- [x] `/api/admin/soins` → Migrer vers safeHandler ✅
+- [x] `/api/admin/articles` → Migrer vers safeHandler ✅
+- [x] `/api/admin/professionnels` → Migrer vers safeHandler ✅
+- [x] `/api/admin/categories` → Migrer vers safeHandler ✅
+- [x] `/api/admin/auteurs` → Migrer vers safeHandler ✅
+- [x] `/api/admin/clients-beaute` → Migrer vers safeHandler ✅
+- [x] `/api/admin/equipe` → Migrer vers safeHandler ✅
 
 ### Priorité Basse (Semaine 4+)
 
