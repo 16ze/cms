@@ -86,3 +86,6 @@ next-env.d.ts
 *.rar
 # Prettier
 .prettiercache
+
+# Sentry Config File
+.env.sentry-build-plugin
