@@ -26,6 +26,7 @@
     "test:accessibility": "ts-node scripts/test-accessibility.ts",
     "test:performance": "ts-node scripts/test-performance.ts",
     "test:security": "ts-node scripts/test-security.ts",
+    "migrate:routes": "tsx scripts/migrate-to-safe-handler.ts",
     "postinstall": "prisma generate && npm run seed:auto || echo 'Seed automatique ignoré (base non initialisée)'",
     "typecheck": "tsc --noEmit",
     "typecheck:strict": "tsc --project tsconfig.strict.json --noEmit",

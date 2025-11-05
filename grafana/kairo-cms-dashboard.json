@@ -1,0 +1,133 @@
+{
+  "dashboard": {
+    "title": "Kairo CMS - Monitoring Dashboard",
+    "tags": ["kairo-cms", "monitoring"],
+    "timezone": "browser",
+    "schemaVersion": 27,
+    "version": 1,
+    "refresh": "30s",
+    "panels": [
+      {
+        "id": 1,
+        "title": "HTTP Requests Total",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "sum(rate(http_requests_total[5m]))",
+            "legendFormat": "Requests/sec"
+          }
+        ],
+        "gridPos": { "h": 8, "w": 6, "x": 0, "y": 0 }
+      },
+      {
+        "id": 2,
+        "title": "HTTP Request Duration (p95)",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[5m]))",
+            "legendFormat": "p95"
+          }
+        ],
+        "gridPos": { "h": 8, "w": 6, "x": 6, "y": 0 }
+      },
+      {
+        "id": 3,
+        "title": "HTTP Requests by Status",
+        "type": "piechart",
+        "targets": [
+          {
+            "expr": "sum(rate(http_requests_total[5m])) by (status)",
+            "legendFormat": "{{status}}"
+          }
+        ],
+        "gridPos": { "h": 8, "w": 6, "x": 12, "y": 0 }
+      },
+      {
+        "id": 4,
+        "title": "HTTP Requests by Tenant",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "sum(rate(http_requests_total[5m])) by (tenant_id)",
+            "legendFormat": "Tenant {{tenant_id}}"
+          }
+        ],
+        "gridPos": { "h": 8, "w": 6, "x": 18, "y": 0 }
+      },
+      {
+        "id": 5,
+        "title": "Database Queries Duration (p95)",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "histogram_quantile(0.95, rate(tenant_db_query_duration_seconds_bucket[5m]))",
+            "legendFormat": "{{model}}.{{action}}"
+          }
+        ],
+        "gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 }
+      },
+      {
+        "id": 6,
+        "title": "API Errors Rate",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "sum(rate(api_errors_total[5m])) by (route, error_type)",
+            "legendFormat": "{{route}} - {{error_type}}"
+          }
+        ],
+        "gridPos": { "h": 8, "w": 12, "x": 12, "y": 8 }
+      },
+      {
+        "id": 7,
+        "title": "Slow Queries (> 200ms)",
+        "type": "table",
+        "targets": [
+          {
+            "expr": "sum(rate(tenant_db_query_duration_seconds_bucket{le=\"0.2\"}[5m])) by (model, action, tenant_id)",
+            "legendFormat": "{{model}}.{{action}} ({{tenant_id}})"
+          }
+        ],
+        "gridPos": { "h": 8, "w": 12, "x": 0, "y": 16 }
+      },
+      {
+        "id": 8,
+        "title": "Error Rate by Route",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "sum(rate(api_errors_total[5m])) / sum(rate(http_requests_total[5m])) * 100",
+            "legendFormat": "{{route}}"
+          }
+        ],
+        "gridPos": { "h": 8, "w": 12, "x": 12, "y": 16 }
+      }
+    ],
+    "annotations": {
+      "list": []
+    },
+    "editable": true,
+    "fiscalYearStartMonth": 0,
+    "graphTooltip": 0,
+    "links": [],
+    "liveNow": false,
+    "panels": [],
+    "schemaVersion": 27,
+    "style": "dark",
+    "tags": ["kairo-cms"],
+    "templating": {
+      "list": []
+    },
+    "time": {
+      "from": "now-1h",
+      "to": "now"
+    },
+    "timepicker": {},
+    "timezone": "browser",
+    "title": "Kairo CMS - Monitoring Dashboard",
+    "uid": "kairo-cms-monitoring",
+    "version": 1
+  }
+}
+
