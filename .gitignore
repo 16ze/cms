@@ -89,3 +89,29 @@ next-env.d.ts
 
 # Sentry Config File
 .env.sentry-build-plugin
+
+
+*.bak
+*.old
+
+
+*.sql
+*.dump
+*.db
+
+
+.next/cache
+.prisma/
+
+
+.turbo/
+.env.backup
+.env.development.local
+.env.local
+.env.production.local
+.env.test.local
+.env.test
+.env.production
+.env.development
+.env
+

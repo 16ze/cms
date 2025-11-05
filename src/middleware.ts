@@ -1,24 +1,66 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import { rateLimit, applySecurityHeaders } from "@/lib/security";
+import { setTenantContext } from "@/lib/prisma-middleware";
+import { getAuthenticatedUser } from "@/lib/tenant-auth";
 
 /**
- * MIDDLEWARE MULTI-TENANT SIMPLIFIÉ
- * ==================================
+ * MIDDLEWARE MULTI-TENANT AVEC SÉCURITÉ RENFORCÉE
+ * ===============================================
  *
- * Ce middleware a été simplifié pour :
- * 1. Laisser le client-side gérer l'authentification
- * 2. Éviter les problèmes de timing avec les cookies
- * 3. Permettre au nouveau système multi-tenant de fonctionner
- *
- * La vérification d'authentification se fait maintenant via :
- * - /api/auth/me (côté client)
- * - useAdminSession hook
- * - useTempAdmin hook
+ * - Rate limiting global
+ * - Headers de sécurité
+ * - Détection tenant pour isolation
+ * - Protection contre les attaques courantes
  */
 
-// Middleware pour protéger les routes admin
+// Rate limiting pour les routes API
+const apiRateLimit = rateLimit({
+  windowMs: 60000, // 1 minute
+  maxRequests: 100, // 100 requêtes par minute
+});
+
+// Rate limiting plus strict pour les routes d'authentification
+const authRateLimit = rateLimit({
+  windowMs: 60000, // 1 minute
+  maxRequests: 5, // 5 tentatives par minute
+});
+
 export async function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
+
+  // Appliquer rate limiting sur les routes API
+  if (pathname.startsWith("/api")) {
+    // Rate limiting plus strict pour les routes d'auth
+    if (pathname.startsWith("/api/auth/login") || pathname.startsWith("/api/auth/tenant")) {
+      const authLimitResponse = authRateLimit(request);
+      if (authLimitResponse) {
+        return applySecurityHeaders(authLimitResponse);
+      }
+    } else {
+      // Rate limiting standard pour les autres routes API
+      const apiLimitResponse = apiRateLimit(request);
+      if (apiLimitResponse) {
+        return applySecurityHeaders(apiLimitResponse);
+      }
+    }
+
+    // Définir le contexte tenant pour Prisma
+    try {
+      const user = await getAuthenticatedUser(request);
+      if (user?.tenantId) {
+        setTenantContext(user.tenantId);
+      } else {
+        // Essayer de récupérer depuis query params (pour Super Admin)
+        const tenantId = request.nextUrl.searchParams.get("tenantId");
+        if (tenantId) {
+          setTenantContext(tenantId);
+        }
+      }
+    } catch (error) {
+      // Ignorer les erreurs d'authentification ici (gérées par les routes)
+    }
+  }
 
   // Vérifier si le mode maintenance est activé via un cookie
   const maintenanceMode =
@@ -38,31 +80,30 @@ export async function middleware(request: NextRequest) {
       pathname.includes(".") ||
       pathname === "/maintenance"
     ) {
-      return NextResponse.next();
+      return applySecurityHeaders(NextResponse.next());
     }
 
     // Rediriger vers la page de maintenance
-    return NextResponse.redirect(new URL("/maintenance", request.url));
+    return applySecurityHeaders(
+      NextResponse.redirect(new URL("/maintenance", request.url))
+    );
   }
 
   // Si c'est la page d'accueil principale, router vers le template approprié
-  // TODO: Détecter le tenant depuis le domaine ou le contexte
-  // Pour l'instant, rediriger vers /beaute pour tester
   if (
     pathname === "/" &&
     !pathname.startsWith("/admin") &&
     !pathname.startsWith("/api") &&
     !pathname.startsWith("/super-admin")
   ) {
-    return NextResponse.rewrite(new URL("/beaute", request.url));
+    return applySecurityHeaders(
+      NextResponse.rewrite(new URL("/beaute", request.url))
+    );
   }
 
-  // Laisser passer toutes les autres requêtes
-  // L'authentification est gérée côté client via :
-  // - /api/auth/me
-  // - useAdminSession()
-  // - useTempAdmin()
-  return NextResponse.next();
+  // Laisser passer toutes les autres requêtes avec headers de sécurité
+  const response = NextResponse.next();
+  return applySecurityHeaders(response);
 }
 
 // Configuration pour spécifier sur quelles routes le middleware s'applique
