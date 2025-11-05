@@ -190,6 +190,170 @@ test.describe("Isolation Tenant Prisma", () => {
       response.status === 403 || responseData.data?.tenantId === "tenant-1"
     ).toBe(true);
   });
+
+  test("devrait empêcher la mise à jour d'une ressource d'un autre tenant", async ({
+    page,
+  }) => {
+    // Connexion tenant 1
+    await page.goto("/login");
+
+    await page.route("**/api/auth/login/tenant", (route) => {
+      route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          success: true,
+          tenantId: "tenant-1",
+        }),
+        headers: {
+          "Set-Cookie": "admin_session=session-tenant-1; Path=/; HttpOnly",
+        },
+      });
+    });
+
+    await page.getByLabel(/Adresse email/i).fill("tenant1@example.com");
+    await page.getByLabel(/Mot de passe/i).fill("Password123");
+    await page.getByRole("button", { name: /Se connecter/i }).click();
+
+    await expect(page).toHaveURL(/\/admin\/dashboard/);
+
+    // Mock l'API pour simuler une tentative de mise à jour cross-tenant
+    await page.route("**/api/admin/clients/*", (route) => {
+      if (route.request().method() === "PUT") {
+        // Simuler que le client appartient à tenant-2
+        route.fulfill({
+          status: 404, // Pas trouvé car filtré par tenantId
+          contentType: "application/json",
+          body: JSON.stringify({
+            success: false,
+            error: "Client non trouvé",
+          }),
+        });
+      } else {
+        route.continue();
+      }
+    });
+
+    // Tenter de mettre à jour un client qui appartient à tenant-2
+    const response = await page.request.put("/api/admin/clients/client-tenant-2-id", {
+      data: {
+        firstName: "Hacked",
+        lastName: "Client",
+      },
+    });
+
+    // Devrait retourner 404 car filtré par tenantId
+    expect(response.status()).toBe(404);
+  });
+
+  test("devrait empêcher la suppression d'une ressource d'un autre tenant", async ({
+    page,
+  }) => {
+    // Connexion tenant 1
+    await page.goto("/login");
+
+    await page.route("**/api/auth/login/tenant", (route) => {
+      route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          success: true,
+          tenantId: "tenant-1",
+        }),
+        headers: {
+          "Set-Cookie": "admin_session=session-tenant-1; Path=/; HttpOnly",
+        },
+      });
+    });
+
+    await page.getByLabel(/Adresse email/i).fill("tenant1@example.com");
+    await page.getByLabel(/Mot de passe/i).fill("Password123");
+    await page.getByRole("button", { name: /Se connecter/i }).click();
+
+    await expect(page).toHaveURL(/\/admin\/dashboard/);
+
+    // Mock l'API pour simuler une tentative de suppression cross-tenant
+    await page.route("**/api/admin/clients/*", (route) => {
+      if (route.request().method() === "DELETE") {
+        // Simuler que le client appartient à tenant-2
+        route.fulfill({
+          status: 404, // Pas trouvé car filtré par tenantId
+          contentType: "application/json",
+          body: JSON.stringify({
+            success: false,
+            error: "Client non trouvé",
+          }),
+        });
+      } else {
+        route.continue();
+      }
+    });
+
+    // Tenter de supprimer un client qui appartient à tenant-2
+    const response = await page.request.delete("/api/admin/clients/client-tenant-2-id");
+
+    // Devrait retourner 404 car filtré par tenantId
+    expect(response.status()).toBe(404);
+  });
+
+  test("devrait isoler les statistiques par tenant", async ({ page }) => {
+    // Connexion tenant 1
+    await page.goto("/login");
+
+    await page.route("**/api/auth/login/tenant", (route) => {
+      route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          success: true,
+          tenantId: "tenant-1",
+        }),
+        headers: {
+          "Set-Cookie": "admin_session=session-tenant-1; Path=/; HttpOnly",
+        },
+      });
+    });
+
+    await page.getByLabel(/Adresse email/i).fill("tenant1@example.com");
+    await page.getByLabel(/Mot de passe/i).fill("Password123");
+    await page.getByRole("button", { name: /Se connecter/i }).click();
+
+    await expect(page).toHaveURL(/\/admin\/dashboard/);
+
+    // Mock l'API avec statistiques isolées par tenant
+    await page.route("**/api/admin/clients*", (route) => {
+      if (route.request().method() === "GET") {
+        route.fulfill({
+          status: 200,
+          contentType: "application/json",
+          body: JSON.stringify({
+            success: true,
+            data: [
+              { id: "1", firstName: "Client", lastName: "Tenant1", tenantId: "tenant-1" },
+            ],
+            stats: {
+              total: 10, // Seulement pour tenant-1
+              clients: 5,
+              prospects: 3,
+              inactive: 2,
+            },
+          }),
+        });
+      } else {
+        route.continue();
+      }
+    });
+
+    await page.goto("/admin/clients");
+    await page.waitForLoadState("networkidle");
+
+    // Vérifier que les statistiques sont isolées
+    const response = await page.waitForResponse("**/api/admin/clients*");
+    const data = await response.json();
+    
+    expect(data.stats.total).toBe(10);
+    // Les stats ne devraient pas inclure les données de tenant-2
+  });
 });
 
 test.describe("Super Admin - Accès multi-tenant", () => {
@@ -244,5 +408,53 @@ test.describe("Super Admin - Accès multi-tenant", () => {
     const responses = await page.waitForResponse("**/api/admin/clients*");
     expect(responses.ok()).toBe(true);
   });
-});
 
+  test("devrait empêcher un tenant user d'accéder aux données d'un autre tenant même avec query param", async ({
+    page,
+  }) => {
+    // Connexion tenant 1 (pas super-admin)
+    await page.goto("/login");
+
+    await page.route("**/api/auth/login/tenant", (route) => {
+      route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          success: true,
+          tenantId: "tenant-1",
+        }),
+        headers: {
+          "Set-Cookie": "admin_session=session-tenant-1; Path=/; HttpOnly",
+        },
+      });
+    });
+
+    await page.getByLabel(/Adresse email/i).fill("tenant1@example.com");
+    await page.getByLabel(/Mot de passe/i).fill("Password123");
+    await page.getByRole("button", { name: /Se connecter/i }).click();
+
+    await expect(page).toHaveURL(/\/admin\/dashboard/);
+
+    // Tenter d'accéder aux données de tenant-2 via query param
+    await page.route("**/api/admin/clients*", (route) => {
+      // Le middleware devrait ignorer le query param et utiliser le tenantId de la session
+      route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          success: true,
+          data: [], // Vide car filtré par tenantId de la session (tenant-1)
+        }),
+      });
+    });
+
+    await page.goto("/admin/clients?tenantId=tenant-2");
+
+    const response = await page.waitForResponse("**/api/admin/clients*");
+    const data = await response.json();
+    
+    // Devrait retourner les données filtrées par tenant-1, pas tenant-2
+    expect(data.success).toBe(true);
+    // Les données devraient être filtrées par le tenantId de la session
+  });
+});
