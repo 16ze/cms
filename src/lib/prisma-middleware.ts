@@ -9,6 +9,7 @@
 import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { enhancedLogger } from "@/lib/logger";
+import { requiresTenantIsolation, guardTenantIsolation } from "./prisma/tenant-guard";
 
 /**
  * Contexte tenant pour le middleware Prisma
@@ -37,30 +38,11 @@ export function tenantIsolationMiddleware(): Prisma.Middleware {
   return async (params, next) => {
     const { model, action, args } = params;
 
-    // Modèles qui nécessitent l'isolation tenant
-    const tenantIsolatedModels = [
-      "Client",
-      "BeautyBusiness",
-      "BeautyTreatment",
-      "BeautyAppointment",
-      "BeautyProfessional",
-      "BeautyClient",
-      "BeautyProfessionalSchedule",
-      "BeautyProduct",
-      "TenantUser",
-      "FrontendContent",
-      "SiteSection",
-      "SiteMedia",
-      "SiteButton",
-      "RestaurantReservation",
-      "Reservation",
-      "Project",
-      "WellnessCourse",
-      "WellnessCoach",
-    ];
+    // Vérifier l'isolation tenant avec le guard
+    guardTenantIsolation(model, action, args);
 
     // Si le modèle nécessite l'isolation et qu'on a un tenantId
-    if (tenantIsolatedModels.includes(model) && currentTenantId) {
+    if (requiresTenantIsolation(model) && currentTenantId) {
       // Pour les opérations de lecture (findMany, findUnique, etc.)
       if (action.startsWith("find") || action === "count" || action === "aggregate") {
         if (!args.where) {

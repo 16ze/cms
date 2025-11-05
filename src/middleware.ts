@@ -1,8 +1,11 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { rateLimit, applySecurityHeaders } from "@/lib/security";
+import { applySecureHeaders } from "@/lib/secure-headers";
+import { applyRateLimit, adminRateLimiter, superAdminRateLimiter } from "@/lib/rate-limit";
 import { setTenantContext } from "@/lib/prisma-middleware";
 import { getAuthenticatedUser } from "@/lib/tenant-auth";
+import { enhancedLogger } from "@/lib/logger";
+import { v4 as uuidv4 } from "uuid";
 
 /**
  * MIDDLEWARE MULTI-TENANT AVEC SÉCURITÉ RENFORCÉE
@@ -14,48 +17,90 @@ import { getAuthenticatedUser } from "@/lib/tenant-auth";
  * - Protection contre les attaques courantes
  */
 
-// Rate limiting pour les routes API
-const apiRateLimit = rateLimit({
-  windowMs: 60000, // 1 minute
-  maxRequests: 100, // 100 requêtes par minute
-});
-
-// Rate limiting plus strict pour les routes d'authentification
-const authRateLimit = rateLimit({
-  windowMs: 60000, // 1 minute
-  maxRequests: 5, // 5 tentatives par minute
-});
+/**
+ * MIDDLEWARE MULTI-TENANT AVEC SÉCURITÉ RENFORCÉE
+ * ===============================================
+ *
+ * - Rate limiting global avec Upstash Redis
+ * - Headers de sécurité renforcés
+ * - Détection tenant pour isolation
+ * - Protection contre les attaques courantes
+ * - Blocage des routes admin non authentifiées
+ */
 
 export async function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
+  const requestId = uuidv4();
 
-  // Appliquer rate limiting sur les routes API
-  if (pathname.startsWith("/api")) {
-    // Rate limiting plus strict pour les routes d'auth
-    if (pathname.startsWith("/api/auth/login") || pathname.startsWith("/api/auth/tenant")) {
-      const authLimitResponse = authRateLimit(request);
-      if (authLimitResponse) {
-        return applySecurityHeaders(authLimitResponse);
+  // 🔒 Bloquer l'accès public aux routes admin et super-admin
+  if (
+    pathname.startsWith("/api/admin") ||
+    pathname.startsWith("/api/super-admin")
+  ) {
+    const user = await getAuthenticatedUser(request);
+    
+    if (!user) {
+      enhancedLogger.warn("Unauthorized access attempt to admin route", {
+        requestId,
+        path: pathname,
+        ip: request.headers.get("x-forwarded-for") || request.ip || "unknown",
+      });
+      
+      return applySecureHeaders(
+        NextResponse.json(
+          {
+            success: false,
+            error: "Unauthorized",
+            message: "Authentication required",
+          },
+          { status: 401 }
+        )
+      );
+    }
+
+    // Appliquer rate limiting spécifique selon le type d'utilisateur
+    if (pathname.startsWith("/api/super-admin")) {
+      const rateLimitResponse = await applyRateLimit(request, superAdminRateLimiter);
+      if (rateLimitResponse) {
+        return rateLimitResponse;
       }
     } else {
-      // Rate limiting standard pour les autres routes API
-      const apiLimitResponse = apiRateLimit(request);
-      if (apiLimitResponse) {
-        return applySecurityHeaders(apiLimitResponse);
+      const rateLimitResponse = await applyRateLimit(request, adminRateLimiter);
+      if (rateLimitResponse) {
+        return rateLimitResponse;
       }
     }
 
     // Définir le contexte tenant pour Prisma
+    if (user.tenantId) {
+      setTenantContext(user.tenantId);
+      enhancedLogger.api("info", request.method, pathname, undefined, {
+        requestId,
+        userId: user.id,
+        tenantId: user.tenantId,
+        userType: user.type,
+      });
+    } else if (user.type === "SUPER_ADMIN") {
+      // Super admin peut accéder à tous les tenants via query param
+      const tenantId = request.nextUrl.searchParams.get("tenantId");
+      if (tenantId) {
+        setTenantContext(tenantId);
+      }
+    }
+  }
+
+  // Appliquer rate limiting sur les autres routes API
+  if (pathname.startsWith("/api") && !pathname.startsWith("/api/admin") && !pathname.startsWith("/api/super-admin")) {
+    const rateLimitResponse = await applyRateLimit(request);
+    if (rateLimitResponse) {
+      return rateLimitResponse;
+    }
+
+    // Définir le contexte tenant pour Prisma (si authentifié)
     try {
       const user = await getAuthenticatedUser(request);
       if (user?.tenantId) {
         setTenantContext(user.tenantId);
-      } else {
-        // Essayer de récupérer depuis query params (pour Super Admin)
-        const tenantId = request.nextUrl.searchParams.get("tenantId");
-        if (tenantId) {
-          setTenantContext(tenantId);
-        }
       }
     } catch (error) {
       // Ignorer les erreurs d'authentification ici (gérées par les routes)
@@ -80,11 +125,11 @@ export async function middleware(request: NextRequest) {
       pathname.includes(".") ||
       pathname === "/maintenance"
     ) {
-      return applySecurityHeaders(NextResponse.next());
+      return applySecureHeaders(NextResponse.next());
     }
 
     // Rediriger vers la page de maintenance
-    return applySecurityHeaders(
+    return applySecureHeaders(
       NextResponse.redirect(new URL("/maintenance", request.url))
     );
   }
@@ -96,22 +141,26 @@ export async function middleware(request: NextRequest) {
     !pathname.startsWith("/api") &&
     !pathname.startsWith("/super-admin")
   ) {
-    return applySecurityHeaders(
+    return applySecureHeaders(
       NextResponse.rewrite(new URL("/beaute", request.url))
     );
   }
 
   // Laisser passer toutes les autres requêtes avec headers de sécurité
   const response = NextResponse.next();
-  return applySecurityHeaders(response);
+  return applySecureHeaders(response);
 }
 
 // Configuration pour spécifier sur quelles routes le middleware s'applique
 export const config = {
   matcher: [
-    // Routes admin protégées
+    // Routes API (doivent être protégées)
+    "/api/:path*",
+    // Routes admin
     "/admin/:path*",
-    // Exclure la page de login admin et les routes API
-    "/((?!login|api|_next/static|_next/image|favicon.ico).*)",
+    // Routes super-admin
+    "/super-admin/:path*",
+    // Toutes les autres routes sauf les ressources statiques
+    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:ico|png|jpg|jpeg|gif|svg|webp|css|js|woff|woff2|ttf|eot)).*)",
   ],
 };

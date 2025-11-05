@@ -22,6 +22,10 @@ export interface LogContext {
   endpoint?: string;
   statusCode?: number;
   duration?: number;
+  method?: string;
+  path?: string;
+  ip?: string;
+  userAgent?: string;
   [key: string]: unknown;
 }
 

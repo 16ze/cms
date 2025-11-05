@@ -1,5 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import { initializePrismaMiddleware } from "./prisma-middleware";
+import { createPrismaMonitoringMiddleware } from "./monitoring/metrics";
 
 // PrismaClient est attaché au scope global en développement pour éviter
 // d'épuiser les connexions pendant les hot-reloads
@@ -16,12 +17,18 @@ export const prisma =
 
 if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
 
-// Initialiser le middleware d'isolation tenant
+// Initialiser les middlewares Prisma
 if (typeof window === "undefined") {
   try {
+    // Middleware d'isolation tenant
     initializePrismaMiddleware();
+    
+    // Middleware de monitoring (si activé)
+    if (process.env.ENABLE_METRICS === "true") {
+      prisma.$use(createPrismaMonitoringMiddleware());
+    }
   } catch (error) {
-    // Éviter les erreurs si le middleware est déjà initialisé
+    // Éviter les erreurs si les middlewares sont déjà initialisés
     console.warn("Prisma middleware initialization skipped:", error);
   }
 }
