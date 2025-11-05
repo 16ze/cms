@@ -93,8 +93,6 @@ Si vous voyez des erreurs, vérifiez :
 - Que le DSN commence bien par `https://`
 - Que votre projet Sentry est actif
 
-### 4. Vérifier la configuration via le script
-
 ## 📊 Utilisation en Production
 
 ### Environnements Recommandés
