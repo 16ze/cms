@@ -31,11 +31,17 @@ Cet audit de sécurité a été effectué sur le CMS multi-tenant KAIRO Digital 
 - ✅ **Permissions-Policy**: camera=(), microphone=(), geolocation=()
 - 📁 **Fichier** : `next.config.ts`, `src/lib/security.ts`
 
-#### 3. Validation des Entrées
+#### 3. Validation des Entrées avec Zod
 - ✅ **Zod** : Validation Zod standardisée pour toutes les routes API
 - ✅ **Helpers** : `validateRequest()`, `validateQueryParams()`, `validateRouteParams()`
 - ✅ **Sanitization** : Fonctions de sanitization XSS pour les inputs
-- 📁 **Fichier** : `src/lib/validation.ts`, `src/lib/security.ts`
+- ✅ **Routes protégées** :
+  - `/api/auth/login/tenant` ✅
+  - `/api/auth/login/super-admin` ✅
+  - `/api/contact` ✅
+  - `/api/booking/reservation` ✅
+  - `/api/admin/clients` (POST) ✅
+- 📁 **Fichier** : `src/lib/validation.ts`
 
 #### 4. Isolation Multi-Tenant Prisma
 - ✅ **Middleware Prisma** : Isolation automatique par tenantId
@@ -96,7 +102,7 @@ Cet audit de sécurité a été effectué sur le CMS multi-tenant KAIRO Digital 
 
 1. **Isolation Multi-Tenant** : Isolation robuste avec middleware Prisma
 2. **Headers de Sécurité** : Tous les headers requis sont présents
-3. **Validation** : Framework Zod configuré et prêt à l'emploi
+3. **Validation Zod** : Framework Zod configuré et appliqué sur routes critiques
 4. **Logging** : Système de logging structuré complet
 5. **Monitoring** : Sentry et OTEL configurés
 6. **Rate Limiting** : Protection contre les abus de requêtes
@@ -104,39 +110,33 @@ Cet audit de sécurité a été effectué sur le CMS multi-tenant KAIRO Digital 
 ### ⚠️ Points d'Attention
 
 1. **npm audit** : Certaines vulnérabilités peuvent nécessiter des mises à jour
-2. **Validation Zod** : À appliquer progressivement sur toutes les routes API existantes
+   - `axios` : Version 1.0.0 - 1.11.0 (DoS attack)
+   - `@playwright/test` : Vulnérabilités dans certaines versions
+   - `brace-expansion` : Regex DoS (low severity)
+   - `@eslint/plugin-kit` : Regex DoS (low severity)
+2. **Validation Zod** : Appliquée sur routes critiques, à étendre progressivement
 3. **CSP** : Content-Security-Policy peut nécessiter des ajustements selon les besoins
 
 ---
 
 ## 🔧 Actions Recommandées
 
-### Priorité Haute
+### Priorité Haute ✅ (EN COURS)
 
-1. **Appliquer la validation Zod** sur toutes les routes API existantes
-   ```typescript
-   // Exemple d'utilisation
-   import { validateRequest } from "@/lib/validation";
-   import { z } from "zod";
-   
-   const schema = z.object({
-     email: z.string().email(),
-     name: z.string().min(1),
-   });
-   
-   const validation = await validateRequest(request, schema);
-   if (!validation.success) {
-     return validation.response;
-   }
-   ```
+1. ✅ **Appliquer la validation Zod** sur toutes les routes API critiques
+   - ✅ Routes d'authentification
+   - ✅ Route de contact
+   - ✅ Route de réservation
+   - ✅ Route de création de clients
+   - ⏳ À étendre sur les autres routes progressivement
 
-2. **Vérifier et corriger les vulnérabilités npm**
+2. ⏳ **Vérifier et corriger les vulnérabilités npm**
    ```bash
    npm audit
-   npm audit fix
+   npm audit fix --legacy-peer-deps  # Si nécessaire
    ```
 
-3. **Configurer les variables d'environnement Sentry**
+3. ⏳ **Configurer les variables d'environnement Sentry**
    - Ajouter `NEXT_PUBLIC_SENTRY_DSN` dans `.env.local`
    - Configurer `SENTRY_ORG` et `SENTRY_PROJECT` si nécessaire
 
@@ -222,6 +222,8 @@ OTEL_ENABLED=true
 LOG_LEVEL=info
 ```
 
+Un fichier `env.example` est disponible à la racine avec toutes les variables documentées.
+
 ---
 
 ## 📚 Documentation
@@ -235,7 +237,11 @@ LOG_LEVEL=info
 
 ## ✅ Checklist de Déploiement
 
-- [ ] Variables d'environnement configurées
+- [x] Variables d'environnement documentées (`env.example`)
+- [x] Rate limiting configuré
+- [x] Headers de sécurité vérifiés
+- [x] Validation Zod appliquée sur routes critiques
+- [x] Middleware Prisma configuré
 - [ ] npm audit exécuté et vulnérabilités corrigées
 - [ ] Tests de sécurité passés
 - [ ] Build de production réussi
