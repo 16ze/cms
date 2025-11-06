@@ -5,8 +5,11 @@
  * Composants optimisés avec lazy loading et code splitting
  */
 
+"use client";
+
 import dynamic from "next/dynamic";
 import { Suspense } from "react";
+import React from "react";
 
 /**
  * Lazy load le composant LivePreview (chargé uniquement quand nécessaire)
@@ -58,6 +61,7 @@ export const GoogleAnalyticsLazy = dynamic(
   () => import("@/components/GoogleAnalytics"),
   {
     ssr: false,
+    loading: () => null, // Ne rien afficher pendant le chargement
   }
 );
 
@@ -68,11 +72,13 @@ export const ConditionalChatbotLazy = dynamic(
   () => import("@/components/conditional-chatbot"),
   {
     ssr: false,
+    loading: () => null, // Ne rien afficher pendant le chargement
   }
 );
 
 /**
- * Wrapper Suspense pour les composants lazy
+ * Wrapper Suspense pour les composants lazy avec gestion d'erreur
+ * Les composants enfants doivent avoir ssr: false pour éviter les erreurs de réhydratation
  */
 export function LazyComponentWrapper({
   children,
@@ -81,6 +87,8 @@ export function LazyComponentWrapper({
   children: React.ReactNode;
   fallback?: React.ReactNode;
 }) {
+  // Toujours rendre Suspense de la même manière côté serveur et client
+  // Les composants enfants avec ssr: false ne seront pas rendus côté serveur
   return (
     <Suspense
       fallback={

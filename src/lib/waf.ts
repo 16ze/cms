@@ -11,9 +11,14 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
-import * as Sentry from "@sentry/nextjs";
 import { secureErrorResponse } from "./secure-headers";
-import { enhancedLogger } from "./logger";
+
+// Logger Edge-compatible (pas d'import de pino)
+// Toujours utiliser logger-edge dans le middleware (Edge Runtime)
+const enhancedLogger = require("./logger-edge").enhancedLogger;
+
+// Sentry désactivé dans Edge Runtime (pas compatible)
+let Sentry: any = null;
 
 export interface WAFResult {
   blocked: boolean;
@@ -43,8 +48,8 @@ const XSS_PATTERNS = [
  */
 const SQLI_PATTERNS = [
   /(\b(SELECT|INSERT|UPDATE|DELETE|DROP|CREATE|ALTER|EXEC|EXECUTE|UNION|CAST|CONVERT)\b)/i,
-  /('|("|;|\s|^)(OR|AND)\s+\d+\s*=\s*\d+/i,
-  /('|("|;|\s|^)(OR|AND)\s+'[^']*'\s*=\s*'[^']*'/i,
+  /('|"|;|\s|^)(OR|AND)\s+\d+\s*=\s*\d+/i,
+  /('|"|;|\s|^)(OR|AND)\s+'[^']*'\s*=\s*'[^']*'/i,
   /(\bOR\b\s+\d+\s*=\s*\d+\s*--)/i,
   /(\bUNION\b.*\bSELECT\b)/i,
   /(\bDROP\b.*\bTABLE\b)/i,
@@ -179,24 +184,79 @@ function checkPayloadSize(request: NextRequest): WAFResult | null {
 }
 
 /**
+ * Headers HTTP standards à exclure de l'analyse WAF
+ * Ces headers sont normaux et peuvent contenir des patterns suspects mais sont sûrs
+ */
+const SAFE_HTTP_HEADERS = [
+  'accept',
+  'accept-encoding',
+  'accept-language',
+  'accept-charset',
+  'user-agent',
+  'referer',
+  'origin',
+  'connection',
+  'cache-control',
+  'content-length',
+  'content-type',
+  'content-encoding',
+  'content-language',
+  'cookie', // Header cookie standard (contient les tokens de session)
+  'dnt',
+  'upgrade-insecure-requests',
+  'sec-fetch-site',
+  'sec-fetch-mode',
+  'sec-fetch-user',
+  'sec-fetch-dest',
+  'sec-ch-ua',
+  'sec-ch-ua-mobile',
+  'sec-ch-ua-platform',
+];
+
+/**
+ * Routes à exclure du WAF
+ * Ces routes peuvent recevoir des données qui déclenchent des faux positifs
+ */
+const WAF_EXCLUDED_ROUTES = [
+  '/api/security/report', // Route de rapport CSP qui peut contenir des patterns suspects dans les rapports
+  '/api/public/design', // Route publique pour le design (pas de risques de sécurité)
+  '/api/settings', // Route publique pour les paramètres (si utilisée côté client)
+  '/api/auth/login', // Routes de login - nécessitent des mots de passe qui peuvent déclencher des faux positifs
+  '/api/auth/login/', // Routes de login avec slash
+  '/api/auth/me', // Route de vérification de session - doit être accessible sans authentification pour vérifier si l'utilisateur est connecté
+];
+
+/**
  * Analyser une requête avec le WAF
  */
 export async function analyzeRequest(request: NextRequest): Promise<WAFResult> {
+  // Exclure certaines routes du WAF
+  const pathname = request.nextUrl.pathname;
+  if (WAF_EXCLUDED_ROUTES.some(route => pathname.startsWith(route))) {
+    return { blocked: false };
+  }
+
   // Vérifier la taille du payload
   const sizeCheck = checkPayloadSize(request);
   if (sizeCheck) {
     return sizeCheck;
   }
 
-  // Analyser les headers
+  // Analyser les headers (exclure les headers HTTP standards pour éviter les faux positifs)
   const headers: Record<string, string> = {};
   request.headers.forEach((value, key) => {
-    headers[key] = value;
+    // Ignorer les headers HTTP standards qui peuvent contenir des patterns suspects mais sont sûrs
+    if (!SAFE_HTTP_HEADERS.includes(key.toLowerCase())) {
+      headers[key] = value;
+    }
   });
 
-  const headersResult = analyzeValue(headers, "headers");
-  if (headersResult) {
-    return headersResult;
+  // Analyser seulement les headers non standards
+  if (Object.keys(headers).length > 0) {
+    const headersResult = analyzeValue(headers, "headers");
+    if (headersResult) {
+      return headersResult;
+    }
   }
 
   // Analyser les query params
@@ -282,21 +342,23 @@ export async function applyWAF(
       reason: wafResult.reason,
     });
 
-    // Envoyer à Sentry pour monitoring
-    Sentry.captureMessage("WAF: Requête bloquée", {
-      level: wafResult.severity === "critical" ? "error" : "warning",
-      tags: {
-        waf: true,
-        severity: wafResult.severity,
-        reason: wafResult.reason,
-      },
-      extra: {
-        ip,
-        userAgent,
-        path: request.nextUrl.pathname,
-        method: request.method,
-      },
-    });
+    // Envoyer à Sentry pour monitoring (seulement si disponible et pas en Edge Runtime)
+    if (Sentry) {
+      Sentry.captureMessage("WAF: Requête bloquée", {
+        level: wafResult.severity === "critical" ? "error" : "warning",
+        tags: {
+          waf: true,
+          severity: wafResult.severity,
+          reason: wafResult.reason,
+        },
+        extra: {
+          ip,
+          userAgent,
+          path: request.nextUrl.pathname,
+          method: request.method,
+        },
+      });
+    }
 
     // Retourner une réponse d'erreur générique
     return secureErrorResponse(

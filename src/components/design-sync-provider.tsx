@@ -12,18 +12,20 @@ export function DesignSyncProvider({ children }: DesignSyncProviderProps) {
 
  // Appliquer les paramètres de design au chargement
  useEffect(() => {
- if (designSettings && !loading) {
- // Les couleurs sont automatiquement appliquées par le hook
- console.log("✅ Paramètres de design synchronisés:", designSettings);
- }
+   if (designSettings && !loading) {
+     // Les couleurs sont automatiquement appliquées par le hook
+     console.log("✅ Paramètres de design synchronisés:", designSettings);
+   }
  }, [designSettings, loading]);
 
  // Gérer les erreurs de synchronisation
  useEffect(() => {
- if (error) {
- console.warn("⚠️ Erreur de synchronisation design:", error);
- }
+   if (error) {
+     console.warn("⚠️ Erreur de synchronisation design:", error);
+   }
  }, [error]);
 
+ // Toujours rendre les enfants de la même manière côté serveur et client
+ // Le hook useClientDesignSync gère déjà le montage côté client
  return <>{children}</>;
 }

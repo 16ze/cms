@@ -4,9 +4,42 @@
  *
  * Intégration OpenTelemetry et métriques Prometheus
  * pour le monitoring des performances et de la sécurité
+ * 
+ * Note: prom-client n'est pas compatible avec Edge Runtime
+ * Ce module ne doit être utilisé que dans Node.js Runtime
  */
 
-import { Counter, Histogram, register } from "prom-client";
+// Détecter Edge Runtime - si on est en Edge Runtime, ne pas charger prom-client
+const isEdgeRuntime = typeof process === "undefined" || process.env.NEXT_RUNTIME === "edge";
+
+// Import conditionnel de prom-client (uniquement en Node.js Runtime)
+let Counter: any, Histogram: any, register: any;
+
+if (!isEdgeRuntime) {
+  try {
+    const promClient = require("prom-client");
+    Counter = promClient.Counter;
+    Histogram = promClient.Histogram;
+    register = promClient.register;
+  } catch (error) {
+    console.warn("prom-client not available:", error);
+  }
+} else {
+  // Créer des stubs pour Edge Runtime
+  Counter = class {
+    constructor() {}
+    inc() {}
+  };
+  Histogram = class {
+    constructor() {}
+    observe() {}
+  };
+  register = {
+    metrics: () => Promise.resolve(""),
+    resetMetrics: () => {},
+  };
+}
+
 import { enhancedLogger } from "@/lib/logger";
 
 /**

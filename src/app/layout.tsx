@@ -227,7 +227,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="fr">
+    <html lang="fr" data-scroll-behavior="smooth">
       <head>
         <link rel="canonical" href={companyData.company.seo.siteUrl} />
         <link
@@ -337,9 +337,6 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-white text-black min-h-screen`}
       >
-        {/* Google Analytics et GTM - Chargés conditionnellement depuis /admin/settings */}
-        <GoogleAnalytics />
-
         <ThemeProvider
           attribute="class"
           defaultTheme="light"

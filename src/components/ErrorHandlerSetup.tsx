@@ -13,7 +13,8 @@ import { setupGlobalErrorHandler } from "@/lib/errors";
 
 export function ErrorHandlerSetup() {
   useEffect(() => {
-    // Initialiser le gestionnaire d'erreurs global
+    // Initialiser le gestionnaire d'erreurs global IMMÉDIATEMENT
+    // Doit être appelé avant tout autre code pour intercepter les erreurs dès le début
     setupGlobalErrorHandler();
   }, []);
 

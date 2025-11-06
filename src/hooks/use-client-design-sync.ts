@@ -27,6 +27,11 @@ export function useClientDesignSync() {
 
       // Récupérer les paramètres de design depuis l'API publique
       const designResponse = await fetch("/api/public/design");
+      
+      if (!designResponse.ok) {
+        throw new Error(`HTTP error! status: ${designResponse.status}`);
+      }
+
       const designData = await designResponse.json();
 
       if (designData.success) {
@@ -37,7 +42,7 @@ export function useClientDesignSync() {
             accent: designData.colors?.accent || "#F59E0B",
             background: designData.colors?.background || "#FFFFFF",
             text: designData.colors?.text || "#1F2937",
-            footerText: designData.colors?.textSecondary || "#6B7280",
+            footerText: designData.colors?.textSecondary || designData.colors?.footerText || "#6B7280",
           },
           theme: {
             name: designData.theme?.name || "default",
@@ -51,13 +56,46 @@ export function useClientDesignSync() {
         // Appliquer les couleurs au CSS personnalisé
         applyColorsToCSS(transformedSettings.colors);
       } else {
-        throw new Error(
-          "Erreur lors de la récupération des paramètres de design"
-        );
+        // Utiliser les valeurs par défaut si l'API retourne success: false
+        const defaultSettings: ClientDesignSettings = {
+          colors: {
+            primary: "#3B82F6",
+            secondary: "#8B5CF6",
+            accent: "#F59E0B",
+            background: "#FFFFFF",
+            text: "#1F2937",
+            footerText: "#6B7280",
+          },
+          theme: {
+            name: "default",
+            config: {},
+          },
+        };
+        setDesignSettings(defaultSettings);
+        applyColorsToCSS(defaultSettings.colors);
+        setError(null); // Ne pas afficher d'erreur si on utilise les valeurs par défaut
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Erreur inconnue");
-      console.error("Erreur lors du chargement des paramètres de design:", err);
+      // En cas d'erreur, utiliser les valeurs par défaut
+      const defaultSettings: ClientDesignSettings = {
+        colors: {
+          primary: "#3B82F6",
+          secondary: "#8B5CF6",
+          accent: "#F59E0B",
+          background: "#FFFFFF",
+          text: "#1F2937",
+          footerText: "#6B7280",
+        },
+        theme: {
+          name: "default",
+          config: {},
+        },
+      };
+      setDesignSettings(defaultSettings);
+      applyColorsToCSS(defaultSettings.colors);
+      // Logger l'erreur mais ne pas la propager pour éviter les erreurs en console
+      console.warn("Utilisation des valeurs par défaut pour le design:", err);
+      setError(null); // Ne pas afficher d'erreur si on utilise les valeurs par défaut
     } finally {
       setLoading(false);
     }

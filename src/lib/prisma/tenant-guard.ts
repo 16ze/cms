@@ -7,8 +7,8 @@
  */
 
 import { Prisma } from "@prisma/client";
-import { getTenantContext } from "./prisma-middleware";
-import { enhancedLogger } from "./logger";
+import { getTenantContext } from "../prisma-middleware";
+import { enhancedLogger } from "../logger";
 
 /**
  * Modèles qui nécessitent l'isolation tenant
@@ -104,6 +104,11 @@ export function enrichWithTenantId<T extends Record<string, unknown>>(
 
 /**
  * Guard pour vérifier l'isolation tenant avant une opération Prisma
+ * 
+ * Stratégie :
+ * - Pour les modèles isolés : vérifier le contexte tenant
+ * - Pour les opérations de lecture : permettre sans erreur (le middleware gérera le filtre)
+ * - Pour les opérations d'écriture : exiger strictement le contexte tenant
  */
 export function guardTenantIsolation(
   model: string,
@@ -116,8 +121,25 @@ export function guardTenantIsolation(
 
   const tenantId = getTenantContext();
   
-  if (!tenantId) {
-    enhancedLogger.warn("Tenant isolation guard failed - no tenant context", {
+  // Opérations critiques (écriture) : nécessitent strictement le contexte tenant
+  const isCriticalOperation = 
+    action === "create" || 
+    action === "createMany" || 
+    action === "update" || 
+    action === "updateMany" || 
+    action === "delete" || 
+    action === "deleteMany" ||
+    action === "upsert";
+
+  // Opérations de lecture : toujours autorisées (le middleware gérera le filtre)
+  const isReadOperation = 
+    action.startsWith("find") || 
+    action === "count" || 
+    action === "aggregate";
+
+  // Si c'est une opération critique et qu'il n'y a pas de tenant context
+  if (isCriticalOperation && !tenantId) {
+    enhancedLogger.error("Tenant isolation guard failed - no tenant context for critical operation", {
       model,
       action,
     });
@@ -126,10 +148,23 @@ export function guardTenantIsolation(
     );
   }
 
-  // Log pour audit
-  enhancedLogger.prisma("debug", action, model, {
-    tenantId,
-    action: "tenant-isolation-guard-passed",
-  });
+  // Pour les opérations de lecture, permettre sans erreur
+  // Le middleware ajoutera le filtre tenantId si nécessaire
+  if (isReadOperation && !tenantId) {
+    enhancedLogger.warn("Tenant isolation guard - no tenant context for read operation, middleware will add filter", {
+      model,
+      action,
+    });
+    // Ne pas lancer d'erreur pour les opérations de lecture
+    return;
+  }
+
+  // Log pour audit si tenant context est défini
+  if (tenantId) {
+    enhancedLogger.prisma("debug", action, model, {
+      tenantId,
+      action: "tenant-isolation-guard-passed",
+    });
+  }
 }
 

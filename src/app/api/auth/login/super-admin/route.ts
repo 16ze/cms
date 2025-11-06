@@ -7,6 +7,13 @@ import { NextRequest, NextResponse } from "next/server";
 import { loginSuperAdmin } from "@/lib/tenant-auth";
 import { setSecureCookie } from "@/lib/cookie-utils";
 import { validateRequest, commonSchemas } from "@/lib/validation";
+import {
+  ADMIN_SESSION_COOKIE,
+  ADMIN_SESSION_MAX_AGE_SECONDS,
+  getAdminSessionSecret,
+  signAdminSession,
+} from "@/lib/admin-session";
+import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 
 const loginSchema = z.object({
@@ -36,19 +43,53 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Récupérer les informations complètes du SuperAdmin pour créer la session
+    const normalizedEmail = email.trim().toLowerCase();
+    const superAdmin = await prisma.superAdmin.findUnique({
+      where: { email: normalizedEmail },
+    });
+
+    if (!superAdmin) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Utilisateur non trouvé",
+        },
+        { status: 401 }
+      );
+    }
+
+    // Créer les données de session (format unifié avec les autres routes)
+    const sessionData = {
+      email: superAdmin.email,
+      name: superAdmin.name || superAdmin.email.split("@")[0],
+      id: superAdmin.id,
+      role: "SUPER_ADMIN" as const,
+      loginTime: new Date().toISOString(),
+    };
+
+    // Créer le token signé avec signAdminSession (comme les autres routes)
+    const token = signAdminSession(
+      sessionData,
+      getAdminSessionSecret(),
+      ADMIN_SESSION_MAX_AGE_SECONDS
+    );
+
     // Créer la response avec le cookie de session
     const response = NextResponse.json({
       success: true,
       message: "Connexion réussie",
       user: {
         type: "SUPER_ADMIN",
-        email,
+        email: superAdmin.email,
+        name: superAdmin.name,
+        id: superAdmin.id,
       },
     });
 
-    // Définir le cookie de session avec les paramètres sécurisés standardisés
-    setSecureCookie(response, "auth_session", result.token!, {
-      maxAge: 60 * 60 * 24 * 7, // 7 jours
+    // Définir le cookie de session avec le nom correct (ADMIN_SESSION_COOKIE)
+    setSecureCookie(response, ADMIN_SESSION_COOKIE, token, {
+      maxAge: ADMIN_SESSION_MAX_AGE_SECONDS,
     });
 
     return response;

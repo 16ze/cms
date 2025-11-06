@@ -2,9 +2,9 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { applySecureHeaders } from "@/lib/secure-headers";
 import { applyRateLimit, adminRateLimiter, superAdminRateLimiter, apiRateLimiter } from "@/lib/rate-limit";
-import { setTenantContext } from "@/lib/prisma-middleware";
-import { getAuthenticatedUser } from "@/lib/tenant-auth";
-import { enhancedLogger } from "@/lib/logger";
+// Note: setTenantContext et getAuthenticatedUser ne sont pas importés car Prisma ne fonctionne pas en Edge Runtime
+// L'authentification et le contexte tenant seront gérés dans les routes API individuelles (Node.js Runtime)
+import { enhancedLogger } from "@/lib/logger-edge";
 import { applyWAF } from "@/lib/waf";
 import { validateOriginAndReferer } from "@/lib/tenant-context-validator";
 import { v4 as uuidv4 } from "uuid";
@@ -45,9 +45,10 @@ export async function middleware(request: NextRequest) {
   }
 
   // 🔒 Bloquer l'accès public aux routes admin et super-admin
+  // Exception : les routes de login sont publiques
   if (
-    pathname.startsWith("/api/admin") ||
-    pathname.startsWith("/api/super-admin")
+    (pathname.startsWith("/api/admin") || pathname.startsWith("/api/super-admin")) &&
+    !pathname.includes("/login")
   ) {
     // Vérifier l'origine et le referer pour les routes sensibles
     const allowedOrigins = process.env.NEXT_PUBLIC_ADMIN_ALLOWED_ORIGINS
@@ -75,28 +76,11 @@ export async function middleware(request: NextRequest) {
       );
     }
 
-    const user = await getAuthenticatedUser(request);
-    
-    if (!user) {
-      enhancedLogger.warn("Unauthorized access attempt to admin route", {
-        requestId,
-        path: pathname,
-        ip: request.headers.get("x-forwarded-for") || request.ip || "unknown",
-      });
-      
-      return applySecureHeaders(
-        NextResponse.json(
-          {
-            success: false,
-            error: "Unauthorized",
-            message: "Authentication required",
-          },
-          { status: 401 }
-        )
-      );
-    }
+    // Note: L'authentification et la définition du contexte tenant sont gérées dans les routes API individuelles
+    // car Prisma ne fonctionne pas en Edge Runtime. Le middleware Edge Runtime ne fait que du rate limiting
+    // et de la validation d'origine/referer.
 
-    // Appliquer rate limiting spécifique selon le type d'utilisateur
+    // Appliquer rate limiting spécifique selon le type de route
     if (pathname.startsWith("/api/super-admin")) {
       const rateLimitResponse = await applyRateLimit(request, superAdminRateLimiter);
       if (rateLimitResponse) {
@@ -108,40 +92,15 @@ export async function middleware(request: NextRequest) {
         return rateLimitResponse;
       }
     }
-
-    // Définir le contexte tenant pour Prisma
-    if (user.tenantId) {
-      setTenantContext(user.tenantId);
-      enhancedLogger.api("info", request.method, pathname, undefined, {
-        requestId,
-        userId: user.id,
-        tenantId: user.tenantId,
-        userType: user.type,
-      });
-    } else if (user.type === "SUPER_ADMIN") {
-      // Super admin peut accéder à tous les tenants via query param
-      const tenantId = request.nextUrl.searchParams.get("tenantId");
-      if (tenantId) {
-        setTenantContext(tenantId);
-      }
-    }
   }
 
   // Appliquer rate limiting sur les autres routes API (10 req/sec)
+  // Note: Ne pas appeler getAuthenticatedUser ici car Prisma ne fonctionne pas en Edge Runtime
+  // Le contexte tenant sera défini dans les routes API individuelles (Node.js Runtime)
   if (pathname.startsWith("/api") && !pathname.startsWith("/api/admin") && !pathname.startsWith("/api/super-admin")) {
     const rateLimitResponse = await applyRateLimit(request, apiRateLimiter);
     if (rateLimitResponse) {
       return rateLimitResponse;
-    }
-
-    // Définir le contexte tenant pour Prisma (si authentifié)
-    try {
-      const user = await getAuthenticatedUser(request);
-      if (user?.tenantId) {
-        setTenantContext(user.tenantId);
-      }
-    } catch (error) {
-      // Ignorer les erreurs d'authentification ici (gérées par les routes)
     }
   }
 

@@ -11,8 +11,12 @@ import { useEffect, useState } from 'react';
 export default function GoogleAnalytics() {
   const [gaId, setGaId] = useState<string | null>(null);
   const [gtmId, setGtmId] = useState<string | null>(null);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    // Marquer comme monté pour éviter les erreurs de réhydratation
+    setMounted(true);
+
     // Récupérer les IDs depuis les paramètres du site
     async function fetchAnalyticsIds() {
       try {
@@ -52,6 +56,11 @@ export default function GoogleAnalytics() {
     fetchAnalyticsIds();
   }, []);
 
+  // Ne rien rendre avant le montage côté client pour éviter les erreurs de réhydratation
+  if (!mounted) {
+    return null;
+  }
+
   return (
     <>
       {/* Google Analytics (GA4) - Conditionnel */}
@@ -60,6 +69,12 @@ export default function GoogleAnalytics() {
           <Script
             src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`}
             strategy="afterInteractive"
+            onError={(e) => {
+              // Ignorer les erreurs de chargement en développement
+              if (process.env.NODE_ENV === 'development') {
+                console.warn('Erreur chargement GA:', e);
+              }
+            }}
           />
           <Script id="google-analytics" strategy="afterInteractive">
             {`
@@ -77,15 +92,27 @@ export default function GoogleAnalytics() {
       {/* Google Tag Manager (GTM) - Conditionnel */}
       {gtmId && (
         <>
-          <Script id="google-tag-manager" strategy="afterInteractive">
-            {`
-              (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-              new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-              j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-              'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-              })(window,document,'script','dataLayer','${gtmId}');
-            `}
-          </Script>
+          {/* Utiliser Next.js Script component avec dangerouslySetInnerHTML
+              Le script GTM utilise uniquement appendChild pour éviter les erreurs DOM */}
+          <Script
+            id="google-tag-manager"
+            strategy="afterInteractive"
+            dangerouslySetInnerHTML={{
+              __html: `
+                (function(w,d,s,l,i){
+                  w[l]=w[l]||[];
+                  w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});
+                  var j=d.createElement(s);
+                  j.async=true;
+                  j.src='https://www.googletagmanager.com/gtm.js?id='+i;
+                  d.head.appendChild(j);
+                })(window,document,'script','dataLayer','${gtmId}');
+              `,
+            }}
+            onError={() => {
+              // Ignorer silencieusement les erreurs de chargement
+            }}
+          />
           <noscript>
             <iframe
               src={`https://www.googletagmanager.com/ns.html?id=${gtmId}`}

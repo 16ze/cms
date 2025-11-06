@@ -52,7 +52,19 @@ function DashboardContent() {
   useEffect(() => {
     const checkUserType = async () => {
       try {
-        const response = await fetch("/api/auth/me");
+        const response = await fetch("/api/auth/me", {
+          credentials: "include", // Important pour inclure les cookies
+        });
+
+        // Ignorer les erreurs 401/403 (utilisateur non connecté)
+        if (!response.ok) {
+          if (response.status === 401 || response.status === 403) {
+            return; // Utilisateur non connecté, continuer normalement
+          }
+          console.error("Erreur vérification utilisateur:", response.status);
+          return;
+        }
+
         const data = await response.json();
 
         if (data.success && data.user.type === "SUPER_ADMIN") {
@@ -61,6 +73,7 @@ function DashboardContent() {
           return;
         }
       } catch (error) {
+        // Ignorer les erreurs de réseau
         console.error("Erreur vérification utilisateur:", error);
       }
     };

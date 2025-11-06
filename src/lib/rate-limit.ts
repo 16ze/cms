@@ -10,7 +10,10 @@ import { Ratelimit } from "@upstash/ratelimit";
 import { Redis } from "@upstash/redis";
 import { NextRequest, NextResponse } from "next/server";
 import { secureErrorResponse } from "./secure-headers";
-import { enhancedLogger } from "./logger";
+
+// Logger Edge-compatible (pas d'import de pino)
+// Toujours utiliser logger-edge dans le middleware (Edge Runtime)
+const enhancedLogger = require("./logger-edge").enhancedLogger;
 
 // Instance Redis pour le rate limiting
 const redis = new Redis({

@@ -5,9 +5,8 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
-
-const prisma = new PrismaClient();
+import { prisma } from "@/lib/prisma";
+import { setTenantContext } from "@/lib/prisma-middleware";
 
 // GET - Récupérer les avis Google publics
 export async function GET(request: NextRequest) {
@@ -22,6 +21,9 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ success: true, data: [] });
     }
 
+    // Définir le contexte tenant pour le middleware Prisma
+    setTenantContext(tenant.id);
+
     const reviews = await prisma.googleReview.findMany({
       where: {
         tenantId: tenant.id,
@@ -30,8 +32,13 @@ export async function GET(request: NextRequest) {
       orderBy: [{ orderIndex: "asc" }, { date: "desc" }],
     });
 
+    // Nettoyer le contexte tenant après la requête
+    setTenantContext(null);
+
     return NextResponse.json({ success: true, data: reviews });
   } catch (error) {
+    // Nettoyer le contexte tenant en cas d'erreur
+    setTenantContext(null);
     console.error("❌ Erreur récupération avis Google:", error);
     return NextResponse.json({ success: true, data: [] });
   }

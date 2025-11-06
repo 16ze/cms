@@ -9,10 +9,33 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
-import { getAuthenticatedUser } from "./tenant-auth";
-import { prisma } from "./prisma";
 import { secureErrorResponse } from "./secure-headers";
-import { enhancedLogger } from "./logger";
+
+// Logger Edge-compatible (pas d'import de pino)
+// Toujours utiliser logger-edge dans le middleware (Edge Runtime)
+const enhancedLogger = require("./logger-edge").enhancedLogger;
+
+// Import conditionnel de Prisma et tenant-auth (uniquement en Node.js Runtime)
+// Ces imports ne doivent pas être évalués en Edge Runtime
+let prisma: any = null;
+let getAuthenticatedUser: any = null;
+
+// Détecter si on est en Edge Runtime
+const isEdgeRuntime = typeof process === "undefined" || process.env.NEXT_RUNTIME === "edge";
+
+if (!isEdgeRuntime) {
+  // Import dynamique uniquement en Node.js Runtime
+  try {
+    const prismaModule = require("./prisma");
+    prisma = prismaModule.prisma;
+    
+    const tenantAuthModule = require("./tenant-auth");
+    getAuthenticatedUser = tenantAuthModule.getAuthenticatedUser;
+  } catch (error) {
+    // Si les imports échouent, les fonctions seront null
+    // Cela ne devrait pas arriver en Node.js Runtime
+  }
+}
 
 /**
  * Valider le contexte tenant d'une requête
@@ -26,6 +49,15 @@ export async function validateTenantContext(
   | { valid: true; tenantId: string; tenantSlug: string | null }
   | { valid: false; response: NextResponse }
 > {
+  // Cette fonction nécessite Prisma et ne peut pas être utilisée en Edge Runtime
+  if (isEdgeRuntime || !prisma || !getAuthenticatedUser) {
+    enhancedLogger.warn("validateTenantContext called in Edge Runtime or Prisma not available");
+    return {
+      valid: false,
+      response: secureErrorResponse("Service unavailable", 503),
+    };
+  }
+
   try {
     // Récupérer l'utilisateur authentifié
     const user = await getAuthenticatedUser(request);

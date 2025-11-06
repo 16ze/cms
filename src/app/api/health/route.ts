@@ -7,11 +7,9 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "@/lib/prisma";
 import { enhancedLogger } from "@/lib/logger";
 import { withApiLogging } from "@/lib/api-wrapper";
-
-const prisma = new PrismaClient();
 
 interface HealthStatus {
   status: "healthy" | "degraded" | "unhealthy";

@@ -240,6 +240,14 @@ export async function loginSuperAdmin(
     // Normaliser l'email (lowercase et trim)
     const normalizedEmail = email.trim().toLowerCase();
     
+    // Log en développement pour le débogage
+    if (process.env.NODE_ENV === "development") {
+      console.log("🔍 [loginSuperAdmin] Tentative de connexion:", {
+        email: normalizedEmail,
+        passwordLength: password.length,
+      });
+    }
+
     const superAdmin = await prisma.superAdmin.findUnique({
       where: { email: normalizedEmail },
       // Note: isActive n'est pas dans la clause where car Prisma ne supporte pas
@@ -247,6 +255,13 @@ export async function loginSuperAdmin(
     });
 
     if (!superAdmin) {
+      // Log en développement pour aider au débogage
+      if (process.env.NODE_ENV === "development") {
+        const allSuperAdmins = await prisma.superAdmin.findMany({
+          select: { email: true, isActive: true },
+        });
+        console.log("❌ [loginSuperAdmin] SuperAdmin non trouvé. SuperAdmins existants:", allSuperAdmins);
+      }
       return { success: false, error: "Email ou mot de passe incorrect" };
     }
 
@@ -258,6 +273,9 @@ export async function loginSuperAdmin(
     const isPasswordValid = await bcrypt.compare(password, superAdmin.password);
 
     if (!isPasswordValid) {
+      if (process.env.NODE_ENV === "development") {
+        console.log("❌ [loginSuperAdmin] Mot de passe invalide pour:", normalizedEmail);
+      }
       return { success: false, error: "Email ou mot de passe incorrect" };
     }
 
@@ -341,7 +359,23 @@ export function logout(): NextResponse {
     message: "Déconnexion réussie",
   });
 
+  // Supprimer tous les cookies de session possibles
+  // Pour compatibilité avec l'ancien système (auth_session) et le nouveau (admin_session)
   response.cookies.delete("auth_session");
+  response.cookies.delete("admin_session");
+  
+  // Supprimer aussi avec set pour s'assurer que le cookie est bien supprimé
+  response.cookies.set("auth_session", "", {
+    maxAge: -1,
+    expires: new Date(0),
+    path: "/",
+  });
+  
+  response.cookies.set("admin_session", "", {
+    maxAge: -1,
+    expires: new Date(0),
+    path: "/",
+  });
 
   return response;
 }

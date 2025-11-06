@@ -79,48 +79,42 @@ function calculateBundleChecksum(): string {
 
 /**
  * Détecter les extensions navigateur suspectes
+ * Version allégée pour réduire les faux positifs en développement
  */
 function detectMaliciousExtensions(): string[] {
   const detected: string[] = [];
 
   if (typeof window === "undefined") return detected;
 
+  // Désactiver en développement pour éviter les faux positifs avec les DevTools
+  const isDevelopment = process.env.NODE_ENV === "development";
+  if (isDevelopment) {
+    return detected; // Ne pas détecter les extensions en développement
+  }
+
   try {
-    // Vérifier les objets globaux ajoutés par des extensions
-    const suspiciousGlobals = [
-      "__WEBPACK_DEVTOOLS__",
-      "__REACT_DEVTOOLS__",
-      "chrome",
-      "mozExtension",
-    ];
+    // Vérifier uniquement les scripts injectés vraiment suspects (pas les extensions normales)
+    const suspiciousScripts = Array.from(document.querySelectorAll("script[src]")).filter(
+      (script) => {
+        const src = script.getAttribute("src");
+        return (
+          src &&
+          (src.includes("chrome-extension://") ||
+            src.includes("moz-extension://") ||
+            src.includes("extension://")) &&
+          !src.includes("webpack") && // Ignorer les scripts de développement
+          !src.includes("react-devtools") // Ignorer les DevTools React
+        );
+      }
+    );
 
-    for (const global of suspiciousGlobals) {
-      if (global in window && global !== "chrome") {
-        // chrome est normal dans Chrome, mais vérifier les propriétés suspectes
-        const chromeObj = (window as unknown as { chrome?: unknown }).chrome;
-        if (chromeObj && typeof chromeObj === "object") {
-          const chromeKeys = Object.keys(chromeObj);
-          if (chromeKeys.some((key) => key.includes("extension") || key.includes("runtime"))) {
-            detected.push(`Extension Chrome détectée: ${chromeKeys.join(", ")}`);
-          }
+    if (suspiciousScripts.length > 0) {
+      suspiciousScripts.forEach((script) => {
+        const src = script.getAttribute("src");
+        if (src && !src.includes("localhost") && !src.includes("127.0.0.1")) {
+          detected.push(`Script extension suspect détecté: ${src}`);
         }
-      }
-    }
-
-    // Vérifier les modifications de prototypes
-    const nativePrototypes = [
-      Array.prototype,
-      Object.prototype,
-      String.prototype,
-      Function.prototype,
-    ];
-
-    for (const proto of nativePrototypes) {
-      const ownProps = Object.getOwnPropertyNames(proto);
-      if (ownProps.length > 0) {
-        // Des extensions peuvent modifier les prototypes
-        detected.push(`Modification prototype détectée: ${proto.constructor.name}`);
-      }
+      });
     }
   } catch (error) {
     console.warn("Erreur lors de la détection d'extensions:", error);
@@ -207,6 +201,13 @@ export function useSecurityWatchdog(config: WatchdogConfig = {}) {
   const [threats, setThreats] = useState<string[]>([]);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const checksumRef = useRef<string | null>(null);
+  const threatsSeenRef = useRef<Set<string>>(new Set()); // Pour éviter les doublons
+  const onThreatDetectedRef = useRef(onThreatDetected); // Ref pour éviter les re-renders
+
+  // Mettre à jour le ref quand le callback change
+  useEffect(() => {
+    onThreatDetectedRef.current = onThreatDetected;
+  }, [onThreatDetected]);
 
   useEffect(() => {
     // Initialiser le checksum du bundle
@@ -219,8 +220,11 @@ export function useSecurityWatchdog(config: WatchdogConfig = {}) {
     const performCheck = () => {
       const detectedThreats: string[] = [];
 
-      // 1. Vérifier l'intégrité du bundle
-      if (checkBundleIntegrity && typeof window !== "undefined") {
+      // En développement, désactiver les vérifications strictes qui causent des faux positifs
+      const isDevelopment = process.env.NODE_ENV === "development";
+
+      // 1. Vérifier l'intégrité du bundle (uniquement en production)
+      if (checkBundleIntegrity && typeof window !== "undefined" && !isDevelopment) {
         const currentChecksum = calculateBundleChecksum();
         if (checksumRef.current && currentChecksum !== checksumRef.current && currentChecksum) {
           const threat = createThreatContext(
@@ -234,10 +238,14 @@ export function useSecurityWatchdog(config: WatchdogConfig = {}) {
           reportThreat(threat);
           detectedThreats.push("Altération du bundle détectée");
         }
+        // Mettre à jour le checksum seulement si on n'a pas détecté de menace
+        if (detectedThreats.length === 0) {
+          checksumRef.current = currentChecksum;
+        }
       }
 
-      // 2. Vérifier window.__proto__
-      if (!checkWindowPrototype()) {
+      // 2. Vérifier window.__proto__ (uniquement en production)
+      if (!isDevelopment && !checkWindowPrototype()) {
         const threat = createThreatContext(
           ThreatType.DOM_INJECTION,
           "watchdog",
@@ -250,8 +258,8 @@ export function useSecurityWatchdog(config: WatchdogConfig = {}) {
         detectedThreats.push("Modification de window.__proto__ détectée");
       }
 
-      // 3. Vérifier document.cookie
-      if (!checkCookieIntegrity()) {
+      // 3. Vérifier document.cookie (uniquement en production)
+      if (!isDevelopment && !checkCookieIntegrity()) {
         const threat = createThreatContext(
           ThreatType.DOM_INJECTION,
           "watchdog",
@@ -264,7 +272,7 @@ export function useSecurityWatchdog(config: WatchdogConfig = {}) {
         detectedThreats.push("Intégrité des cookies compromise");
       }
 
-      // 4. Détecter les extensions malicieuses
+      // 4. Détecter les extensions malicieuses (version allégée)
       if (checkBrowserExtensions && typeof window !== "undefined") {
         const extensions = detectMaliciousExtensions();
         if (extensions.length > 0) {
@@ -283,46 +291,25 @@ export function useSecurityWatchdog(config: WatchdogConfig = {}) {
         }
       }
 
-      // 5. Vérifier les scripts injectés
-      if (typeof document !== "undefined") {
-        const scripts = Array.from(document.querySelectorAll("script"));
-        const suspiciousScripts = scripts.filter((script) => {
-          const src = script.getAttribute("src");
-          return (
-            src &&
-            (src.includes("chrome-extension://") ||
-              src.includes("moz-extension://") ||
-              src.includes("extension://"))
-          );
-        });
-
-        if (suspiciousScripts.length > 0) {
-          suspiciousScripts.forEach((script) => {
-            const threat = createThreatContext(
-              ThreatType.SCRIPT_INJECTION,
-              "watchdog",
-              `Suspicious script detected: ${script.getAttribute("src")}`,
-              {
-                stack: new Error().stack,
-              }
-            );
-            reportThreat(threat);
-            detectedThreats.push(`Script suspect: ${script.getAttribute("src")}`);
-          });
+      // Si des menaces sont détectées, filtrer celles déjà vues
+      const newThreats = detectedThreats.filter((threat) => {
+        if (!threatsSeenRef.current.has(threat)) {
+          threatsSeenRef.current.add(threat);
+          return true;
         }
-      }
+        return false;
+      });
 
-      // Si des menaces sont détectées
-      if (detectedThreats.length > 0) {
-        setThreats((prev) => [...prev, ...detectedThreats]);
+      if (newThreats.length > 0) {
+        setThreats((prev) => [...prev, ...newThreats]);
 
-        // Appeler le callback
-        if (onThreatDetected) {
-          detectedThreats.forEach((threat) => onThreatDetected(threat));
+        // Appeler le callback uniquement pour les nouvelles menaces
+        if (onThreatDetectedRef.current) {
+          newThreats.forEach((threat) => onThreatDetectedRef.current?.(threat));
         }
 
-        // Forcer logout si configuré
-        if (forceLogoutOnTampering && detectedThreats.length > 0) {
+        // Forcer logout si configuré (une seule fois par type de menace)
+        if (forceLogoutOnTampering && newThreats.length > 0) {
           console.error("🚨 Altération détectée - Déconnexion forcée");
           Sentry.captureMessage("Security tampering detected - forcing logout", {
             level: "error",
@@ -331,7 +318,7 @@ export function useSecurityWatchdog(config: WatchdogConfig = {}) {
             },
           });
 
-          // Flush cache et rediriger vers login
+          // Flush cache et rediriger vers login (une seule fois)
           try {
             localStorage.clear();
             sessionStorage.clear();
@@ -359,8 +346,8 @@ export function useSecurityWatchdog(config: WatchdogConfig = {}) {
     checkInterval,
     checkBundleIntegrity,
     checkBrowserExtensions,
-    onThreatDetected,
     forceLogoutOnTampering,
+    // onThreatDetected est géré via ref pour éviter les re-renders
   ]);
 
   return {

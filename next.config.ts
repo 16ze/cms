@@ -19,17 +19,18 @@ const nextConfig: NextConfig = {
         key: "Content-Security-Policy",
         value: `
           default-src 'self';
-          script-src 'self' 'unsafe-inline' 'strict-dynamic' https:;
+          script-src 'self' ${isDev ? "'unsafe-inline' 'unsafe-eval'" : "'unsafe-inline' 'strict-dynamic'"} ${isDev ? "http://localhost:* http://127.0.0.1:*" : ""} https:;
           style-src 'self' 'unsafe-inline';
           img-src 'self' data: https:;
           font-src 'self' data:;
-          connect-src 'self' https://api.sentry.io ${isDev ? "http://localhost:* ws://localhost:*" : ""};
+          connect-src 'self' https://api.sentry.io https://*.ingest.sentry.io https://*.ingest.de.sentry.io https://*.google-analytics.com https://*.googletagmanager.com ${isDev ? "http://localhost:* ws://localhost:* ws://127.0.0.1:*" : ""};
+          worker-src 'self' blob: ${isDev ? "http://localhost:* http://127.0.0.1:*" : ""};
           frame-ancestors 'none';
           base-uri 'self';
           form-action 'self';
           object-src 'none';
           frame-src 'none';
-          upgrade-insecure-requests;
+          ${isDev ? "" : "upgrade-insecure-requests;"}
           report-uri /api/security/report;
         `
           .replace(/\s{2,}/g, " ")

@@ -15,6 +15,17 @@ export async function GET(request: NextRequest) {
     const sessionResult = verifyAdminSessionFromRequest(request);
 
     if (!sessionResult.success) {
+      // En développement, logger la raison de l'échec pour le débogage
+      if (process.env.NODE_ENV === "development") {
+        const cookieValue = request.cookies.get("admin_session")?.value;
+        console.log("🔍 [auth/me] Échec authentification:", {
+          reason: sessionResult.error,
+          hasCookie: !!cookieValue,
+          cookieLength: cookieValue?.length || 0,
+          allCookies: Array.from(request.cookies.getAll()).map(c => c.name),
+        });
+      }
+
       return NextResponse.json(
         {
           success: false,

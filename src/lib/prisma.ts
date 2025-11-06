@@ -1,6 +1,5 @@
 import { PrismaClient } from "@prisma/client";
 import { initializePrismaMiddleware } from "./prisma-middleware";
-import { createPrismaMonitoringMiddleware } from "./monitoring/metrics";
 
 // PrismaClient est attaché au scope global en développement pour éviter
 // d'épuiser les connexions pendant les hot-reloads
@@ -23,9 +22,19 @@ if (typeof window === "undefined") {
     // Middleware d'isolation tenant
     initializePrismaMiddleware();
     
-    // Middleware de monitoring (si activé)
-    if (process.env.ENABLE_METRICS === "true") {
-      prisma.$use(createPrismaMonitoringMiddleware());
+    // Middleware de monitoring (si activé et pas en Edge Runtime)
+    // Utiliser un import dynamique pour éviter le chargement de prom-client en Edge Runtime
+    const isEdgeRuntime = typeof process === "undefined" || process.env.NEXT_RUNTIME === "edge";
+    
+    if (process.env.ENABLE_METRICS === "true" && !isEdgeRuntime) {
+      // Import dynamique pour éviter le chargement de prom-client en Edge Runtime
+      import("./monitoring/metrics")
+        .then(({ createPrismaMonitoringMiddleware }) => {
+          prisma.$use(createPrismaMonitoringMiddleware());
+        })
+        .catch((error) => {
+          console.warn("Failed to load monitoring middleware:", error);
+        });
     }
   } catch (error) {
     // Éviter les erreurs si les middlewares sont déjà initialisés

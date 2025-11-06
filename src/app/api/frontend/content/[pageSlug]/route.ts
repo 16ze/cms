@@ -5,9 +5,8 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
-
-const prisma = new PrismaClient();
+import { prisma } from "@/lib/prisma";
+import { setTenantContext } from "@/lib/prisma-middleware";
 
 // GET - Récupérer le contenu frontend public
 export async function GET(
@@ -27,6 +26,9 @@ export async function GET(
       return NextResponse.json({ success: true, data: {} });
     }
 
+    // Définir le contexte tenant pour le middleware Prisma
+    setTenantContext(tenant.id);
+
     const contents = await prisma.frontendContent.findMany({
       where: {
         tenantId: tenant.id,
@@ -36,9 +38,14 @@ export async function GET(
       orderBy: [{ orderIndex: "asc" }, { createdAt: "desc" }],
     });
 
+    // Nettoyer le contexte tenant après la requête
+    setTenantContext(null);
+
     // ✅ Plus besoin de parser - le contenu est déjà en JSON natif
     return NextResponse.json({ success: true, data: contents });
   } catch (error) {
+    // Nettoyer le contexte tenant en cas d'erreur
+    setTenantContext(null);
     console.error("❌ Erreur récupération contenu frontend:", error);
     return NextResponse.json({ success: true, data: [] });
   }

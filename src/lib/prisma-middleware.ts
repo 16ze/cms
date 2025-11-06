@@ -38,19 +38,44 @@ export function tenantIsolationMiddleware(): Prisma.Middleware {
   return async (params, next) => {
     const { model, action, args } = params;
 
-    // Vérifier l'isolation tenant avec le guard
-    guardTenantIsolation(model, action, args);
+    // Vérifier l'isolation tenant avec le guard (peut lancer une erreur pour les opérations critiques)
+    // Ignorer les erreurs du guard pour les modèles qui ne nécessitent pas d'isolation
+    if (model && requiresTenantIsolation(model)) {
+      try {
+        guardTenantIsolation(model, action, args);
+      } catch (error) {
+        // Si le guard lance une erreur, la propager (opération critique sans tenant context)
+        enhancedLogger.error("Tenant guard failed", error as Error, {
+          model,
+          action,
+        });
+        throw error;
+      }
+    }
+
+    // Si pas de modèle, laisser passer (opérations système Prisma)
+    if (!model) {
+      return await next(params);
+    }
 
     // Si le modèle nécessite l'isolation et qu'on a un tenantId
-    if (requiresTenantIsolation(model) && currentTenantId) {
+    if (model && requiresTenantIsolation(model) && currentTenantId) {
       // Pour les opérations de lecture (findMany, findUnique, etc.)
       if (action.startsWith("find") || action === "count" || action === "aggregate") {
         if (!args.where) {
           args.where = {};
         }
 
-        // Ajouter le filtre tenantId
-        args.where.tenantId = currentTenantId;
+        // Ajouter le filtre tenantId seulement si le modèle nécessite l'isolation
+        try {
+          args.where.tenantId = currentTenantId;
+        } catch (error) {
+          // Si le modèle n'a pas de champ tenantId, ignorer l'erreur
+          enhancedLogger.warn("Cannot add tenantId filter - model may not have tenantId field", {
+            model,
+            action,
+          });
+        }
 
         enhancedLogger.prisma("debug", action, model, {
           tenantId: currentTenantId,

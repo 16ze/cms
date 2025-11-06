@@ -91,10 +91,25 @@ export default function SuperAdminDashboard() {
 
   const checkAuth = async () => {
     try {
-      const response = await fetch("/api/auth/me");
+      const response = await fetch("/api/auth/me", {
+        credentials: "include", // Important pour inclure les cookies
+      });
+      
+      if (!response.ok) {
+        // Si 401 ou 403, rediriger vers login
+        if (response.status === 401 || response.status === 403) {
+          router.push("/super-admin/login");
+          return;
+        }
+        // Autres erreurs HTTP
+        console.error("Erreur auth:", response.status, response.statusText);
+        router.push("/super-admin/login");
+        return;
+      }
+
       const data = await response.json();
 
-      if (!response.ok || !data.success) {
+      if (!data.success) {
         router.push("/super-admin/login");
         return;
       }
@@ -284,11 +299,21 @@ Il pourra se connecter sur: ${window.location.origin}/login`;
             <button
               onClick={async () => {
                 try {
-                  await fetch("/api/auth/logout", { method: "POST" });
-                  router.push("/super-admin/login");
+                  // Déconnexion avec suppression du cookie
+                  await fetch("/api/auth/logout", {
+                    method: "POST",
+                    credentials: "include", // Important pour inclure les cookies
+                  });
+                  
+                  // Utiliser window.location.href pour forcer une redirection complète
+                  // Ajouter ?logout=true pour indiquer qu'on vient de se déconnecter
+                  // Cela évite que la vérification d'authentification sur la page de login
+                  // détecte encore l'utilisateur connecté (cookie pas encore supprimé côté client)
+                  window.location.href = "/super-admin/login?logout=true";
                 } catch (error) {
                   console.error("Erreur déconnexion:", error);
-                  router.push("/super-admin/login");
+                  // Même en cas d'erreur, forcer la redirection
+                  window.location.href = "/super-admin/login?logout=true";
                 }
               }}
               className="px-6 py-3 bg-red-500/20 hover:bg-red-500/30 text-white rounded-lg border border-red-500/50 transition-all"
